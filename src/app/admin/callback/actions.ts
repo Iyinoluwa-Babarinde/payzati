@@ -1,6 +1,6 @@
 'use server';
 
-import { getAuthenticatedClient } from '@/lib/ilp/client';
+import { getAuthenticatedClient, normalizePaymentPointer } from '@/lib/ilp/client';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
 export async function processMasterCallback(url: string) {
@@ -15,8 +15,9 @@ export async function processMasterCallback(url: string) {
   const client = await getAuthenticatedClient();
   if (!client) throw new Error('Authenticated client credentials missing or invalid');
 
-  const masterWallet = process.env.PAYZATI_WALLET_ADDRESS;
-  if (!masterWallet) throw new Error('PAYZATI_WALLET_ADDRESS not set');
+  const rawMasterWallet = process.env.PAYZATI_WALLET_ADDRESS;
+  if (!rawMasterWallet) throw new Error('PAYZATI_WALLET_ADDRESS not set');
+  const masterWallet = normalizePaymentPointer(rawMasterWallet);
 
   const supabase = await createServerClient();
   

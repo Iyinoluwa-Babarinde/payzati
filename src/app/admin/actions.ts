@@ -1,19 +1,23 @@
 'use server';
 
-import { getAuthenticatedClient, getUnauthenticatedClient } from '@/lib/ilp/client';
+import { getAuthenticatedClient, getUnauthenticatedClient, normalizePaymentPointer } from '@/lib/ilp/client';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
-export async function initiateMasterAuthorization() {
-  const masterWallet = process.env.PAYZATI_WALLET_ADDRESS;
-  if (!masterWallet) throw new Error('PAYZATI_WALLET_ADDRESS not set in .env.local');
+export async function initiateMasterAuthorization(limitUSD: number = 10000000) {
+  const rawMasterWallet = process.env.PAYZATI_WALLET_ADDRESS;
+  if (!rawMasterWallet) throw new Error('PAYZATI_WALLET_ADDRESS not set in environment variables');
 
+  const masterWallet = normalizePaymentPointer(rawMasterWallet);
   const unauthClient = await getUnauthenticatedClient();
   const client = await getAuthenticatedClient();
   if (!client) throw new Error('Authenticated client credentials missing or invalid');
 
   const walletAddress = await unauthClient.walletAddress.get({ url: masterWallet });
 
-  // Request a massive, long-lived outgoing payment grant
+  // Value calculation: amount * 10^scale (USD has scale 2)
+  const debitValue = String(Math.round(limitUSD * 100));
+
+  // Request a long-lived outgoing payment grant
   const grant = await client.grant.request(
     { url: walletAddress.authServer },
     {
@@ -25,7 +29,7 @@ export async function initiateMasterAuthorization() {
             identifier: masterWallet,
             limits: {
               debitAmount: {
-                value: '10000000000', // $10,000,000.00
+                value: debitValue,
                 assetCode: 'USD',
                 assetScale: 2,
               },
@@ -59,4 +63,14 @@ export async function initiateMasterAuthorization() {
   }
 
   throw new Error('Failed to get interaction redirect URL');
+}
+
+export async function getAdminConfigStatus() {
+  const rawMasterWallet = process.env.PAYZATI_WALLET_ADDRESS;
+  return {
+    walletAddress: rawMasterWallet ? normalizePaymentPointer(rawMasterWallet) : '',
+    hasPrivateKey: !!process.env.ILP_PRIVATE_KEY,
+    hasKeyId: !!process.env.ILP_KEY_ID,
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  };
 }

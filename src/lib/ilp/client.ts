@@ -9,6 +9,17 @@ import crypto from 'crypto';
 let authenticatedClient: AuthenticatedClient | null = null;
 let unauthenticatedClient: UnauthenticatedClient | null = null;
 
+export function normalizePaymentPointer(pointer: string): string {
+  if (!pointer) return '';
+  let url = pointer.trim();
+  if (url.startsWith('$')) {
+    url = 'https://' + url.substring(1);
+  } else if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    url = 'https://' + url;
+  }
+  return url;
+}
+
 export async function getUnauthenticatedClient(): Promise<UnauthenticatedClient> {
   if (!unauthenticatedClient) {
     unauthenticatedClient = await createUnauthenticatedClient({ validateResponses: false });
@@ -18,14 +29,16 @@ export async function getUnauthenticatedClient(): Promise<UnauthenticatedClient>
 
 export async function getAuthenticatedClient(): Promise<AuthenticatedClient | null> {
   if (authenticatedClient) return authenticatedClient;
-  const walletAddress = process.env.PAYZATI_WALLET_ADDRESS;
+  const rawWalletAddress = process.env.PAYZATI_WALLET_ADDRESS;
   const privateKey = process.env.ILP_PRIVATE_KEY;
   const keyId = process.env.ILP_KEY_ID;
 
-  if (!walletAddress || !privateKey || !keyId) {
+  if (!rawWalletAddress || !privateKey || !keyId) {
     console.warn('[ILP] Missing credentials — unable to create authenticated client');
     return null;
   }
+
+  const walletAddress = normalizePaymentPointer(rawWalletAddress);
 
   try {
     const keyObject = crypto.createPrivateKey({

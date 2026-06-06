@@ -1,6 +1,6 @@
 'use server';
 
-import { getAuthenticatedClient, getUnauthenticatedClient } from './client';
+import { getAuthenticatedClient, getUnauthenticatedClient, normalizePaymentPointer } from './client';
 
 export interface PaymentResult {
   id: string;
@@ -61,11 +61,14 @@ export async function processPayment(
   amount: number,
   currency: string
 ): Promise<PaymentResult> {
-  const masterWallet = process.env.PAYZATI_WALLET_ADDRESS;
+  const masterWallet = normalizePaymentPointer(process.env.PAYZATI_WALLET_ADDRESS || '');
   if (!masterWallet) {
     console.warn('[ILP] PAYZATI_WALLET_ADDRESS not set, using simulation');
     return simulatePayment(senderWallet, receiverWallet, amount, currency);
   }
+
+  receiverWallet = normalizePaymentPointer(receiverWallet);
+  senderWallet = normalizePaymentPointer(senderWallet);
 
   try {
     const client = await getAuthenticatedClient();
