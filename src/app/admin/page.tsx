@@ -83,24 +83,23 @@ export default function AdminPortal() {
           </div>
           <div>
             <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>Admin Dashboard</h1>
-            <span style={{ fontSize: '0.78125rem', color: 'var(--text-tertiary)' }}>Hey there! Let&apos;s get your main wallet linked up so we can get started.</span>
+            <span style={{ fontSize: '0.78125rem', color: 'var(--text-tertiary)' }}>Hey there! Let&apos;s connect your master wallet to set up your payroll flow.</span>
           </div>
         </div>
 
         <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: '1.6', fontSize: 'var(--text-sm)' }}>
-          Welcome! Before we can start sending out payments to your wonderful team, let&apos;s link up your main wallet. 
-          This lets us handle all the heavy lifting in the background so you can sit back and relax, without having to manually approve every single person&apos;s salary.
+          Welcome! To help you take care of your team, we&apos;ll link your main wallet. This lets Payzati handle the heavy lifting behind the scenes. You can sit back and watch things run automatically, with no manual payout approvals needed.
         </p>
 
         {/* Configuration Status Card */}
         <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '1.25rem', marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '0.875rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Key size={14} color="var(--accent-teal)" /> Let&apos;s check if we&apos;ve got everything ready to go
+            <Key size={14} color="var(--accent-teal)" /> Let&apos;s check if we&apos;ve got all the pieces ready to go
           </h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>Your wallet&apos;s address</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Wallet Address</span>
               {config?.walletAddress ? (
                 <span style={{ color: 'var(--accent-teal)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}>{config.walletAddress}</span>
               ) : (
@@ -109,7 +108,7 @@ export default function AdminPortal() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>Your private signature key</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Private Signature Key</span>
               {config?.hasPrivateKey ? (
                 <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Active</span>
               ) : (
@@ -118,7 +117,7 @@ export default function AdminPortal() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>Key ID check</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Key ID</span>
               {config?.hasKeyId ? (
                 <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Configured</span>
               ) : (
@@ -145,7 +144,7 @@ export default function AdminPortal() {
             {/* Interactive Limit Selector */}
             <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '1.5rem', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <label htmlFor="limit-select" style={{ fontSize: '0.875rem', fontWeight: 600 }}>How much of a safety limit would you like to set?</label>
+                <label htmlFor="limit-select" style={{ fontSize: '0.875rem', fontWeight: 600 }}>Let&apos;s set a friendly safety cap</label>
                 <select 
                   id="limit-select"
                   value={limitUSD} 
@@ -173,9 +172,8 @@ export default function AdminPortal() {
               <div style={{ display: 'flex', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <Info size={16} color="var(--accent-teal)" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div style={{ fontSize: '0.78125rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                  <strong>Wait, how does this limit work?</strong><br />
-                  Think of this as a friendly safety cap. It&apos;s just a quick heads-up to the system so we know the max amount we can send out on your behalf before checking in with you. 
-                  <span style={{ color: 'var(--accent-teal)' }}> Don&apos;t worry, you don&apos;t need to have this exact amount sitting in your account right now</span> — it&apos;s just a budget boundary to keep your funds safe and sound!
+                  <strong>How does this limit work?</strong><br />
+                  Think of this as a safety boundary. It&apos;s a quick message to let the system know the maximum we can send out on your behalf before asking for your go-ahead. You don&apos;t need this amount in your balance right now—it&apos;s just a budget cap to keep your funds safe!
                 </div>
               </div>
             </div>

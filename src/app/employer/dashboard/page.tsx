@@ -196,7 +196,7 @@ export default function EmployerDashboard() {
           </div>
           <div style={{ flex: 1 }}>
             <h3 style={{ marginBottom: '0.25rem', color: 'var(--text-primary)' }}>
-              {stats.totalEmployees === 0 ? 'Let&apos;s get you set up!' : 'Roster Active'}
+              {stats.totalEmployees === 0 ? "Let's get you set up!" : 'Roster Active'}
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '1rem' }}>
               {stats.totalEmployees === 0 
@@ -310,49 +310,8 @@ export default function EmployerDashboard() {
           </table>
         </div>
 
-        {/* Where Your Team Lives + Settlement Streak Proprietary Metric Side Card */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-          
-          {/* Settlement Streak Card */}
-          <div className="card" style={{ background: 'var(--elevation-1)' }}>
-            <div className={styles.cardHeader}>
-              <h3>Settlement health</h3>
-            </div>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginTop: '0.5rem' }}>
-              {/* Circular SVG progress bar */}
-              <div style={{ position: 'relative', width: '70px', height: '70px' }}>
-                <svg width="70" height="70" viewBox="0 0 36 36" style={{ transform: 'rotate(-90deg)' }}>
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="var(--border-default)"
-                    strokeWidth="3.5"
-                  />
-                  <path
-                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="var(--accent-teal)"
-                    strokeDasharray="100, 100"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div style={{ position: 'absolute', top: 0, left: 0, width: '70px', height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', fontWeight: 700 }}>
-                  100%
-                </div>
-              </div>
-              
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--accent-teal)' }}>
-                  <Flame size={16} fill="var(--accent-teal)" /> On-time payment streak
-                </div>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', marginTop: '4px' }}>
-                  Every single payment has gone through instantly and on time. You&apos;re doing great!
-                </p>
-              </div>
-            </div>
-          </div>
+        {/* Where Your Team Lives Side Card */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
 
           <div className={`card ${styles.distributionCard}`}>
             <div className={styles.cardHeader}>

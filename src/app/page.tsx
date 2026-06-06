@@ -178,25 +178,25 @@ export default function LandingPage() {
                   <div style={{ padding: '1.5rem', overflow: 'hidden' }}>
                     {/* Collapsed 2x2 Stats Grid to prevent overflow */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1.25rem' }}>
-                      <div className="card" style={{ padding: '0.85rem', background: 'var(--elevation-1)' }}>
+                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
                         <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Total People</div>
                         <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>142</div>
                       </div>
-                      <div className="card" style={{ padding: '0.85rem', background: 'var(--elevation-1)' }}>
+                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
                         <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Countries</div>
                         <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>12</div>
                       </div>
-                      <div className="card" style={{ padding: '0.85rem', background: 'var(--elevation-1)' }}>
+                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
                         <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Monthly Total</div>
                         <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>$145k</div>
                       </div>
-                      <div className="card" style={{ padding: '0.85rem', background: 'var(--elevation-1)' }}>
+                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
                         <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Balance</div>
                         <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>$12.4k</div>
                       </div>
                     </div>
                     
-                    <div className="card" style={{ padding: '1rem', height: '110px', background: 'var(--elevation-1)' }}>
+                    <div className={styles.mockCard} style={{ height: '110px', background: 'var(--elevation-1)' }}>
                       <table style={{ width: '100%', fontSize: '0.75rem', textAlign: 'left', borderCollapse: 'collapse' }}>
                         <thead>
                           <tr style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)' }}>
@@ -234,12 +234,12 @@ export default function LandingPage() {
                 {/* Employee Main Replica */}
                 <div style={{ padding: '1.5rem', display: 'flex', gap: '1rem', flex: 1, overflow: 'hidden' }}>
                   <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div className="card" style={{ padding: '1rem', background: 'var(--elevation-1)' }}>
+                    <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
                       <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Next Payday</div>
                       <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.75rem' }}>in 12 days</div>
-                      <div className="progress-container"><div className="progress-fill" style={{ width: '60%' }}></div></div>
+                      <div className={styles.mockProgressContainer}><div className={styles.mockProgressFill} style={{ width: '60%' }}></div></div>
                     </div>
-                    <div className="card" style={{ padding: '1rem', flex: 1, background: 'var(--elevation-1)' }}>
+                    <div className={styles.mockCard} style={{ flex: 1, background: 'var(--elevation-1)' }}>
                       <div style={{ fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Recent paystubs</div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}>
                         <span>May 2026</span><span style={{ fontWeight: 700 }}>KES 145,000</span>
@@ -250,7 +250,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div style={{ flex: 1.2 }}>
-                    <div className="card" style={{ padding: '1rem', background: 'var(--elevation-2)', borderLeft: '4px solid var(--accent-teal)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                    <div className={styles.mockCard} style={{ background: 'var(--elevation-2)', borderLeft: '4px solid var(--accent-teal)', height: '100%', display: 'flex', flexDirection: 'column' }}>
                       <div style={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Wage Access</div>
                       <div style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginBottom: '1.25rem', lineHeight: 1.4 }}>Withdraw accrued earnings instantly.</div>
                       <div style={{ marginTop: 'auto' }}>

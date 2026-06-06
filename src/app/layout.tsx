@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://payzati.com'),
   title: "Payzati — Pay Anyone. Anywhere. Instantly.",
-  description: "Global B2B Payroll & Settlement Platform powered by Interledger Protocol. Instant cross-border salary payments with near-zero fees and automatic tax compliance.",
+  description: "Global B2B B2C Payroll & Settlement Platform powered by Interledger Protocol. Instant cross-border salary payments with near-zero fees and automatic tax compliance.",
   keywords: "payroll, global payments, interledger, ILP, cross-border, salary, fintech",
 };
 
@@ -14,7 +15,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Organization',
+              name: 'Payzati',
+              url: 'https://payzati.com',
+              logo: 'https://payzati.com/logo.png',
+            }),
+          }}
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
 }
+

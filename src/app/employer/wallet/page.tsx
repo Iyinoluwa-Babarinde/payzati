@@ -9,6 +9,10 @@ import toast from 'react-hot-toast';
 
 export default function WalletPage() {
   const [showLinkModal, setShowLinkModal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [depositAmount, setDepositAmount] = useState('');
+  const [depositCurrency, setDepositCurrency] = useState('USD');
+  const [depositing, setDepositing] = useState(false);
   const [bankDetails, setBankDetails] = useState({ routing: '', account: '' });
   const [linking, setLinking] = useState(false);
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -99,6 +103,35 @@ export default function WalletPage() {
     }, 1500);
   };
 
+  const handleDeposit = async () => {
+    if (!depositAmount || isNaN(Number(depositAmount)) || Number(depositAmount) <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    setDepositing(true);
+    const supabaseClient = createClient();
+    
+    const { error: depositError } = await supabaseClient.from('transactions').insert({
+      company_id: companyId,
+      type: 'deposit',
+      amount: Number(depositAmount),
+      currency: depositCurrency,
+      status: 'completed',
+      description: 'Manual Wallet Deposit'
+    });
+
+    if (depositError) {
+      toast.error('Failed to process deposit: ' + depositError.message);
+    } else {
+      toast.success(`Successfully deposited ${formatCurrency(Number(depositAmount), depositCurrency)}!`);
+      setShowDepositModal(false);
+      setDepositAmount('');
+      // Reload page state or query transactions
+      window.location.reload();
+    }
+    setDepositing(false);
+  };
+
   const toggleAutoFund = async () => {
     const newState = !autoFund;
     setAutoFund(newState);
@@ -177,11 +210,14 @@ export default function WalletPage() {
             {loading ? '-' : formatCurrency(balance, 'USD')}
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <div style={{ flex: 1 }}>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+            <div>
               <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Total paid out</div>
               <div style={{ fontWeight: 700 }}>{loading ? '-' : formatCurrency(totalDisbursed, 'USD')}</div>
             </div>
+            <button className="btn btn-primary btn-sm" onClick={() => setShowDepositModal(true)}>
+              Deposit Funds
+            </button>
           </div>
         </div>
       </div>
@@ -273,6 +309,67 @@ export default function WalletPage() {
 
             <button className="btn btn-primary btn-lg btn-block" onClick={handleLinkBank} disabled={linking}>
               {linking ? 'Verifying Account...' : 'Connect bank account'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showDepositModal && (
+        <div className="modal-overlay" onClick={() => setShowDepositModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Deposit funds to your prepay wallet</h3>
+              <button className="btn btn-ghost btn-icon" onClick={() => setShowDepositModal(false)}><X size={16} /></button>
+            </div>
+
+            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+              <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center', color: 'var(--accent-teal)' }}><Zap size={48} /></div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>Load funds into your Payzati wallet so you can execute payouts to your global roster in seconds.</p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>Amount</label>
+                <input
+                  type="number"
+                  placeholder="e.g. 5000"
+                  value={depositAmount}
+                  onChange={e => setDepositAmount(e.target.value)}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>Currency</label>
+                <select
+                  value={depositCurrency}
+                  onChange={e => setDepositCurrency(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-default)',
+                    background: 'var(--elevation-2)',
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="KES">KES (Sh)</option>
+                  <option value="NGN">NGN (₦)</option>
+                  <option value="GHS">GHS (₵)</option>
+                  <option value="ZAR">ZAR (R)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style={{ background: 'var(--elevation-2)', padding: '1rem', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+              <Lock size={24} color="var(--status-success)" />
+              Payments are routed directly through the Interledger network. No extra fees, instant clearing.
+            </div>
+
+            <button className="btn btn-primary btn-lg btn-block" onClick={handleDeposit} disabled={depositing}>
+              {depositing ? 'Processing Deposit...' : 'Confirm Deposit'}
             </button>
           </div>
         </div>

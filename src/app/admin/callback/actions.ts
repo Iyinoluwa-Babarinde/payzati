@@ -12,14 +12,25 @@ export async function processMasterCallback(url: string) {
     throw new Error('No interact_ref found in URL');
   }
 
+  const supabase = await createServerClient();
+
+  if (interactRef.startsWith('simulated_ref')) {
+    // Add real-time timing delay (1.5 seconds) to make the handshake feel alive during demo
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Save the final simulated token
+    await supabase.from('system_config').upsert({
+      key: 'master_ilp_token',
+      value: 'simulated_long_lived_token_for_demo_day_123456789'
+    });
+    return true;
+  }
+
   const client = await getAuthenticatedClient();
   if (!client) throw new Error('Authenticated client credentials missing or invalid');
 
   const rawMasterWallet = process.env.PAYZATI_WALLET_ADDRESS;
   if (!rawMasterWallet) throw new Error('PAYZATI_WALLET_ADDRESS not set');
-  const masterWallet = normalizePaymentPointer(rawMasterWallet);
-
-  const supabase = await createServerClient();
   
   const { data, error } = await supabase.from('system_config').select('value').eq('key', 'master_grant_continue').single();
   if (error || !data) throw new Error('Could not find continue details in database');

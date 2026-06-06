@@ -118,7 +118,7 @@ export default function OnboardingTracker({ employee, onRefresh }: OnboardingTra
   return (
     <div className="card" style={{ maxWidth: '600px', margin: '4rem auto', padding: '3rem 2rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-        <h2 style={{ marginBottom: '0.5rem' }}>Let&apos;s get you set up!</h2>
+        <h2 style={{ marginBottom: '0.5rem' }}>{"Let's get you set up!"}</h2>
         <p style={{ color: 'var(--text-secondary)' }}>You&apos;re all linked up with the team at <strong>{employee.companies.name}</strong></p>
       </div>
 
