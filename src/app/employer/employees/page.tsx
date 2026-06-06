@@ -247,7 +247,7 @@ export default function EmployeesPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">The Roster</h1>
-          <p className="page-subtitle">Your cross-border team accounts.</p>
+          <p className="page-subtitle">A friendly place to manage everyone in your team.</p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
           <button className="btn btn-secondary" onClick={copyInviteCode}>
@@ -262,8 +262,8 @@ export default function EmployeesPage() {
       {company && (
         <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', background: 'var(--elevation-1)' }}>
           <div>
-            <strong>Organization Invite Code</strong>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', marginTop: '2px' }}>Share this code with employees to link their accounts directly.</p>
+            <strong>Your team invite code</strong>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', marginTop: '2px' }}>Send this code to your new hires so they can link up their accounts and onboard themselves!</p>
           </div>
           <div style={{ background: 'var(--elevation-2)', padding: '0.5rem 1rem', borderRadius: 'var(--radius-sm)', fontFamily: 'var(--font-mono)', fontSize: 'var(--text-md)', color: 'var(--accent-teal)', fontWeight: 700, border: '1px solid var(--border-default)' }}>
             {inviteCode}
@@ -360,13 +360,13 @@ export default function EmployeesPage() {
               <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--accent-teal-dim)', color: 'var(--accent-teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
                 <Users size={32} />
               </div>
-              <h3 style={{ marginBottom: '0.5rem' }}>Roster is empty</h3>
+              <h3 style={{ marginBottom: '0.5rem' }}>Your team roster is empty right now</h3>
               <p style={{ color: 'var(--text-secondary)', maxWidth: '400px', margin: '0 auto 2rem', fontSize: 'var(--text-sm)', lineHeight: '1.5' }}>
-                Add your first employee manually, or share your organization invite code so they can join and onboard themselves.
+                Let&apos;s bring some people on board! You can add them manually right now, or just share your invite code so they can set themselves up.
               </p>
               <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-                  <Plus size={16} /> Add Employee
+                  <Plus size={16} /> Add team member
                 </button>
                 <button className="btn btn-secondary" onClick={copyInviteCode}>
                   <Link2 size={16} /> Copy Invite Code
@@ -535,12 +535,12 @@ export default function EmployeesPage() {
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Add New Employee</h3>
+              <h3>Bring someone new on board</h3>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowModal(false)}><X size={16} /></button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>Full Name</label>
+                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>Their full name</label>
                 <input placeholder="Name" value={newEmp.name} onChange={e => setNewEmp({ ...newEmp, name: e.target.value })} />
               </div>
               
@@ -560,11 +560,11 @@ export default function EmployeesPage() {
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>Monthly Salary ({newEmp.currency})</label>
+                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>Monthly salary ({newEmp.currency})</label>
                 <input type="number" placeholder="Amount" value={newEmp.salary} onChange={e => setNewEmp({ ...newEmp, salary: e.target.value })} />
               </div>
               
-              <button className="btn btn-primary btn-lg" onClick={handleAdd}>Add Employee</button>
+              <button className="btn btn-primary btn-lg" onClick={handleAdd}>Add team member</button>
             </div>
           </div>
         </div>
@@ -575,7 +575,7 @@ export default function EmployeesPage() {
         <div className="modal-overlay" onClick={() => setShowApproveModal(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>{showApproveModal.onboarding_step === 'negotiation_emp_1' ? 'Final Offer: ' : 'Propose Salary: '}{showApproveModal.name}</h3>
+              <h3>{showApproveModal.onboarding_step === 'negotiation_emp_1' ? 'Final Offer: ' : 'Let&apos;s set the salary: '}{showApproveModal.name}</h3>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowApproveModal(null)}><X size={16} /></button>
             </div>
             
@@ -589,7 +589,7 @@ export default function EmployeesPage() {
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: 'var(--text-sm)' }}>
               {showApproveModal.onboarding_step === 'negotiation_emp_1' 
                 ? 'Submit your final salary offering for review.' 
-                : 'Propose location and payment scale details.'}
+                : 'Let&apos;s set the location and salary scale.'}
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -604,7 +604,7 @@ export default function EmployeesPage() {
               </div>
               
               <div>
-                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>Monthly Salary ({approveData.currency})</label>
+                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>Monthly salary ({approveData.currency})</label>
                 <input type="number" placeholder="Amount" value={approveData.salary} onChange={e => setApproveData({ ...approveData, salary: e.target.value })} />
               </div>
               

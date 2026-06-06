@@ -7,7 +7,6 @@ import {
   ShieldCheck, 
   AlertTriangle, 
   Key, 
-  Layers, 
   Settings, 
   Info,
   ChevronRight,
@@ -28,7 +27,7 @@ export default function AdminPortal() {
       const status = await getAdminConfigStatus();
       setConfig(status);
     } catch (e: any) {
-      setError('Failed to fetch admin config status: ' + e.message);
+      setError('Failed to load setup status: ' + e.message);
     }
     setChecking(false);
   };
@@ -47,14 +46,13 @@ export default function AdminPortal() {
       }
     } catch (e: any) {
       console.error(e);
-      // Catch production next.js server action exceptions gracefully
       const errorMsg = e.message || '';
       if (errorMsg.includes('Server Components render') || errorMsg.includes('digest')) {
         setError(
-          'Authorization request failed on the server. This usually means the Interledger key signature or wallet address is invalid, or the testnet bank could not be reached. Double-check your Vercel credentials.'
+          "Ah, looks like the server had a tiny hiccup. This usually means a signature key or wallet link isn't quite right, or the testnet bank is taking a quick nap. Double-check your settings and let's try that again!"
         );
       } else {
-        setError(e.message || 'An unexpected error occurred during authorization.');
+        setError(e.message || "Oops! An unexpected issue came up while linking the wallet.");
       }
       setLoading(false);
     }
@@ -65,7 +63,7 @@ export default function AdminPortal() {
       <div style={{ height: '100vh', width: '100vw', background: 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
           <RefreshCw className="animate-spin" size={24} color="var(--accent-teal)" />
-          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Verifying Vercel Environment Configuration...</span>
+          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>Just making sure everything is in order... one moment!</span>
         </div>
       </div>
     );
@@ -84,25 +82,25 @@ export default function AdminPortal() {
             <Settings size={22} color="var(--accent-teal)" />
           </div>
           <div>
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>Payzati Admin Console</h1>
-            <span style={{ fontSize: '0.78125rem', color: 'var(--text-tertiary)' }}>Interledger Node & Escrow Wallet Manager</span>
+            <h1 style={{ fontSize: '1.5rem', fontWeight: 700, margin: 0 }}>Admin Dashboard</h1>
+            <span style={{ fontSize: '0.78125rem', color: 'var(--text-tertiary)' }}>Hey there! Let&apos;s get your main wallet linked up so we can get started.</span>
           </div>
         </div>
 
         <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: '1.6', fontSize: 'var(--text-sm)' }}>
-          Establish the liquidity pipeline for automated payroll payouts. Setting up a master payment grant 
-          enables employers to run frictionless bulk payroll without requiring manual approvals for individual employee transactions.
+          Welcome! Before we can start sending out payments to your wonderful team, let&apos;s link up your main wallet. 
+          This lets us handle all the heavy lifting in the background so you can sit back and relax, without having to manually approve every single person&apos;s salary.
         </p>
 
         {/* Configuration Status Card */}
         <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '1.25rem', marginBottom: '2rem' }}>
           <h3 style={{ fontSize: '0.875rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Key size={14} color="var(--accent-teal)" /> Credentials Checklist
+            <Key size={14} color="var(--accent-teal)" /> Let&apos;s check if we&apos;ve got everything ready to go
           </h3>
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>Master Wallet Pointer (PAYZATI_WALLET_ADDRESS)</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Your wallet&apos;s address</span>
               {config?.walletAddress ? (
                 <span style={{ color: 'var(--accent-teal)', fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}>{config.walletAddress}</span>
               ) : (
@@ -111,7 +109,7 @@ export default function AdminPortal() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>Signature Private Key (ILP_PRIVATE_KEY)</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Your private signature key</span>
               {config?.hasPrivateKey ? (
                 <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Active</span>
               ) : (
@@ -120,7 +118,7 @@ export default function AdminPortal() {
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8125rem' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>Key Identifier (ILP_KEY_ID)</span>
+              <span style={{ color: 'var(--text-secondary)' }}>Key ID check</span>
               {config?.hasKeyId ? (
                 <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Configured</span>
               ) : (
@@ -135,11 +133,11 @@ export default function AdminPortal() {
           <div style={{ padding: '1.25rem', background: 'rgba(255,170,0,0.08)', border: '1px solid rgba(255,170,0,0.25)', borderRadius: 'var(--radius-md)', color: 'var(--status-warning)', fontSize: 'var(--text-sm)', marginBottom: '2rem' }}>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
               <AlertTriangle size={18} style={{ flexShrink: 0 }} />
-              <strong>Missing Environment Configuration</strong>
+              <strong>Oops! Looks like a few details are still missing</strong>
             </div>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.8125rem', lineHeight: '1.5', margin: 0 }}>
-              The application requires you to set the missing variables in your Vercel Project Settings. 
-              Once added, deploy a new build of the site to complete authentication setup.
+              No worries! Just head over to your Vercel settings, drop in the missing keys, and trigger a quick redeploy. 
+              We&apos;ll be right here waiting for you!
             </p>
           </div>
         ) : (
@@ -147,7 +145,7 @@ export default function AdminPortal() {
             {/* Interactive Limit Selector */}
             <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '1.5rem', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <label htmlFor="limit-select" style={{ fontSize: '0.875rem', fontWeight: 600 }}>Set Outgoing Payment Cap</label>
+                <label htmlFor="limit-select" style={{ fontSize: '0.875rem', fontWeight: 600 }}>How much of a safety limit would you like to set?</label>
                 <select 
                   id="limit-select"
                   value={limitUSD} 
@@ -163,11 +161,11 @@ export default function AdminPortal() {
                     outline: 'none'
                   }}
                 >
-                  <option value={100}>$100.00 (Single Transaction testing)</option>
-                  <option value={1000}>$1,000.00 (Recommended Sandbox Limit)</option>
-                  <option value={10000}>$10,000.00 (Business payroll test)</option>
-                  <option value={100000}>$100,000.00 (Medium Enterprise cap)</option>
-                  <option value={10000000}>$10,000,000.00 (Maximum platform allowance)</option>
+                  <option value={100}>$100 (Great for small tests)</option>
+                  <option value={1000}>$1,000 (Recommended for sandbox testing)</option>
+                  <option value={10000}>$10,000 (For slightly larger payouts)</option>
+                  <option value={100000}>$100,000 (Enterprise sandbox cap)</option>
+                  <option value={10000000}>$10,000,000 (Unlimited cap)</option>
                 </select>
               </div>
 
@@ -175,9 +173,9 @@ export default function AdminPortal() {
               <div style={{ display: 'flex', gap: '8px', background: 'rgba(255,255,255,0.02)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(255,255,255,0.05)' }}>
                 <Info size={16} color="var(--accent-teal)" style={{ flexShrink: 0, marginTop: '2px' }} />
                 <div style={{ fontSize: '0.78125rem', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
-                  <strong>How does this cap work?</strong><br />
-                  This is a <strong>direct debit mandate</strong> limit. It authorizes Payzati to execute payments on your behalf up to a cumulative maximum of <strong>${limitUSD.toLocaleString()}</strong> over the lifetime of this key. 
-                  <span style={{ color: 'var(--accent-teal)' }}> You do NOT need this amount deposited in your account.</span> It is simply a budget limit for security.
+                  <strong>Wait, how does this limit work?</strong><br />
+                  Think of this as a friendly safety cap. It&apos;s just a quick heads-up to the system so we know the max amount we can send out on your behalf before checking in with you. 
+                  <span style={{ color: 'var(--accent-teal)' }}> Don&apos;t worry, you don&apos;t need to have this exact amount sitting in your account right now</span> — it&apos;s just a budget boundary to keep your funds safe and sound!
                 </div>
               </div>
             </div>
@@ -188,7 +186,7 @@ export default function AdminPortal() {
           <div style={{ padding: '1.25rem', background: 'rgba(235,94,85,0.1)', border: '1px solid rgba(235,94,85,0.3)', color: 'var(--status-error)', borderRadius: 'var(--radius-md)', marginBottom: '2rem', fontSize: 'var(--text-sm)' }}>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '0.5rem' }}>
               <AlertTriangle size={16} />
-              <strong>Authorization Failed</strong>
+              <strong>Oops, something didn&apos;t quite work!</strong>
             </div>
             <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>{error}</p>
           </div>
@@ -201,7 +199,7 @@ export default function AdminPortal() {
             disabled 
             style={{ width: '100%', cursor: 'not-allowed', opacity: 0.6 }}
           >
-            Configure environment variables to authorize
+            Let&apos;s get those settings filled in first!
           </button>
         ) : (
           <button 
@@ -210,7 +208,7 @@ export default function AdminPortal() {
             disabled={loading}
             style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
           >
-            {loading ? 'Initiating Handshake...' : 'Authorize Master Wallet on Testnet'} <ChevronRight size={18} />
+            {loading ? 'Connecting...' : 'All set! Let\'s link your wallet'} <ChevronRight size={18} />
           </button>
         )}
 

@@ -36,10 +36,10 @@ export default function OnboardingTracker({ employee, onRefresh }: OnboardingTra
   }, [employee.id, onRefresh]);
 
   const visualSteps = [
-    { id: 'requested', label: 'Request Sent', desc: 'Awaiting HR review' },
-    { id: 'reviewed', label: 'Under Review', desc: 'HR is preparing your offer' },
-    { id: 'offer_phase', label: 'Offer Phase', desc: 'Review & Negotiate' },
-    { id: 'completed', label: 'Approved', desc: 'Setup complete' }
+    { id: 'requested', label: 'Request sent', desc: 'Waiting for HR to take a look' },
+    { id: 'reviewed', label: 'Under review', desc: 'The team is putting together your offer details' },
+    { id: 'offer_phase', label: 'Offer time!', desc: 'Take a look and negotiate if you&apos;d like' },
+    { id: 'completed', label: 'All set!', desc: 'You&apos;re ready to roll!' }
   ];
 
   let visualStepId = step;
@@ -118,8 +118,8 @@ export default function OnboardingTracker({ employee, onRefresh }: OnboardingTra
   return (
     <div className="card" style={{ maxWidth: '600px', margin: '4rem auto', padding: '3rem 2rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-        <h2 style={{ marginBottom: '0.5rem' }}>Account Setup Progress</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>You are linked to <strong>{employee.companies.name}</strong></p>
+        <h2 style={{ marginBottom: '0.5rem' }}>Let&apos;s get you set up!</h2>
+        <p style={{ color: 'var(--text-secondary)' }}>You&apos;re all linked up with the team at <strong>{employee.companies.name}</strong></p>
       </div>
 
       <div style={{ position: 'relative', marginBottom: '2rem' }}>
@@ -166,21 +166,21 @@ export default function OnboardingTracker({ employee, onRefresh }: OnboardingTra
 
       {step === 'requested' && (
         <div style={{ textAlign: 'center', padding: '1.5rem', background: 'var(--elevation-1)', borderRadius: 'var(--radius-md)' }}>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>We have notified your HR department. Check back later as they process your onboarding.</p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9375rem' }}>We&apos;ve let your HR team know you&apos;re here. Hang tight while they process your onboarding!</p>
         </div>
       )}
 
       {step === 'reviewed' && (
         <div style={{ textAlign: 'center', padding: '1.5rem', background: 'rgba(108,92,231,0.1)', border: '1px solid rgba(108,92,231,0.2)', borderRadius: 'var(--radius-md)' }}>
-          <p style={{ color: 'var(--accent-purple)', fontWeight: 600, fontSize: '0.9375rem' }}>HR is actively reviewing your profile and will propose your salary details shortly.</p>
+          <p style={{ color: 'var(--accent-purple)', fontWeight: 600, fontSize: '0.9375rem' }}>The HR team is reviewing your profile and will put together your salary offer very soon!</p>
         </div>
       )}
 
       {step === 'salary_proposed' && (
         <div className="animate-fade-in" style={{ textAlign: 'center', padding: '2rem', background: 'rgba(0,212,170,0.05)', border: '1px solid rgba(0,212,170,0.2)', borderRadius: 'var(--radius-md)' }}>
           <div style={{ color: 'var(--accent-teal)', display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}><Sparkles size={48} /></div>
-          <h3 style={{ marginBottom: '0.5rem' }}>Salary Offer Received</h3>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>HR has set your official salary details. You can accept or negotiate a different amount.</p>
+          <h3 style={{ marginBottom: '0.5rem' }}>Your salary offer is ready!</h3>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>The team has put together your salary details. Take a look below—you can accept it right away or negotiate if you want to adjust something.</p>
           
           <div style={{ display: 'inline-block', textAlign: 'left', background: 'var(--bg-primary)', padding: '1.5rem', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem', border: '1px solid var(--border-subtle)', minWidth: '280px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '3rem', marginBottom: '0.75rem' }}>
@@ -210,10 +210,10 @@ export default function OnboardingTracker({ employee, onRefresh }: OnboardingTra
             <div className="animate-fade-in" style={{ textAlign: 'left', background: 'var(--elevation-1)', padding: '2rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-subtle)', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)' }}>
               <h4 style={{ marginBottom: '0.5rem', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-teal)" strokeWidth="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                Counter Offer
+                Make a counter-offer
               </h4>
               <p style={{ fontSize: '0.9375rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
-                Enter your desired counter-offer. Keep in mind that HR will review this and may either accept it or return with a final offer.
+                Enter your desired amount. HR will review it and let you know if it works or if they have a final offer.
               </p>
               
               <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-end', marginBottom: '1rem' }}>
@@ -248,8 +248,8 @@ export default function OnboardingTracker({ employee, onRefresh }: OnboardingTra
           </div>
           <h3 style={{ marginBottom: '0.75rem', fontSize: '1.5rem' }}>Counter Offer Sent</h3>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', maxWidth: '400px', margin: '0 auto', lineHeight: '1.6' }}>
-            You proposed a salary of <strong style={{ color: '#FFAA00' }}>{formatCurrency(employee.salary, employee.currency)}</strong>. 
-            HR is currently reviewing your request and will respond shortly.
+            You sent a counter-offer of <strong style={{ color: '#FFAA00' }}>{formatCurrency(employee.salary, employee.currency)}</strong>. 
+            We&apos;ve let HR know, and they&apos;ll take a look and get back to you shortly!
           </p>
         </div>
       )}
@@ -257,9 +257,9 @@ export default function OnboardingTracker({ employee, onRefresh }: OnboardingTra
       {step === 'negotiation_hr_final' && (
         <div className="animate-fade-in" style={{ textAlign: 'center', padding: '3rem 2rem', background: 'linear-gradient(145deg, var(--elevation-1) 0%, rgba(108,92,231,0.05) 100%)', border: '1px solid rgba(108,92,231,0.3)', borderRadius: 'var(--radius-lg)', boxShadow: '0 10px 30px -10px rgba(0,0,0,0.3)' }}>
           <div style={{ display: 'inline-block', padding: '0.5rem 1rem', background: 'rgba(108,92,231,0.1)', color: 'var(--accent-purple)', borderRadius: '20px', fontSize: '0.875rem', fontWeight: 700, marginBottom: '1.5rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
-            Final HR Offer
+            HR&apos;s Final Offer
           </div>
-          <h3 style={{ marginBottom: '1rem', fontSize: '1.75rem' }}>Review Final Offer</h3>
+          <h3 style={{ marginBottom: '1rem', fontSize: '1.75rem' }}>Take a look at the final offer</h3>
           
           <div style={{ background: 'var(--bg-primary)', padding: '2rem', borderRadius: 'var(--radius-md)', margin: '0 auto 2rem auto', border: '1px solid var(--border-subtle)', maxWidth: '320px' }}>
             <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Offered Base Salary</div>
@@ -268,7 +268,7 @@ export default function OnboardingTracker({ employee, onRefresh }: OnboardingTra
           </div>
           
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem auto', lineHeight: '1.6' }}>
-            HR has reviewed your counter and provided this final, best offer. Further negotiation is closed.
+            The team has reviewed your counter-offer and sent over this final offer to wrap things up.
           </p>
           
           <button className="btn btn-primary btn-lg" style={{ width: '100%', maxWidth: '320px', background: 'var(--accent-purple)', border: 'none', boxShadow: '0 4px 14px 0 rgba(108,92,231,0.39)' }} onClick={handleAcceptOffer} disabled={loading}>

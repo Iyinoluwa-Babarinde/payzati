@@ -79,7 +79,7 @@ export default function EmployeeDashboard() {
     <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ fontSize: 'var(--text-lg)', marginBottom: '0.25rem' }}>Welcome, {employee?.name.split(' ')[0]}.</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>Personal earnings and direct deposit rails.</p>
+        <p style={{ color: 'var(--text-secondary)' }}>Here&apos;s a quick look at your earnings and payment history.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
@@ -87,27 +87,27 @@ export default function EmployeeDashboard() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Next Payday</div>
             <div style={{ background: 'var(--accent-teal-dim)', color: 'var(--accent-teal)', padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 700 }}>
-              {Math.ceil((nextPayday.getTime() - today.getTime()) / (1000 * 3600 * 24))} days left
+              {Math.ceil((nextPayday.getTime() - today.getTime()) / (1000 * 3600 * 24))} days until payday
             </div>
           </div>
           <div style={{ fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
             {nextPayday.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </div>
           <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>
-            Estimated Net Pay: <strong>{formatCurrency(employee.salary * 0.75, employee.currency)}</strong>
+            Your estimated take-home pay: <strong>{formatCurrency(employee.salary * 0.75, employee.currency)}</strong>
           </p>
         </div>
 
         <div className="card" style={{ background: 'var(--elevation-1)', borderLeft: '4px solid var(--accent-purple)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-            <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Earned Wage Access</div>
+            <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Need cash early?</div>
             <div style={{ color: 'var(--text-secondary)' }}><Banknote size={24} color="var(--accent-teal)" /></div>
           </div>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: 'var(--text-xs)', lineHeight: 1.5 }}>
-            Access a portion of your earned salary before payday. Funds route instantly over Interledger.
+            Need to cover an unexpected bill? You can withdraw some of your earned salary early. It arrives in seconds!
           </p>
           <button className="btn btn-secondary btn-block" onClick={() => setShowAdvanceModal(true)}>
-            Request Advance
+            Request early pay
           </button>
         </div>
       </div>
@@ -131,7 +131,7 @@ export default function EmployeeDashboard() {
               <tr>
                 <td colSpan={5} style={{textAlign:'center', padding:'3rem'}}>
                   <div style={{opacity:0.3,marginBottom:'0.5rem', display: 'flex', justifyContent: 'center'}}><Receipt size={48} /></div>
-                  <p style={{color: 'var(--text-secondary)'}}>No paystubs available.</p>
+                  <p style={{color: 'var(--text-secondary)'}}>No paystubs yet. Once you receive your first payment, they&apos;ll appear here!</p>
                 </td>
               </tr>
             ) : payrolls.map((pr, i) => (
@@ -155,14 +155,14 @@ export default function EmployeeDashboard() {
         <div className="modal-overlay" onClick={() => setShowAdvanceModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Request Salary Advance</h3>
+              <h3>Request early pay</h3>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowAdvanceModal(false)}><X size={16} /></button>
             </div>
             <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: 'var(--text-sm)' }}>
-              You can request up to 50% of your net salary before payday. Deducted automatically from your next paycheck.
+              You can request up to half of your estimated take-home salary early. We&apos;ll automatically deduct this from your next payday.
             </p>
             <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700, color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>Amount to Request ({employee.currency})</label>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700, color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>How much do you need? ({employee.currency})</label>
               <input 
                 type="number" 
                 placeholder="Enter amount" 
@@ -171,18 +171,18 @@ export default function EmployeeDashboard() {
                 style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', background: 'var(--elevation-2)', color: 'var(--text-primary)' }}
               />
               <div style={{ marginTop: '0.5rem', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
-                Max available: {formatCurrency(employee.salary * 0.75 * 0.5, employee.currency)}
+                Max you can request right now: {formatCurrency(employee.salary * 0.75 * 0.5, employee.currency)}
               </div>
             </div>
             
             <div style={{ background: 'var(--elevation-2)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', marginBottom: '1.5rem' }}>
               <div style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '0.5rem' }}>Receiving Bank Account</div>
               <div style={{ fontWeight: 700, fontSize: 'var(--text-sm)' }}>{employee.bank_name || 'No bank linked'}</div>
-              <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>{employee.bank_account_number || 'Please link a bank account in Settings'}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>{employee.bank_account_number || 'Please add your bank account details in Settings first'}</div>
             </div>
 
             <button className="btn btn-primary btn-lg btn-block" onClick={handleRequestAdvance} disabled={!employee.bank_name}>
-              Submit Request
+              Send request
             </button>
           </div>
         </div>

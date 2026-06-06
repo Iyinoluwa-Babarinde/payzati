@@ -118,7 +118,7 @@ export default function WalletPage() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Funding &amp; Balances</h1>
-          <p className="page-subtitle">Configure your ILP payroll routing accounts.</p>
+          <p className="page-subtitle">Set up your payment routes and fund your wallet.</p>
         </div>
       </div>
 
@@ -126,8 +126,8 @@ export default function WalletPage() {
         <div className="card" style={{ background: 'var(--elevation-1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
             <div>
-              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Linked Corporate Account</div>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: '0.25rem' }}>Fiat source for payroll routing</p>
+              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your linked bank account</div>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: '0.25rem' }}>Where we pull funds to pay your team</p>
             </div>
             <div style={{ color: 'var(--text-secondary)' }}><Building2 size={32} /></div>
           </div>
@@ -140,19 +140,19 @@ export default function WalletPage() {
                 <strong style={{ display: 'block', fontSize: 'var(--text-sm)' }}>{linkedBank.bankName}</strong>
                 <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>•••• {linkedBank.last4}</span>
               </div>
-              <button className="btn btn-ghost btn-sm" onClick={() => setShowLinkModal(true)}>Change</button>
+              <button className="btn btn-ghost btn-sm" onClick={() => setShowLinkModal(true)}>Change account</button>
             </div>
           ) : (
             <button className="btn btn-primary btn-block" onClick={() => setShowLinkModal(true)}>
-              Link Bank Account
+              Link a bank account
             </button>
           )}
 
           {linkedBank && (
             <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem', background: autoFund ? 'var(--accent-teal-dim)' : 'var(--elevation-2)', border: `1px solid ${autoFund ? 'rgba(0,212,170,0.3)' : 'var(--border-subtle)'}`, borderRadius: 'var(--radius-md)' }}>
               <div>
-                <strong style={{ display: 'block', color: autoFund ? 'var(--accent-teal)' : 'var(--text-primary)', fontSize: 'var(--text-sm)' }}>Auto-Fund Payroll</strong>
-                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>Direct debit exact amounts when running payroll</span>
+                <strong style={{ display: 'block', color: autoFund ? 'var(--accent-teal)' : 'var(--text-primary)', fontSize: 'var(--text-sm)' }}>Automatic payroll funding</strong>
+                <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>We&apos;ll pull the exact amount automatically whenever you run payroll so you don&apos;t have to pre-fund.</span>
               </div>
               <label style={{ position: 'relative', display: 'inline-block', width: '44px', height: '24px' }}>
                 <input type="checkbox" checked={autoFund} onChange={toggleAutoFund} style={{ opacity: 0, width: 0, height: 0 }} />
@@ -167,8 +167,8 @@ export default function WalletPage() {
         <div className="card" style={{ background: 'var(--elevation-1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
             <div>
-              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Pre-Funded ILP Balance</div>
-              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: '0.25rem' }}>Available instantly for routing</p>
+              <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your prepay wallet</div>
+              <p style={{ fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)', marginTop: '0.25rem' }}>Funds ready to go instantly</p>
             </div>
             <div style={{ color: 'var(--accent-teal)' }}><Zap size={32} /></div>
           </div>
@@ -179,7 +179,7 @@ export default function WalletPage() {
 
           <div style={{ display: 'flex', gap: '1rem' }}>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Total Disbursed</div>
+              <div style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>Total paid out</div>
               <div style={{ fontWeight: 700 }}>{loading ? '-' : formatCurrency(totalDisbursed, 'USD')}</div>
             </div>
           </div>
@@ -187,7 +187,7 @@ export default function WalletPage() {
       </div>
 
       <div className="card" style={{ background: 'var(--elevation-1)' }}>
-        <h3 style={{ marginBottom: '1rem' }}>Funding &amp; Routing History</h3>
+        <h3 style={{ marginBottom: '1rem' }}>Your transaction history</h3>
         <table className="data-table">
           <thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
           <tbody>
@@ -202,7 +202,7 @@ export default function WalletPage() {
                 <tr>
                   <td colSpan={5} style={{textAlign:'center', padding:'4rem'}}>
                     <div style={{opacity:0.3,marginBottom:'1rem', display: 'flex', justifyContent: 'center'}}><Receipt size={48} /></div>
-                    <h3 style={{color:'var(--text-secondary)'}}>No transactions.</h3>
+                    <h3 style={{color:'var(--text-secondary)'}}>No transactions yet. Any funds you move will show up here!</h3>
                   </td>
                 </tr>
               ) :
@@ -212,7 +212,7 @@ export default function WalletPage() {
                   <td>{tx.description}</td>
                   <td>
                     <span className={`badge ${tx.type === 'deposit' ? 'badge-success' : tx.type === 'payroll' ? 'badge-info' : 'badge-warning'}`}>
-                      {tx.type === 'deposit' ? 'Auto-Fund' : 'ILP Route'}
+                      {tx.type === 'deposit' ? 'Auto-funded' : 'Sent payout'}
                     </span>
                   </td>
                   <td style={{ fontWeight: 700, color: tx.amount > 0 ? 'var(--status-success)' : 'var(--text-primary)' }}>
@@ -234,13 +234,13 @@ export default function WalletPage() {
         <div className="modal-overlay" onClick={() => setShowLinkModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Secure Bank Link</h3>
+              <h3>Link your bank account</h3>
               <button className="btn btn-ghost btn-icon" onClick={() => setShowLinkModal(false)}><X size={16} /></button>
             </div>
 
             <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
               <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'center', color: 'var(--text-primary)' }}><Building2 size={48} /></div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>Connect your corporate bank account to enable seamless fiat-to-ILP routing for payroll.</p>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>Connect your bank account so we can automatically route payments to your team when you run payroll.</p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
@@ -268,11 +268,11 @@ export default function WalletPage() {
 
             <div style={{ background: 'var(--elevation-2)', padding: '1rem', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)', marginBottom: '1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
               <Lock size={24} color="var(--status-success)" />
-              Your bank details are encrypted and securely stored. We use industry-standard protocols to authorize direct debits.
+              Don&apos;t worry, your bank details are completely encrypted and safe. We only pull funds when you tell us to run payroll.
             </div>
 
             <button className="btn btn-primary btn-lg btn-block" onClick={handleLinkBank} disabled={linking}>
-              {linking ? 'Verifying Account...' : 'Agree & Link Account'}
+              {linking ? 'Verifying Account...' : 'Connect bank account'}
             </button>
           </div>
         </div>

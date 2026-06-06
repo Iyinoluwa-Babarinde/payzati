@@ -230,10 +230,10 @@ export default function PayrollPage() {
         <div>
           <h1 className="page-title">Run Payroll</h1>
           <p className="page-subtitle">
-            {step === 1 && 'Pick who you are paying today.'}
-            {step === 2 && "Calculated taxes and contributions."}
-            {step === 3 && 'Double check balance rails.'}
-            {step === 4 && (completed ? "Payments executed." : "Routing packets...")}
+            {step === 1 && 'Who are we paying today? Select your team members below.'}
+            {step === 2 && 'Here&apos;s the breakdown of taxes and what everyone takes home.'}
+            {step === 3 && 'Let&apos;s make sure we&apos;ve got enough funds ready to go.'}
+            {step === 4 && (completed ? 'All done! Payments have been sent.' : 'Sending payments now...')}
           </p>
         </div>
         <div className={styles.steps}>
@@ -246,7 +246,7 @@ export default function PayrollPage() {
       {step === 1 && (
         <div className="card" style={{ background: 'var(--elevation-1)' }}>
           <div className="flex-between" style={{ marginBottom: '1.5rem' }}>
-            <h3>Roster Check ({selected.length}/{employees.length})</h3>
+            <h3>Select team members ({selected.length}/{employees.length})</h3>
             <button className="btn btn-ghost btn-sm" onClick={() => setSelected(selected.length === employees.length ? [] : employees.map(e => e.id))}>
               {selected.length === employees.length ? 'Deselect all' : 'Select all'}
             </button>
@@ -266,7 +266,7 @@ export default function PayrollPage() {
                 <tr>
                   <td colSpan={5} style={{textAlign:'center', padding:'3rem'}}>
                     <div style={{ opacity: 0.3, marginBottom: '0.5rem', display: 'flex', justifyContent: 'center' }}><Users size={48} /></div>
-                    <p style={{color: 'var(--text-secondary)'}}>No active team members.</p>
+                    <p style={{color: 'var(--text-secondary)'}}>No active team members found. Go to the Roster page to add some!</p>
                   </td>
                 </tr>
               ) : employees.map(emp => (
@@ -284,7 +284,7 @@ export default function PayrollPage() {
           </table>
           <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>
             <button className="btn btn-primary" disabled={selected.length === 0} onClick={() => setStep(2)}>
-              Confirm roster <ArrowRight size={14} />
+              Review tax breakdown <ArrowRight size={14} />
             </button>
           </div>
         </div>
@@ -292,17 +292,17 @@ export default function PayrollPage() {
 
       {step === 2 && (
         <div className="card" style={{ background: 'var(--elevation-1)' }}>
-          <h3 style={{ marginBottom: '1.5rem' }}>Tax breakdowns</h3>
+          <h3 style={{ marginBottom: '1.5rem' }}>Tax &amp; Net Payout Details</h3>
           <div style={{ overflowX: 'auto' }}>
             <table className="data-table">
               <thead>
                 <tr>
                   <th>Employee</th>
-                  <th>Gross</th>
-                  <th>Income Tax</th>
-                  <th>Social Security</th>
-                  <th>Deductions</th>
-                  <th>Net Payout</th>
+                  <th>Gross pay</th>
+                  <th>Income tax</th>
+                  <th>Social security</th>
+                  <th>Total deductions</th>
+                  <th>Take-home pay</th>
                 </tr>
               </thead>
               <tbody>
@@ -326,27 +326,27 @@ export default function PayrollPage() {
           </div>
           <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'space-between' }}>
             <button className="btn btn-secondary" onClick={() => setStep(1)}><ArrowLeft size={14} /> Back</button>
-            <button className="btn btn-primary" onClick={() => setStep(3)}>Verify funding <ArrowRight size={14} /></button>
+            <button className="btn btn-primary" onClick={() => setStep(3)}>Check funding <ArrowRight size={14} /></button>
           </div>
         </div>
       )}
 
       {step === 3 && (
         <div className="card" style={{ background: 'var(--elevation-1)' }}>
-          <h3 style={{ marginBottom: '1.5rem' }}>Funding Summary</h3>
+          <h3 style={{ marginBottom: '1.5rem' }}>Funding Check</h3>
           <div className="grid-3" style={{ marginBottom: '2rem' }}>
             <div className="card stat-card" style={{ background: 'var(--elevation-2)', textAlign: 'center' }}>
-              <span className="stat-label">Roster count</span>
+              <span className="stat-label">Team members being paid</span>
               <span className="stat-value">{selectedEmps.length}</span>
             </div>
             <div className="card stat-card" style={{ background: 'var(--elevation-2)', textAlign: 'center' }}>
-              <span className="stat-label">Estimated cost (USD)</span>
+              <span className="stat-label">Total cost</span>
               <span className="stat-value" style={{ fontSize: '1.25rem', color: canProceed ? 'var(--accent-teal)' : 'var(--status-error)' }}>
                 ~${estimatedTotalUSD.toFixed(2)}
               </span>
             </div>
             <div className="card stat-card" style={{ background: 'var(--elevation-2)', textAlign: 'center' }}>
-              <span className="stat-label">Current Balance</span>
+              <span className="stat-label">Your wallet balance</span>
               <span className="stat-value" style={{ fontSize: '1.25rem', color: hasSufficientBalance ? 'var(--text-primary)' : 'var(--status-warning)' }}>
                 ${walletBalance.toFixed(2)}
               </span>
@@ -358,11 +358,11 @@ export default function PayrollPage() {
             <div style={{ background: 'var(--accent-teal-dim)', border: '1px solid rgba(0,212,170,0.2)', borderRadius: 'var(--radius-md)', padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
               <Landmark size={24} color="var(--accent-teal)" />
               <div>
-                <strong style={{ color: 'var(--accent-teal)', display: 'block' }}>Auto-Funding active</strong>
+                <strong style={{ color: 'var(--accent-teal)', display: 'block' }}>Auto-funding is active</strong>
                 <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>
                   {hasSufficientBalance 
-                    ? `Sufficient balance. No debit will be made from ${linkedBank.bankName}.` 
-                    : `Shortfall of $${(estimatedTotalUSD - walletBalance).toFixed(2)} will be debited from corporate account (${linkedBank.bankName} ending in ${linkedBank.last4}) and converted to ILP.`}
+                    ? `You have enough funds in your wallet, so we won&apos;t need to pull from ${linkedBank.bankName}.` 
+                    : `We&apos;ll pull the shortfall of $${(estimatedTotalUSD - walletBalance).toFixed(2)} from your bank account (${linkedBank.bankName} ending in ${linkedBank.last4}) automatically to cover this payroll.`}
                 </span>
               </div>
             </div>
@@ -371,23 +371,23 @@ export default function PayrollPage() {
             <div style={{ background: 'rgba(255,71,87,0.1)', border: '1px solid rgba(255,71,87,0.3)', borderRadius: 'var(--radius-md)', padding: '1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <AlertCircle size={24} color="var(--status-error)" />
               <div>
-                <strong style={{ color: 'var(--status-error)' }}>Insufficient balance</strong>
+                <strong style={{ color: 'var(--status-error)' }}>A bit short on funds</strong>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginTop: '2px' }}>
-                  Payroll requires <strong>${estimatedTotalUSD.toFixed(2)}</strong>. You have <strong>${walletBalance.toFixed(2)}</strong>.
-                  Please link a corporate account for auto-debits, or fund manually.
+                  This payroll run needs <strong>${estimatedTotalUSD.toFixed(2)}</strong>, but your wallet only has <strong>${walletBalance.toFixed(2)}</strong>.
+                  Please connect a bank account for auto-funding or add some funds.
                 </p>
               </div>
               <a href="/employer/wallet" className="btn btn-primary btn-sm" style={{ marginLeft: 'auto', flexShrink: 0 }}>Deposit</a>
             </div>
           ) : (
             <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1.5rem', fontSize: 'var(--text-sm)', color: 'var(--status-success)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CheckCircle size={16} /> Pre-funded balance ready. Payments will clear via ILP.
+              <CheckCircle size={16} /> Perfect! You&apos;ve got enough pre-funded balance. Payments will send instantly.
             </div>
           )}
 
           {balanceError && (
             <div style={{ background: 'rgba(255,71,87,0.1)', border: '1px solid rgba(255,71,87,0.3)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1.5rem', color: 'var(--status-error)', fontSize: 'var(--text-sm)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <AlertTriangle size={16} /> {balanceError}
+              <AlertTriangle size={16} /> Looks like you&apos;re a bit short on funds. Please top up your wallet!
             </div>
           )}
 
@@ -398,14 +398,14 @@ export default function PayrollPage() {
               disabled={!canProceed}
               onClick={() => { 
                 if (!canProceed) {
-                  setBalanceError('Insufficient funds. Top up your wallet to proceed.');
+                  setBalanceError('Looks like you&apos;re a bit short on funds. Please top up your wallet!');
                   toast.error('Insufficient funds.');
                   return;
                 }
                 setStep(4); processPayroll(); 
               }}
             >
-              <Play size={14} fill="currentColor" /> Run Payroll via ILP
+              <Play size={14} fill="currentColor" /> Send payments now
             </button>
           </div>
         </div>
@@ -423,10 +423,10 @@ export default function PayrollPage() {
                 </div>
               </div>
               <h2 style={{ marginBottom: '0.5rem' }}>
-                {isAutoFunding && !hasSufficientBalance ? 'Settling bank debit & routing ILP...' : 'Routing ILP packets...'}
+                {isAutoFunding && !hasSufficientBalance ? 'Pulling funds and sending payments...' : 'Sending payments instantly...'}
               </h2>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: 'var(--text-sm)' }}>
-                Streaming funds securely over Interledger channels...
+                Sending funds securely across the network...
               </p>
             </>
           ) : (
@@ -434,9 +434,9 @@ export default function PayrollPage() {
               <div style={{ color: 'var(--accent-teal)', display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
                 <CheckCircle size={64} />
               </div>
-              <h2 style={{ color: 'var(--accent-teal)', marginBottom: '0.5rem' }}>Payroll Executed</h2>
+              <h2 style={{ color: 'var(--accent-teal)', marginBottom: '0.5rem' }}>All Done!</h2>
               <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: 'var(--text-sm)' }}>
-                All salary rails settled successfully.
+                All payments have been successfully sent to your team!
               </p>
               <div style={{ textAlign: 'left', maxWidth: '600px', margin: '0 auto', background: 'var(--elevation-2)', borderRadius: 'var(--radius-md)', padding: '1rem', border: '1px solid var(--border-default)' }}>
                 {results.map((r, i) => (
@@ -453,7 +453,7 @@ export default function PayrollPage() {
                 ))}
               </div>
               <button className="btn btn-secondary btn-block" style={{ marginTop: '2rem' }} onClick={() => { setStep(1); setCompleted(false); setResults([]); setSelected([]); }}>
-                Run Another Payroll
+                Start a new payroll run
               </button>
             </>
           )}

@@ -263,7 +263,7 @@ export default function CompliancePage() {
         <div className="page-header" style={{ marginBottom: '2rem' }}>
           <div>
             <h1 className="page-title">Tax & Compliance</h1>
-            <p className="page-subtitle">Fully automated compliance, tax deductions, and local filings.</p>
+            <p className="page-subtitle">No more tax headaches. We calculate local taxes and file them automatically so you don&apos;t have to.</p>
           </div>
         </div>
 
@@ -274,25 +274,23 @@ export default function CompliancePage() {
               <ShieldCheck size={28} />
             </div>
             <div>
-              <h3 style={{ marginBottom: '0.75rem' }}>How Automated Tax Compliance Works</h3>
+              <h3 style={{ marginBottom: '0.75rem' }}>How do we handle taxes for you?</h3>
               <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', fontSize: 'var(--text-sm)' }}>
-                Payzati operates localized compliance engines for global hires. Every time you process payroll, 
-                our system auto-calculates employee income tax (PAYE), local pension rates, and state-mandated 
-                health levies.
+                Every time you run payroll, our smart system automatically figures out the right income taxes, local pensions, and health contributions for each team member. You don&apos;t have to lift a finger or read any local tax codes!
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginTop: '1.5rem' }}>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <Calendar size={18} color="var(--accent-teal)" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <div>
-                    <strong style={{ fontSize: '0.875rem' }}>Filing Calendar</strong>
-                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginTop: '2px' }}>Deductions are automatically processed and filed with local authorities on the 15th of each month.</p>
+                    <strong style={{ fontSize: '0.875rem' }}>Automatic Remittance</strong>
+                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginTop: '2px' }}>We collect the tax portion from each payroll run and automatically send it to the right local tax office every month. Fully hands-off!</p>
                   </div>
                 </div>
                 <div style={{ display: 'flex', gap: '0.75rem' }}>
                   <Layers size={18} color="var(--accent-teal)" style={{ flexShrink: 0, marginTop: '2px' }} />
                   <div>
-                    <strong style={{ fontSize: '0.875rem' }}>Split Remittance</strong>
-                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginTop: '2px' }}>Net payouts route instantly to employees, while tax pools are locked in escrow for statutory submission.</p>
+                    <strong style={{ fontSize: '0.875rem' }}>Instant Split Payouts</strong>
+                    <p style={{ fontSize: '0.8125rem', color: 'var(--text-tertiary)', marginTop: '2px' }}>Your employees get their net salary in seconds, while the tax portion is safely put aside until it&apos;s time to file. Neat and tidy!</p>
                   </div>
                 </div>
               </div>
@@ -302,7 +300,7 @@ export default function CompliancePage() {
 
         {/* Supported schemes flag row with hoverable glassmorphic tooltips */}
         <div className="card" style={{ background: 'var(--elevation-1)', padding: '2rem', marginBottom: '2rem', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
-          <h4 style={{ marginBottom: '1.25rem', color: 'var(--text-secondary)' }}>Tap or hover flags to check localized tax schemes:</h4>
+          <h4 style={{ marginBottom: '1.25rem', color: 'var(--text-secondary)' }}>Want to see what we calculate? Hover or tap any flag below:</h4>
           
           <div style={{ 
             display: 'flex', 
@@ -405,13 +403,12 @@ export default function CompliancePage() {
           borderRadius: 'var(--radius-lg)' 
         }}>
           <Globe size={48} color="var(--text-tertiary)" style={{ margin: '0 auto 1.5rem' }} />
-          <h2 style={{ marginBottom: '0.75rem', fontWeight: 600 }}>No Active Tax Registrations</h2>
+          <h2 style={{ marginBottom: '0.75rem', fontWeight: 600 }}>No team members set up yet</h2>
           <p style={{ color: 'var(--text-secondary)', maxWidth: '480px', margin: '0 auto 2rem', fontSize: 'var(--text-sm)', lineHeight: '1.5' }}>
-            To generate compliance tables and auto-filing schedules, you need to add your first global employee. 
-            We will register their country under your tax dashboard immediately.
+            Once you add your first team member, their country&apos;s tax calendar and details will show up right here. Let&apos;s get them added!
           </p>
           <Link href="/employer/employees" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            Add Global Employee <ArrowRight size={16} />
+            Add your first team member <ArrowRight size={16} />
           </Link>
         </div>
       </div>
@@ -434,7 +431,7 @@ export default function CompliancePage() {
       <div className="page-header" style={{ marginBottom: '2rem' }}>
         <div>
           <h1 className="page-title">Tax & Compliance</h1>
-          <p className="page-subtitle">Auto-calculated filing logs and statutory distributions.</p>
+          <p className="page-subtitle">No more tax headaches. We calculate local taxes and file them automatically so you don&apos;t have to.</p>
         </div>
         <button className="btn btn-secondary" onClick={() => alert('Downloading consolidated compliance zip...')}>
           <Download size={16} /> Download CSV Logs
@@ -445,26 +442,26 @@ export default function CompliancePage() {
       <div className="card" style={{ background: 'var(--elevation-1)', padding: '1rem 1.25rem', marginBottom: '2rem', display: 'flex', gap: '0.75rem', alignItems: 'center', borderLeft: '3px solid var(--accent-teal)' }}>
         <Info size={16} color="var(--accent-teal)" style={{ flexShrink: 0 }} />
         <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
-          <strong>Automated Filings:</strong> Payzati holds statutory taxes in escrow and remits them automatically to local tax authorities on the <strong>15th of every month</strong>.
+          <strong>Friendly reminder:</strong> We automatically gather and send all tax deductions to local authorities on the <strong>15th of every month</strong>, keeping you perfectly compliant.
         </span>
       </div>
 
       <div className="grid-3" style={{ marginBottom: '2rem' }}>
         <div className="card" style={{ background: 'var(--elevation-1)' }}>
           <div className="stat-card">
-            <span className="stat-label">Covered Markets</span>
+            <span className="stat-label">Countries we support</span>
             <span className="stat-value">{complianceRecords.length}</span>
           </div>
         </div>
         <div className="card" style={{ background: 'var(--elevation-1)' }}>
           <div className="stat-card">
-            <span className="stat-label">Total Remitted (USD Equiv.)</span>
+            <span className="stat-label">Total taxes filed so far</span>
             <span className="stat-value" style={{ color: 'var(--accent-teal)' }}>${Math.round(totalTaxAllCountriesUSD).toLocaleString()}</span>
           </div>
         </div>
         <div className="card" style={{ background: 'var(--elevation-1)' }}>
           <div className="stat-card">
-            <span className="stat-label">Next Filing Cutoff</span>
+            <span className="stat-label">Next tax filing date</span>
             <span className="stat-value" style={{ fontSize: '1.25rem', color: 'var(--status-warning)' }}>{getNextDeadlineDate()}</span>
           </div>
         </div>
@@ -473,7 +470,7 @@ export default function CompliancePage() {
       {/* Supported schemes flag row with hoverable glassmorphic tooltips (also shown when active records are present for convenience) */}
       <div className="card" style={{ background: 'var(--elevation-1)', padding: '1.25rem 2rem', marginBottom: '2rem', textAlign: 'center', border: '1px solid var(--border-subtle)' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>Supported tax schemes:</span>
+          <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>We currently support:</span>
           {SCHEME_PREVIEWS.map(s => {
             const isTooltipActive = activeTooltip === s.country;
             return (
@@ -608,27 +605,27 @@ export default function CompliancePage() {
             <div className="modal-header">
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 {getFlag(selectedReport.country, 22)}
-                <h3 style={{ marginLeft: '6px' }}>{selectedReport.country} Compliance & Tax Roster</h3>
+                <h3 style={{ marginLeft: '6px' }}>{selectedReport.country} Compliance &amp; Tax Details</h3>
               </div>
               <button className="btn btn-ghost btn-icon" onClick={() => setSelectedReportCountry(null)}><X size={16} /></button>
             </div>
             
             <div style={{ marginBottom: '1.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', background: 'var(--elevation-2)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
               <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '2px' }}>Roster Size</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '2px' }}>Team size</div>
                 <strong>{selectedReport.employeesCount} Active Hires</strong>
               </div>
               <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '2px' }}>Total Remitted</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '2px' }}>Total filed</div>
                 <strong style={{ color: 'var(--accent-teal)' }}>{formatCurrency(selectedReport.totalTaxPaid, selectedReport.currency)}</strong>
               </div>
               <div>
-                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '2px' }}>Filing Interval</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: '2px' }}>Filing schedule</div>
                 <strong>Monthly (Every 15th)</strong>
               </div>
             </div>
 
-            <h4 style={{ marginBottom: '0.75rem' }}>Local Employee Breakdowns</h4>
+            <h4 style={{ marginBottom: '0.75rem' }}>Employee Tax Breakdown</h4>
             <div style={{ maxHeight: '240px', overflowY: 'auto', marginBottom: '1.5rem', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)' }}>
               <table className="data-table" style={{ width: '100%', fontSize: 'var(--text-xs)' }}>
                 <thead>
@@ -673,14 +670,14 @@ export default function CompliancePage() {
               <div style={{ padding: '1rem', background: 'rgba(255,170,0,0.06)', border: '1px solid rgba(255,170,0,0.2)', borderRadius: 'var(--radius-md)', display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <AlertTriangle size={16} color="var(--status-warning)" style={{ flexShrink: 0 }} />
                 <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-                  No payroll payments have been completed yet for {selectedReport.country}. Run payroll to initiate the first tax filings.
+                  We haven&apos;t processed any pay cycles for {selectedReport.country} yet. Once you run your first payroll, we&apos;ll start handling the filings!
                 </span>
               </div>
             ) : (
               <div style={{ padding: '1rem', background: 'var(--accent-teal-dim)', border: '1px solid rgba(0,212,170,0.2)', borderRadius: 'var(--radius-md)', display: 'flex', gap: '8px', alignItems: 'center' }}>
                 <ShieldCheck size={16} color="var(--accent-teal)" style={{ flexShrink: 0 }} />
                 <span style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-                  All local tax and compliance filings for {selectedReport.country} are fully automated and managed via Payzati&apos;s Interledger Settlement layers.
+                  Good news! All tax filings for {selectedReport.country} are fully automated and taken care of in the background.
                 </span>
               </div>
             )}

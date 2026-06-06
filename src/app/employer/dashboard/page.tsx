@@ -181,7 +181,7 @@ export default function EmployerDashboard() {
       <div className="page-header">
         <div>
           <h1 className="page-title">Workspace: {companyName ? <span style={{color: 'var(--accent-teal)'}}>{companyName}</span> : 'Payzati'}.</h1>
-          <p className="page-subtitle">Real-time view of your cross-border roster.</p>
+          <p className="page-subtitle">Here&apos;s a quick look at how your global team is doing today.</p>
         </div>
         <Link href="/employer/payroll" className="btn btn-primary">
           <Banknote size={16} /> Run Payroll
@@ -196,12 +196,12 @@ export default function EmployerDashboard() {
           </div>
           <div style={{ flex: 1 }}>
             <h3 style={{ marginBottom: '0.25rem', color: 'var(--text-primary)' }}>
-              {stats.totalEmployees === 0 ? 'Getting Started Checklist' : 'Roster Active'}
+              {stats.totalEmployees === 0 ? 'Let&apos;s get you set up!' : 'Roster Active'}
             </h3>
             <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)', marginBottom: '1rem' }}>
               {stats.totalEmployees === 0 
-                ? 'Meet Payzati. Complete these steps to initiate your global payment rail:'
-                : `Your cross-border team is active. Next paycycle is configured.`}
+                ? 'Welcome to the family! Here are three quick steps to get your global payments up and running:'
+                : `Everything looks great! Your team is active and ready for the next payday.`}
             </p>
             
             {/* Action Items List */}
@@ -209,19 +209,19 @@ export default function EmployerDashboard() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--text-sm)' }}>
                 <CheckIcon size={14} className={stats.totalEmployees > 0 ? styles.stepDone : styles.stepTodo} />
                 <span style={{ color: stats.totalEmployees > 0 ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
-                  Add team members {stats.totalEmployees > 0 && '(Complete)'}
+                  Add your team members {stats.totalEmployees > 0 && '(All done!)'}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--text-sm)' }}>
                 <CheckIcon size={14} className={stats.walletBalance > 0 ? styles.stepDone : styles.stepTodo} />
                 <span style={{ color: stats.walletBalance > 0 ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
-                  Fund wallet balance {stats.walletBalance > 0 && '(Complete)'}
+                  Put some funds in your wallet {stats.walletBalance > 0 && '(All done!)'}
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: 'var(--text-sm)' }}>
                 <CheckIcon size={14} className={recentPayrolls.length > 0 ? styles.stepDone : styles.stepTodo} />
                 <span style={{ color: recentPayrolls.length > 0 ? 'var(--text-secondary)' : 'var(--text-primary)' }}>
-                  Execute payroll cycle {recentPayrolls.length > 0 && '(Complete)'}
+                  Run your first payroll {recentPayrolls.length > 0 && '(All done!)'}
                 </span>
               </div>
             </div>
@@ -234,7 +234,7 @@ export default function EmployerDashboard() {
         <div className={`card ${styles.statCard} animate-slide-up`} style={{ animationDelay: '0.1s', opacity: 0, animationFillMode: 'forwards' }}>
           <div className={styles.statIcon} style={{ background: 'var(--accent-teal-dim)', color: 'var(--accent-teal)' }}><Users size={20} /></div>
           <div className="stat-card">
-            <span className="stat-label">Total People</span>
+            <span className="stat-label">People in your team</span>
             <span className="stat-value">{loading ? '-' : <AnimatedCounter end={stats.totalEmployees} />}</span>
             <span className="stat-change positive">Active</span>
           </div>
@@ -243,7 +243,7 @@ export default function EmployerDashboard() {
         <div className={`card ${styles.statCard} animate-slide-up`} style={{ animationDelay: '0.2s', opacity: 0, animationFillMode: 'forwards' }}>
           <div className={styles.statIcon} style={{ background: 'var(--accent-purple-dim)', color: 'var(--accent-purple)' }}><Globe size={20} /></div>
           <div className="stat-card">
-            <span className="stat-label">Countries</span>
+            <span className="stat-label">Countries represented</span>
             <span className="stat-value">{loading ? '-' : <AnimatedCounter end={stats.countries} />}</span>
             <span className="stat-change positive">Supported</span>
           </div>
@@ -252,7 +252,7 @@ export default function EmployerDashboard() {
         <div className={`card ${styles.statCard} animate-slide-up`} style={{ animationDelay: '0.3s', opacity: 0, animationFillMode: 'forwards' }}>
           <div className={styles.statIcon} style={{ background: 'var(--accent-gold-dim)', color: 'var(--accent-gold)' }}><Banknote size={20} /></div>
           <div className="stat-card">
-            <span className="stat-label">Monthly Total (USD)</span>
+            <span className="stat-label">Estimated monthly payroll</span>
             <span className="stat-value">{loading ? '-' : <AnimatedCounter end={stats.monthlyPayroll} prefix="$" />}</span>
             <span className="stat-change positive">Calculated</span>
           </div>
@@ -261,7 +261,7 @@ export default function EmployerDashboard() {
         <div className={`card ${styles.statCard} animate-slide-up`} style={{ animationDelay: '0.4s', opacity: 0, animationFillMode: 'forwards' }}>
           <div className={styles.statIcon} style={{ background: 'var(--accent-blue-dim)', color: 'var(--accent-blue)' }}><Coins size={20} /></div>
           <div className="stat-card">
-            <span className="stat-label">Wallet Balance</span>
+            <span className="stat-label">Available balance</span>
             <span className="stat-value">{loading ? '-' : formatCurrency(stats.walletBalance, 'USD')}</span>
             <span className="stat-change positive">Settled</span>
           </div>
@@ -272,7 +272,7 @@ export default function EmployerDashboard() {
         {/* Recent Payments Card */}
         <div className={`card ${styles.tableCard}`}>
           <div className={styles.cardHeader}>
-            <h3>Recent runs</h3>
+            <h3>Your recent payroll runs</h3>
             <Link href="/employer/payroll" className="btn btn-ghost btn-sm">See all</Link>
           </div>
           <table className="data-table">
@@ -290,7 +290,7 @@ export default function EmployerDashboard() {
                 <tr>
                   <td colSpan={5} style={{textAlign:'center', padding:'3rem'}}>
                     <div style={{opacity:0.3,marginBottom:'0.5rem', display: 'flex', justifyContent: 'center'}}><Banknote size={48} /></div>
-                    <p style={{color: 'var(--text-secondary)'}}>No payroll records.</p>
+                    <p style={{color: 'var(--text-secondary)'}}>No payroll runs yet. When you pay your team, they&apos;ll show up right here!</p>
                   </td>
                 </tr>
               ) : recentPayrolls.map((pr, i) => (
@@ -316,7 +316,7 @@ export default function EmployerDashboard() {
           {/* Settlement Streak Card */}
           <div className="card" style={{ background: 'var(--elevation-1)' }}>
             <div className={styles.cardHeader}>
-              <h3>Settlement Health</h3>
+              <h3>Settlement health</h3>
             </div>
             
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginTop: '0.5rem' }}>
@@ -345,10 +345,10 @@ export default function EmployerDashboard() {
               
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--accent-teal)' }}>
-                  <Flame size={16} fill="var(--accent-teal)" /> Settlement Streak
+                  <Flame size={16} fill="var(--accent-teal)" /> On-time payment streak
                 </div>
                 <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', marginTop: '4px' }}>
-                  All payroll payouts settle instantly inside the active pay window.
+                  Every single payment has gone through instantly and on time. You&apos;re doing great!
                 </p>
               </div>
             </div>
@@ -356,7 +356,7 @@ export default function EmployerDashboard() {
 
           <div className={`card ${styles.distributionCard}`}>
             <div className={styles.cardHeader}>
-              <h3> Roster Spread</h3>
+              <h3>Where your team lives</h3>
             </div>
             <div className={styles.countryList}>
               {loading ? (
@@ -367,7 +367,7 @@ export default function EmployerDashboard() {
               ) : distribution.length === 0 ? (
                 <div style={{textAlign: 'center', padding:'2rem'}}>
                   <div style={{opacity:0.3,marginBottom:'0.5rem', display: 'flex', justifyContent: 'center'}}><Globe size={48} /></div>
-                  <p style={{color: 'var(--text-secondary)'}}>No roster spread data.</p>
+                  <p style={{color: 'var(--text-secondary)'}}>No team members added yet.</p>
                 </div>
               ) : distribution.map(c => (
                 <div key={c.country} className={styles.countryItem}>

@@ -93,7 +93,7 @@ export default function LinkOrganization({ onLinked }: { onLinked: () => void })
         <Link2 size={32} color="var(--accent-teal)" />
       </div>
       <h1 style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>Link Organization</h1>
-      <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Enter the invite code provided by your employer and your Interledger Wallet Address.</p>
+      <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Just enter the invite code your employer gave you, plus your Interledger wallet address, and we&apos;ll link you up!</p>
 
       <form onSubmit={handleLink} className="card">
         {error && <div style={{ color: 'var(--status-error)', marginBottom: '1rem', fontSize: '0.875rem' }}>{error}</div>}
@@ -120,7 +120,7 @@ export default function LinkOrganization({ onLinked }: { onLinked: () => void })
             required
             style={{ fontFamily: 'var(--font-mono)', width: '100%', padding: '0.75rem', borderRadius: '4px', border: '1px solid var(--border-subtle)', background: 'var(--elevation-1)' }}
           />
-          <small style={{ color: 'var(--text-tertiary)', display: 'block', marginTop: '0.5rem' }}>You must use a real testnet wallet address.</small>
+          <small style={{ color: 'var(--text-tertiary)', display: 'block', marginTop: '0.5rem' }}>Make sure to use a valid testnet wallet address so you can receive payments!</small>
         </div>
 
         <button type="submit" className="btn btn-primary btn-lg" style={{ width: '100%' }} disabled={loading}>
@@ -129,7 +129,7 @@ export default function LinkOrganization({ onLinked }: { onLinked: () => void })
       </form>
 
       <p style={{ marginTop: '1.5rem', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-        Once linked, your employer will need to approve your account and set your salary details before you can access Payzati features.
+        Once you link up, your employer will review your profile and set up your salary details. Then you&apos;ll be good to go!
       </p>
     </div>
   );
