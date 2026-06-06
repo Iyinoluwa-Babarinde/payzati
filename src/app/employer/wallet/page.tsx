@@ -34,7 +34,7 @@ export default function WalletPage() {
   const [depositAmount, setDepositAmount]       = useState('');
   const [depositCurrency, setDepositCurrency]   = useState('USD');
   const [depositing, setDepositing]             = useState(false);
-  const [bankDetails, setBankDetails]           = useState({ routing: '', account: '' });
+  const [bankDetails, setBankDetails]           = useState({ account: '' });
   const [linking, setLinking]                   = useState(false);
   const [transactions, setTransactions]         = useState<any[]>([]);
   const [balance, setBalance]                   = useState(0);
@@ -100,8 +100,8 @@ export default function WalletPage() {
 
   // ── Link bank ──────────────────────────────────────────────────────────────
   const handleLinkBank = async () => {
-    if (!bankDetails.routing || !bankDetails.account) {
-      toast.error('Please fill in both routing and account numbers.');
+    if (!bankDetails.account) {
+      toast.error('Please enter your account number.');
       return;
     }
     setLinking(true);
@@ -135,7 +135,7 @@ export default function WalletPage() {
       setPullSchedule({ nextPull: next.toISOString(), bankName: newBank.bankName, last4: newBank.last4, lastPull: null, lastAmount: null });
       setShowLinkModal(false);
       setLinking(false);
-      setBankDetails({ routing: '', account: '' });
+      setBankDetails({ account: '' });
       toast.success('Bank account linked — monthly auto-pull is live!');
     }, 1800);
   };
@@ -482,23 +482,11 @@ export default function WalletPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>
-                  Routing number
-                </label>
-                <input
-                  type="text"
-                  placeholder="9-digit routing number"
-                  value={bankDetails.routing}
-                  onChange={e => setBankDetails({ ...bankDetails, routing: e.target.value })}
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.375rem', fontSize: 'var(--text-xs)', fontWeight: 700, color: 'var(--text-secondary)' }}>
                   Account number
                 </label>
                 <input
                   type="text"
-                  placeholder="Account number"
+                  placeholder="Your bank account number"
                   value={bankDetails.account}
                   onChange={e => setBankDetails({ ...bankDetails, account: e.target.value })}
                   style={{ fontFamily: 'var(--font-mono)' }}
