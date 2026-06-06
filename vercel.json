@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/monthly-pull",
+      "schedule": "0 6 1 * *"
+    }
+  ]
+}

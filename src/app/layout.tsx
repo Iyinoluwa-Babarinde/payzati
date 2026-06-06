@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import NavigationProgress from "@/components/NavigationProgress";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://payzati.com'),
@@ -29,7 +30,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <NavigationProgress />
+        {children}
+      </body>
     </html>
   );
 }
