@@ -1,46 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=DM+Sans:wght@400;700&display=swap');
 
 :root {
-  /* 60-30-10 Color System */
-  --bg-primary: #0A0E1A;       /* 60% Dominant Page Background */
-  --bg-secondary: #111827;     /* 30% Structural Panels / Sidebar */
-  --border-default: #1D293B;   /* 30% Structural Borders */
-  --text-primary: #F9FAFB;     /* 30% Primary Text */
-  --text-secondary: #9CA3AF;   /* 30% Secondary Text */
-  --text-tertiary: #6B7280;    /* 30% Supporting Text */
+  /* 60-30-10 Color System — Flat 2.0 Dark Theme */
+  --bg-primary: #121212;       /* Base canvas background */
+  --bg-secondary: #1a1a1a;     /* Sidebar / sub-panel background */
+  --border-default: #2a2a2a;   /* Subtle boundary border */
+  --text-primary: #e0e0e0;     /* Soft off-white to eliminate glare */
+  --text-secondary: #a3a3a3;   /* Lighter gray body */
+  --text-tertiary: #737373;    /* Muted text */
   
-  --accent-teal: #00D4AA;      /* 10% Focus Accent */
-  --accent-teal-dim: rgba(0, 212, 170, 0.12);
-  --accent-teal-glow: rgba(0, 212, 170, 0.4);
+  --accent-teal: #1dbb9c;      /* Desaturated, soft teal focus (original: #00D4AA) */
+  --accent-teal-dim: rgba(29, 187, 156, 0.08);
+  --accent-teal-glow: rgba(29, 187, 156, 0.25);
 
-  /* Progressive Surface Elevation (Dark Mode Layers) */
-  --elevation-0: #0A0E1A;      /* Layer 0: Page Base */
-  --elevation-1: #111827;      /* Layer 1: Nav bars, sidebar, base feeds */
-  --elevation-2: #1D263B;      /* Layer 2: Cards, inputs, dropdowns */
-  --elevation-3: #263252;      /* Layer 3: Active hover targets, modal sheets */
+  /* Progressive Surface Elevation (Dark Mode Layers) — Flat 2.0 Overlay Tones */
+  --elevation-0: #121212;      /* Bottom base */
+  --elevation-1: #1e1e1e;      /* Lighter gray sub-containers */
+  --elevation-2: #282828;      /* Lighter cards, panels, inputs */
+  --elevation-3: #323232;      /* Lighter hover targets, modals, dialog sheets */
 
-  /* Accents & Status */
-  --accent-gold: #FFB800;
-  --accent-gold-dim: rgba(255, 184, 0, 0.12);
-  --accent-purple: #6C5CE7;
-  --accent-purple-dim: rgba(108, 92, 231, 0.12);
-  --accent-blue: #3B82F6;
-  --accent-blue-dim: rgba(59, 130, 246, 0.12);
+  /* Accents & Status — Desaturated for Dark Mode compliance */
+  --accent-gold: #eab308;
+  --accent-gold-dim: rgba(234, 179, 8, 0.08);
+  --accent-purple: #818cf8;
+  --accent-purple-dim: rgba(129, 140, 248, 0.08);
+  --accent-blue: #60a5fa;
+  --accent-blue-dim: rgba(96, 165, 250, 0.08);
   
-  --status-success: #10B981;
-  --status-warning: #F59E0B;
-  --status-error: #EF4444;
-  --status-info: #3B82F6;
+  --status-success: #10b981;
+  --status-warning: #f59e0b;
+  --status-error: #ef4444;
+  --status-info: #3b82f6;
 
-  /* Borders & Shadows */
-  --border-subtle: rgba(255, 255, 255, 0.05);
-  --border-strong: rgba(255, 255, 255, 0.18);
+  /* Borders & Shadows — Replaced with elevation overlays and borders */
+  --border-subtle: #222222;
+  --border-strong: #383838;
   --border-accent: var(--accent-teal);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  --shadow-glow-teal: 0 0 24px rgba(0, 212, 170, 0.2);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-glow-teal: none;
   
   /* Radii */
   --radius-sm: 8px;

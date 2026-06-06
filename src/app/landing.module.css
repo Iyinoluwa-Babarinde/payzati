@@ -75,7 +75,7 @@
   transition: all var(--transition-base);
   pointer-events: auto;
   padding: 10px 32px;
-  background: rgba(10, 14, 26, 0.2);
+  background: rgba(18, 18, 18, 0.2);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-subtle);
@@ -95,13 +95,13 @@
 
 .navbar.scrolled .navContent {
   max-width: 680px;
-  background: rgba(17, 24, 39, 0.92);
+  background: var(--elevation-1);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--border-default);
   padding: 8px 24px;
   gap: 1.5rem;
-  box-shadow: var(--shadow-lg), 0 0 32px rgba(0,212,170,0.06);
+  box-shadow: none;
 }
 
 .navLogo {
@@ -121,7 +121,7 @@
 .sq, .cr {
   width: 8px; height: 8px;
   background: var(--accent-teal);
-  box-shadow: 0 0 6px var(--accent-teal-glow);
+  box-shadow: none;
 }
 .sq { border-radius: 1px; }
 .cr { border-radius: 50%; }
@@ -246,7 +246,7 @@
   background: var(--bg-secondary);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-strong);
-  box-shadow: var(--shadow-lg), 0 0 60px rgba(0,212,170,0.08), 0 0 120px rgba(0,212,170,0.04);
+  box-shadow: none;
   overflow: hidden;
   position: relative;
 }
@@ -485,9 +485,9 @@
   gap: 0.75rem;
   padding: 1rem 2rem;
   background: var(--elevation-1);
-  border: 1px solid rgba(0,212,170,0.25);
+  border: 1px solid rgba(29, 187, 156, 0.25);
   border-radius: var(--radius-full);
-  box-shadow: 0 0 24px rgba(0,212,170,0.08);
+  box-shadow: none;
 }
 
 .pricingTxLabel {
@@ -546,7 +546,7 @@
 .pricingCardFeatured {
   background: linear-gradient(160deg, var(--elevation-2) 0%, var(--elevation-1) 100%);
   border: 2px solid var(--accent-teal);
-  box-shadow: var(--shadow-lg), 0 0 40px rgba(0,212,170,0.15);
+  box-shadow: none;
   transform: translateY(-8px);
 }
 

@@ -115,152 +115,154 @@ export default function LandingPage() {
 
       {/* 1. HERO */}
       <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <h1 className={`${styles.heroTitle} text-gradient-teal`}>
-            Global payroll.<br/>Instant settlement.
-          </h1>
-          <p className={styles.heroSubtitle}>
-            Stop paying wire fees. Stop waiting days. Just pay your team.
-          </p>
-          <div className={styles.heroCTA}>
-            <Link href="/auth/register" className="btn btn-primary btn-lg">
-              Start now
-            </Link>
-            <Link href="#how-it-works" className="btn btn-secondary btn-lg">
-              See how
-            </Link>
-          </div>
-        </div>
-        
-        {/* Product Visual / Demo Mockup */}
-        <div className={styles.productVisual}>
-          <div className={styles.browserHeader} style={{ justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', gap: '6px', width: '80px' }}>
-              <div className={`${styles.dot} ${styles.dotR}`}></div>
-              <div className={`${styles.dot} ${styles.dotY}`}></div>
-              <div className={`${styles.dot} ${styles.dotG}`}></div>
+        <div className={styles.heroInner}>
+          <div className={styles.heroContent}>
+            <h1 className={`${styles.heroTitle} text-gradient-teal`}>
+              Global payroll.<br/>Instant settlement.
+            </h1>
+            <p className={styles.heroSubtitle}>
+              Stop paying wire fees. Stop waiting days. Just pay your team.
+            </p>
+            <div className={styles.heroCTA}>
+              <Link href="/auth/register" className="btn btn-primary btn-lg">
+                Start now
+              </Link>
+              <Link href="#how-it-works" className="btn btn-secondary btn-lg">
+                See how
+              </Link>
             </div>
-            
-            <div className={styles.viewSelector}>
-              <button 
-                onClick={() => setActiveView('employer')}
-                className={`${styles.viewBtn} ${activeView === 'employer' ? styles.activeViewBtn : ''}`}
-              >
-                Employer
-              </button>
-              <button 
-                onClick={() => setActiveView('employee')}
-                className={`${styles.viewBtn} ${activeView === 'employee' ? styles.activeViewBtn : ''}`}
-              >
-                Employee
-              </button>
-            </div>
-            
-            <div style={{ width: '80px' }}></div>
           </div>
           
-          <div style={{ background: 'var(--bg-primary)', display: 'flex', height: '380px', overflow: 'hidden' }}>
-            {activeView === 'employer' ? (
-              <>
-                {/* Employer Sidebar Replica - collapsed to 160px */}
-                <div style={{ width: '160px', borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <div style={{ width: '70%', height: '18px', background: 'var(--elevation-2)', borderRadius: '4px', marginBottom: '1.25rem', marginTop: '0.25rem' }}></div>
-                  <div style={{ width: '100%', height: '30px', background: 'var(--accent-teal-dim)', borderRadius: '6px' }}></div>
-                  <div style={{ width: '100%', height: '30px', background: 'var(--elevation-2)', borderRadius: '6px' }}></div>
-                  <div style={{ width: '100%', height: '30px', background: 'var(--elevation-2)', borderRadius: '6px' }}></div>
-                </div>
-                
-                {/* Employer Main Replica */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
-                  <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'flex-end' }}>
-                    <div style={{ padding: '3px 10px', background: 'var(--accent-teal-dim)', border: '1px solid rgba(0, 212, 170, 0.2)', color: 'var(--accent-teal)', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 700 }}>ILP Connected</div>
-                  </div>
-                  <div style={{ padding: '1.5rem', overflow: 'hidden' }}>
-                    {/* Collapsed 2x2 Stats Grid to prevent overflow */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1.25rem' }}>
-                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Total People</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>142</div>
-                      </div>
-                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Countries</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>12</div>
-                      </div>
-                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Monthly Total</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>$145k</div>
-                      </div>
-                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Balance</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>$12.4k</div>
-                      </div>
-                    </div>
-                    
-                    <div className={styles.mockCard} style={{ height: '110px', background: 'var(--elevation-1)' }}>
-                      <table style={{ width: '100%', fontSize: '0.75rem', textAlign: 'left', borderCollapse: 'collapse' }}>
-                        <thead>
-                          <tr style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)' }}>
-                            <th style={{ paddingBottom: '0.35rem' }}>Run</th>
-                            <th style={{ paddingBottom: '0.35rem' }}>Amount</th>
-                            <th style={{ paddingBottom: '0.35rem' }}>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td style={{ padding: '8px 0', fontFamily: 'var(--font-mono)' }}>PR-9281</td>
-                            <td>$145,000.00</td>
-                            <td>
-                              <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: '0.65rem' }}>
-                                <CheckIcon size={10} style={{ marginRight: '2px' }} /> Success
-                              </span>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {/* Employee Topbar Replica */}
-                <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>Welcome back, Sarah</div>
-                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Globex Corp</div>
-                  </div>
-                  <div style={{ width: '32px', height: '32px', background: 'var(--accent-teal-dim)', borderRadius: '50%', color: 'var(--accent-teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>SJ</div>
-                </div>
-                {/* Employee Main Replica */}
-                <div style={{ padding: '1.5rem', display: 'flex', gap: '1rem', flex: 1, overflow: 'hidden' }}>
-                  <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                      <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Next Payday</div>
-                      <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.75rem' }}>in 12 days</div>
-                      <div className={styles.mockProgressContainer}><div className={styles.mockProgressFill} style={{ width: '60%' }}></div></div>
-                    </div>
-                    <div className={styles.mockCard} style={{ flex: 1, background: 'var(--elevation-1)' }}>
-                      <div style={{ fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Recent paystubs</div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}>
-                        <span>May 2026</span><span style={{ fontWeight: 700 }}>KES 145,000</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.75rem' }}>
-                        <span>Apr 2026</span><span style={{ fontWeight: 700 }}>KES 145,000</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div style={{ flex: 1.2 }}>
-                    <div className={styles.mockCard} style={{ background: 'var(--elevation-2)', borderLeft: '4px solid var(--accent-teal)', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                      <div style={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Wage Access</div>
-                      <div style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginBottom: '1.25rem', lineHeight: 1.4 }}>Withdraw accrued earnings instantly.</div>
-                      <div style={{ marginTop: 'auto' }}>
-                        <button className="btn btn-primary btn-sm btn-block" style={{ width: '100%', fontSize: '0.7rem' }}>Withdraw</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+          {/* Product Visual / Demo Mockup */}
+          <div className={styles.productVisual}>
+            <div className={styles.browserHeader} style={{ justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', gap: '6px', width: '80px' }}>
+                <div className={`${styles.dot} ${styles.dotR}`}></div>
+                <div className={`${styles.dot} ${styles.dotY}`}></div>
+                <div className={`${styles.dot} ${styles.dotG}`}></div>
               </div>
-            )}
+              
+              <div className={styles.viewSelector}>
+                <button 
+                  onClick={() => setActiveView('employer')}
+                  className={`${styles.viewBtn} ${activeView === 'employer' ? styles.activeViewBtn : ''}`}
+                >
+                  Employer
+                </button>
+                <button 
+                  onClick={() => setActiveView('employee')}
+                  className={`${styles.viewBtn} ${activeView === 'employee' ? styles.activeViewBtn : ''}`}
+                >
+                  Employee
+                </button>
+              </div>
+              
+              <div style={{ width: '80px' }}></div>
+            </div>
+            
+            <div style={{ background: 'var(--bg-primary)', display: 'flex', height: '380px', overflow: 'hidden' }}>
+              {activeView === 'employer' ? (
+                <>
+                  {/* Employer Sidebar Replica - collapsed to 160px */}
+                  <div style={{ width: '160px', borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ width: '70%', height: '18px', background: 'var(--elevation-2)', borderRadius: '4px', marginBottom: '1.25rem', marginTop: '0.25rem' }}></div>
+                    <div style={{ width: '100%', height: '30px', background: 'var(--accent-teal-dim)', borderRadius: '6px' }}></div>
+                    <div style={{ width: '100%', height: '30px', background: 'var(--elevation-2)', borderRadius: '6px' }}></div>
+                    <div style={{ width: '100%', height: '30px', background: 'var(--elevation-2)', borderRadius: '6px' }}></div>
+                  </div>
+                  
+                  {/* Employer Main Replica */}
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
+                    <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'flex-end' }}>
+                      <div style={{ padding: '3px 10px', background: 'var(--accent-teal-dim)', border: '1px solid rgba(0, 212, 170, 0.2)', color: 'var(--accent-teal)', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 700 }}>ILP Connected</div>
+                    </div>
+                    <div style={{ padding: '1.5rem', overflow: 'hidden' }}>
+                      {/* Collapsed 2x2 Stats Grid to prevent overflow */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1.25rem' }}>
+                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Total People</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>142</div>
+                        </div>
+                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Countries</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>12</div>
+                        </div>
+                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Monthly Total</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>$145k</div>
+                        </div>
+                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Balance</div>
+                          <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>$12.4k</div>
+                        </div>
+                      </div>
+                      
+                      <div className={styles.mockCard} style={{ height: '110px', background: 'var(--elevation-1)' }}>
+                        <table style={{ width: '100%', fontSize: '0.75rem', textAlign: 'left', borderCollapse: 'collapse' }}>
+                          <thead>
+                            <tr style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)' }}>
+                              <th style={{ paddingBottom: '0.35rem' }}>Run</th>
+                              <th style={{ paddingBottom: '0.35rem' }}>Amount</th>
+                              <th style={{ paddingBottom: '0.35rem' }}>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td style={{ padding: '8px 0', fontFamily: 'var(--font-mono)' }}>PR-9281</td>
+                              <td>$145,000.00</td>
+                              <td>
+                                <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: '0.65rem' }}>
+                                  <CheckIcon size={10} style={{ marginRight: '2px' }} /> Success
+                                </span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                  {/* Employee Topbar Replica */}
+                  <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>Welcome back, Sarah</div>
+                      <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Globex Corp</div>
+                    </div>
+                    <div style={{ width: '32px', height: '32px', background: 'var(--accent-teal-dim)', borderRadius: '50%', color: 'var(--accent-teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>SJ</div>
+                  </div>
+                  {/* Employee Main Replica */}
+                  <div style={{ padding: '1.5rem', display: 'flex', gap: '1rem', flex: 1, overflow: 'hidden' }}>
+                    <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Next Payday</div>
+                        <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.75rem' }}>in 12 days</div>
+                        <div className={styles.mockProgressContainer}><div className={styles.mockProgressFill} style={{ width: '60%' }}></div></div>
+                      </div>
+                      <div className={styles.mockCard} style={{ flex: 1, background: 'var(--elevation-1)' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Recent paystubs</div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}>
+                          <span>May 2026</span><span style={{ fontWeight: 700 }}>KES 145,000</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.75rem' }}>
+                          <span>Apr 2026</span><span style={{ fontWeight: 700 }}>KES 145,000</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div style={{ flex: 1.2 }}>
+                      <div className={styles.mockCard} style={{ background: 'var(--elevation-2)', borderLeft: '4px solid var(--accent-teal)', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Wage Access</div>
+                        <div style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginBottom: '1.25rem', lineHeight: 1.4 }}>Withdraw accrued earnings instantly.</div>
+                        <div style={{ marginTop: 'auto' }}>
+                          <button className="btn btn-primary btn-sm btn-block" style={{ width: '100%', fontSize: '0.7rem' }}>Withdraw</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
