@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import NavigationProgress from "@/components/NavigationProgress";
+import PWARegister from "@/components/PWARegister";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://payzati.com'),
   title: "Payzati — Pay Anyone. Anywhere. Instantly.",
   description: "Global B2B B2C Payroll & Settlement Platform powered by Interledger Protocol. Instant cross-border salary payments with near-zero fees and automatic tax compliance.",
   keywords: "payroll, global payments, interledger, ILP, cross-border, salary, fintech",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Payzati',
+  },
 };
 
 export default function RootLayout({
@@ -29,8 +35,10 @@ export default function RootLayout({
             }),
           }}
         />
+        <meta name="theme-color" content="#1dbb9c" />
       </head>
       <body>
+        <PWARegister />
         <NavigationProgress />
         {children}
       </body>
