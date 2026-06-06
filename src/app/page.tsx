@@ -385,40 +385,147 @@ export default function LandingPage() {
       <section id="pricing" className={styles.section}>
         <h2 className={styles.sectionTitle}>Simple pricing.</h2>
         <p className={styles.sectionSubtitle}>No hidden fees.</p>
-        
-        <div className={styles.pricingWrapper}>
-          <div className={styles.singlePriceCard}>
-            <div className={styles.priceHeader}>
-              <span className={styles.pricePlanLabel}>Flat Rate Payroll</span>
-              <div className={styles.priceNumber}>
-                <span className={styles.priceDollar}>$</span>
-                <span className={styles.priceAmountBig}>49</span>
-                <span className={styles.pricePerMonth}>/mo</span>
-              </div>
-            </div>
-            
-            <div className={styles.priceDescription}>
-              <p>
-                Complete access to all multi-country payroll tools. We charge a single monthly fee for your company.
-              </p>
-            </div>
-            
-            <div className={styles.safetyNet}>
-              <div className={styles.safetyNetItem}>
-                <CheckIcon className={styles.safetyIcon} />
-                <span><strong>Transparency Bias Safety Net:</strong> Free for up to 5 employees. We only charge when you execute your payroll. No setup fees, no compliance markup, cancel in 1-click.</span>
-              </div>
-              <div className={styles.safetyNetItem}>
-                <CheckIcon className={styles.safetyIcon} />
-                <span><strong>Evaluative Ease:</strong> One fixed price. No complex tiers, no per-employee additions, no surprise tax filing premiums.</span>
-              </div>
-            </div>
 
-            <div className={styles.priceCTA}>
-              <Link href="/auth/register" className="btn btn-primary btn-lg btn-block">
-                Start free trial
-              </Link>
+        {/* Transaction fee pill */}
+        <div className={styles.pricingTxRow}>
+          <div className={styles.pricingTxPill}>
+            <span className={styles.pricingTxLabel}>Transaction Rate</span>
+            <div className={styles.pricingTxDivider}></div>
+            <span className={styles.pricingTxRate}>0.2%</span>
+            <div className={styles.pricingTxDivider}></div>
+            <span className={styles.pricingTxDesc}>On every transaction. No markup, no hidden spreads.</span>
+          </div>
+        </div>
+
+        {/* The 4-card grid */}
+        <div className={styles.pricingGrid}>
+          {/* Free Tier */}
+          <div className={styles.pricingCard}>
+            <div className={styles.pricingTier}>Free</div>
+            <div className={styles.pricingAmount}>
+              <span className={styles.pricingDollar}>$</span>
+              <span className={styles.pricingNum}>0</span>
+              <span className={styles.pricingPer}>/mo</span>
             </div>
+            <div>
+              <span className={styles.pricingEmployees}>1-10 employees</span>
+            </div>
+            <ul className={styles.pricingFeatures}>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Standard global payroll routing</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Open Payments integration</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Basic tax computation</span>
+              </li>
+            </ul>
+            <Link href="/auth/register" className="btn btn-secondary btn-sm btn-block" style={{ marginTop: 'auto' }}>
+              Get started
+            </Link>
+          </div>
+
+          {/* Pro Tier (Featured) */}
+          <div className={`${styles.pricingCard} ${styles.pricingCardFeatured}`}>
+            <span className={styles.pricingBadge}>Most Popular</span>
+            <div className={styles.pricingTier}>Pro</div>
+            <div className={styles.pricingAmount}>
+              <span className={styles.pricingDollar}>$</span>
+              <span className={styles.pricingNum}>5</span>
+              <span className={styles.pricingPer}>/mo</span>
+            </div>
+            <div>
+              <span className={styles.pricingEmployees}>11-100 employees</span>
+            </div>
+            <ul className={styles.pricingFeatures}>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Everything in Free</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Automated monthly bank pulls</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Advanced multi-currency routing</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Priority support</span>
+              </li>
+            </ul>
+            <Link href="/auth/register" className="btn btn-primary btn-sm btn-block" style={{ marginTop: 'auto' }}>
+              Start Pro trial
+            </Link>
+          </div>
+
+          {/* Premium Tier */}
+          <div className={styles.pricingCard}>
+            <div className={styles.pricingTier}>Premium</div>
+            <div className={styles.pricingAmount}>
+              <span className={styles.pricingDollar}>$</span>
+              <span className={styles.pricingNum}>10</span>
+              <span className={styles.pricingPer}>/mo</span>
+            </div>
+            <div>
+              <span className={styles.pricingEmployees}>101-500 employees</span>
+            </div>
+            <ul className={styles.pricingFeatures}>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Everything in Pro</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>EWA (Earned Wage Access) panel</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Custom compliance reports</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Dedicated account team</span>
+              </li>
+            </ul>
+            <Link href="/auth/register" className="btn btn-secondary btn-sm btn-block" style={{ marginTop: 'auto' }}>
+              Start Premium trial
+            </Link>
+          </div>
+
+          {/* Enterprise Tier */}
+          <div className={styles.pricingCard}>
+            <div className={styles.pricingTier}>Enterprise</div>
+            <div className={styles.pricingCustom}>Custom</div>
+            <div>
+              <span className={styles.pricingEmployees}>501+ employees</span>
+            </div>
+            <ul className={styles.pricingFeatures}>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Tailored transaction rates</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Unlimited employees</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>Dedicated liquidity routing paths</span>
+              </li>
+              <li className={styles.pricingFeatureItem}>
+                <CheckIcon className={styles.pricingCheckIcon} />
+                <span>24/7 SLA support</span>
+              </li>
+            </ul>
+            <Link href="/auth/register" className="btn btn-secondary btn-sm btn-block" style={{ marginTop: 'auto' }}>
+              Contact sales
+            </Link>
           </div>
         </div>
       </section>
