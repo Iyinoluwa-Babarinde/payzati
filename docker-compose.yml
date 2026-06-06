@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # Rafiki Local Playground
+  # A complete local instance of the Interledger network for testing payments
+  rafiki:
+    image: ghcr.io/interledger/rafiki-local-playground:latest
+    ports:
+      - "3000:3000" # Frontend UI
+      - "3001:3001" # Admin GraphQL API
+      - "3002:3002" # Backend API
+      - "4000:4000" # Open Payments API
+    environment:
+      - NODE_ENV=development
+      - AUTH_SERVER_URL=http://localhost:3006
+      - OPEN_PAYMENTS_URL=http://localhost:4000
+    networks:
+      - interledger
+
+  # Simulated Bank / Core banking system
+  bank:
+    image: ghcr.io/interledger/tigerbeetle:latest
+    ports:
+      - "3003:3003"
+    networks:
+      - interledger
+
+networks:
+  interledger:
+    driver: bridge

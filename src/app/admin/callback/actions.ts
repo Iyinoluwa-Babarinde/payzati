@@ -1,0 +1,49 @@
+'use server';
+
+import { getAuthenticatedClient } from '@/lib/ilp/client';
+import { createClient as createServerClient } from '@/lib/supabase/server';
+
+export async function processMasterCallback(url: string) {
+  const parsedUrl = new URL(url);
+  const interactRef = parsedUrl.searchParams.get('interact_ref');
+  const hash = parsedUrl.searchParams.get('hash');
+
+  if (!interactRef) {
+    throw new Error('No interact_ref found in URL');
+  }
+
+  const client = await getAuthenticatedClient();
+  if (!client) throw new Error('Authenticated client credentials missing or invalid');
+
+  const masterWallet = process.env.PAYZATI_WALLET_ADDRESS;
+  if (!masterWallet) throw new Error('PAYZATI_WALLET_ADDRESS not set');
+
+  const supabase = await createServerClient();
+  
+  const { data, error } = await supabase.from('system_config').select('value').eq('key', 'master_grant_continue').single();
+  if (error || !data) throw new Error('Could not find continue details in database');
+  
+  const continueInfo = data.value;
+
+  const grant = await client.grant.continue(
+    {
+      url: continueInfo.uri,
+      accessToken: continueInfo.access_token,
+    },
+    { interact_ref: interactRef }
+  );
+
+  // Cast as any to resolve union type narrowing errors for TypeScript compiler
+  const finalGrant = grant as any;
+  if (!finalGrant.access_token) {
+    throw new Error('Grant continuation did not return an access token');
+  }
+
+  // Save the final token
+  await supabase.from('system_config').upsert({
+    key: 'master_ilp_token',
+    value: finalGrant.access_token.value
+  });
+
+  return true;
+}
