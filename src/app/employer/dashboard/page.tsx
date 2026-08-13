@@ -8,19 +8,13 @@ import {
   Banknote, 
   Wallet, 
   Zap, 
-  ArrowRight, 
   Search, 
-  CheckCircle2, 
-  Plus, 
-  Sparkles,
-  ExternalLink,
-  ShieldCheck
+  Plus
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/fx-engine';
 import { getCompany } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
 import ILPTransferVisualizer from '@/components/ILPTransferVisualizer';
-import styles from './dashboard.module.css';
 
 // Circular Flag SVGs
 function FlagNG({ size = 16 }: { size?: number }) {
@@ -110,18 +104,18 @@ export default function EmployerDashboard() {
           setEmployees(data);
         } else {
           setEmployees([
-            { id: '1', name: 'Sarah Johansson', country: 'Nigeria', currency: 'NGN', salary: 1550000, wallet_address: 'https://ilp.interledger-test.dev/sarah-johansson', role: 'Senior Software Engineer' },
-            { id: '2', name: 'David Ochieng', country: 'Kenya', currency: 'KES', salary: 185000, wallet_address: 'https://ilp.interledger-test.dev/david-ochieng', role: 'DevOps Lead' },
-            { id: '3', name: 'Kwame Mensah', country: 'Ghana', currency: 'GHS', salary: 18400, wallet_address: 'https://ilp.interledger-test.dev/kwame-mensah', role: 'Product Manager' },
-            { id: '4', name: 'Thabo Ndlovu', country: 'South Africa', currency: 'ZAR', salary: 45000, wallet_address: 'https://ilp.interledger-test.dev/thabo-ndlovu', role: 'Security Engineer' },
-            { id: '5', name: 'Youssef Hassan', country: 'Egypt', currency: 'EGP', salary: 38000, wallet_address: 'https://ilp.interledger-test.dev/youssef-hassan', role: 'UX Architect' },
+            { id: '1', name: 'Sarah Johansson', country: 'Nigeria', currency: 'NGN', salary: 1550000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Senior Software Engineer' },
+            { id: '2', name: 'David Ochieng', country: 'Kenya', currency: 'KES', salary: 185000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'DevOps Lead' },
+            { id: '3', name: 'Kwame Mensah', country: 'Ghana', currency: 'GHS', salary: 18400, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Product Manager' },
+            { id: '4', name: 'Thabo Ndlovu', country: 'South Africa', currency: 'ZAR', salary: 45000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Security Engineer' },
+            { id: '5', name: 'Youssef Hassan', country: 'Egypt', currency: 'EGP', salary: 38000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'UX Architect' },
           ]);
         }
       } catch (e) {
         setEmployees([
-          { id: '1', name: 'Sarah Johansson', country: 'Nigeria', currency: 'NGN', salary: 1550000, wallet_address: 'https://ilp.interledger-test.dev/sarah-johansson', role: 'Senior Software Engineer' },
-          { id: '2', name: 'David Ochieng', country: 'Kenya', currency: 'KES', salary: 185000, wallet_address: 'https://ilp.interledger-test.dev/david-ochieng', role: 'DevOps Lead' },
-          { id: '3', name: 'Kwame Mensah', country: 'Ghana', currency: 'GHS', salary: 18400, wallet_address: 'https://ilp.interledger-test.dev/kwame-mensah', role: 'Product Manager' },
+          { id: '1', name: 'Sarah Johansson', country: 'Nigeria', currency: 'NGN', salary: 1550000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Senior Software Engineer' },
+          { id: '2', name: 'David Ochieng', country: 'Kenya', currency: 'KES', salary: 185000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'DevOps Lead' },
+          { id: '3', name: 'Kwame Mensah', country: 'Ghana', currency: 'GHS', salary: 18400, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Product Manager' },
         ]);
       }
       setLoading(false);
@@ -144,84 +138,53 @@ export default function EmployerDashboard() {
       
       {/* 🚀 1. HERO COCKPIT HEADER BAR */}
       <div 
+        className="card"
         style={{
-          background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '24px',
-          padding: '1.75rem',
+          padding: '1.5rem',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
           gap: '1.25rem',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
         }}
       >
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-            <span style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>{companyName}</span>
-            <span
-              style={{
-                background: 'rgba(16,185,129,0.15)',
-                color: '#10b981',
-                border: '1px solid #10b981',
-                padding: '3px 10px',
-                borderRadius: '100px',
-                fontSize: '0.75rem',
-                fontWeight: 800,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-              }}
-            >
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span>
-              LIVE ILP TESTNET
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+            <h1 style={{ fontSize: '1.35rem', margin: 0 }}>{companyName}</h1>
+            <span className="badge badge-success">
+              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--status-success)', display: 'inline-block' }}></span>
+              ILP Testnet Connected
             </span>
           </div>
-          <div style={{ fontSize: '0.825rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>Master Wallet:</span>
-            <code style={{ color: '#38bdf8', background: 'rgba(56,189,248,0.1)', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem' }}>
+          <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Master Pointer:</span>
+            <code style={{ color: 'var(--accent-teal)', background: 'var(--elevation-2)', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontFamily: 'monospace' }}>
               $ilp.interledger-test.dev/a5cb6a41
             </code>
           </div>
         </div>
 
-        {/* Quick Action Buttons */}
+        {/* Action Buttons */}
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <button
             onClick={() => {
               setSelectedRecipient(null);
               setShowExpressVisualizer(true);
             }}
+            className="btn btn-primary"
             style={{
-              background: 'linear-gradient(135deg, #10b981 0%, #00d4aa 100%)',
-              color: '#0d1117',
-              border: 'none',
-              borderRadius: '14px',
-              padding: '0.85rem 1.4rem',
-              fontWeight: 800,
-              fontSize: '0.9rem',
-              cursor: 'pointer',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              boxShadow: '0 8px 24px rgba(16,185,129,0.35)',
-              transition: 'transform 0.2s ease',
+              padding: '0.75rem 1.35rem',
+              fontWeight: 700,
             }}
           >
-            <Zap size={18} /> 1-Click Express Payroll
+            <Zap size={16} /> 1-Click Express Payroll
           </button>
           
           <Link
             href="/employer/employees"
             className="btn btn-secondary"
             style={{
-              borderRadius: '14px',
-              padding: '0.85rem 1.25rem',
-              fontWeight: 700,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
+              padding: '0.75rem 1.25rem',
             }}
           >
             <Plus size={16} /> Add Member
@@ -232,130 +195,113 @@ export default function EmployerDashboard() {
       {/* 📊 2. HIGH-DENSITY METRIC TILES */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
         {/* Wallet Balance */}
-        <div style={{ background: 'rgba(17, 24, 39, 0.75)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '1.25rem' }}>
+        <div className="card" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Available Balance</span>
-            <Wallet size={18} color="#00d4aa" />
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Available Balance</span>
+            <Wallet size={18} color="var(--accent-teal)" />
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#10b981', marginBottom: '4px' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
             ${stats.walletBalance.toLocaleString()}.00 USD
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Auto-funding linked via Chase Business</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Pre-funded testnet balance</span>
         </div>
 
         {/* Total People */}
-        <div style={{ background: 'rgba(17, 24, 39, 0.75)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '1.25rem' }}>
+        <div className="card" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Total Active Team</span>
-            <Users size={18} color="#38bdf8" />
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Total Active Team</span>
+            <Users size={18} color="var(--accent-teal)" />
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', marginBottom: '4px' }}>
-            {stats.totalEmployees} Team Members
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
+            {stats.totalEmployees} Members
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#38bdf8' }}>100% Onboarded with Testnet Pointers</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--status-success)' }}>100% Ready for Payout</span>
         </div>
 
         {/* Global Markets */}
-        <div style={{ background: 'rgba(17, 24, 39, 0.75)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '1.25rem' }}>
+        <div className="card" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Covered Markets</span>
-            <Globe size={18} color="#f59e0b" />
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Covered Markets</span>
+            <Globe size={18} color="var(--accent-teal)" />
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', marginBottom: '4px' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
             {stats.countries} African Countries
           </div>
-          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginTop: '6px' }}>
+          <div style={{ display: 'flex', gap: '4px', alignItems: 'center', marginTop: '4px' }}>
             <FlagNG size={16} /> <FlagKE size={16} /> <FlagGH size={16} /> <FlagZA size={16} /> <FlagEG size={16} />
           </div>
         </div>
 
         {/* Monthly Payroll Total */}
-        <div style={{ background: 'rgba(17, 24, 39, 0.75)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '1.25rem' }}>
+        <div className="card" style={{ padding: '1.25rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase' }}>Estimated Monthly</span>
-            <Banknote size={18} color="#a855f7" />
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Monthly Payroll</span>
+            <Banknote size={18} color="var(--accent-teal)" />
           </div>
-          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', marginBottom: '4px' }}>
+          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
             ${stats.monthlyPayroll.toLocaleString()}.00 USD
           </div>
-          <span style={{ fontSize: '0.75rem', color: '#10b981' }}>0.2% Flat Interledger Fee ($290)</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--status-success)' }}>0.2% Transparent Rate</span>
         </div>
       </div>
 
       {/* 📋 3. LIVE ROSTER & INSTANT STREAM MATRIX */}
-      <div 
-        style={{
-          background: 'rgba(17, 24, 39, 0.75)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '24px',
-          padding: '1.5rem',
-          backdropFilter: 'blur(16px)',
-        }}
-      >
+      <div className="card" style={{ padding: '1.5rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 800 }}>Live Roster &amp; Payout Operations</h3>
-            <span style={{ fontSize: '0.775rem', color: '#94a3b8' }}>Stream micro-wages or trigger batch settlements directly</span>
+            <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700 }}>Team Roster &amp; Payout Matrix</h2>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Send instant Interledger payments to any team member</span>
           </div>
 
           {/* Quick Search */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(0,0,0,0.4)', padding: '6px 14px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-            <Search size={16} color="#94a3b8" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--elevation-2)', padding: '6px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)' }}>
+            <Search size={16} color="var(--text-secondary)" />
             <input
               type="text"
-              placeholder="Search team member or country..."
+              placeholder="Search team or country..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '0.825rem', outline: 'none', width: '220px' }}
+              style={{ background: 'transparent', border: 'none', color: 'var(--text-primary)', fontSize: '0.825rem', outline: 'none', width: '200px', padding: 0 }}
             />
           </div>
         </div>
 
         {/* Data Table */}
         <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+          <table className="data-table">
             <thead>
-              <tr style={{ color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.08)', textAlign: 'left' }}>
-                <th style={{ padding: '10px 12px' }}>Team Member</th>
-                <th style={{ padding: '10px 12px' }}>Market</th>
-                <th style={{ padding: '10px 12px' }}>Payment Pointer</th>
-                <th style={{ padding: '10px 12px' }}>Net Salary</th>
-                <th style={{ padding: '10px 12px', textAlign: 'right' }}>Instant Action</th>
+              <tr>
+                <th>Team Member</th>
+                <th>Market</th>
+                <th>Payment Pointer</th>
+                <th>Net Salary</th>
+                <th style={{ textAlign: 'right' }}>Instant Action</th>
               </tr>
             </thead>
             <tbody>
               {filteredEmployees.map((emp) => (
-                <tr key={emp.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', transition: 'background 0.2s ease' }}>
-                  <td style={{ padding: '12px' }}>
-                    <strong style={{ color: '#fff', display: 'block' }}>{emp.name}</strong>
-                    <span style={{ fontSize: '0.725rem', color: '#94a3b8' }}>{emp.role || 'Full-time Team Member'}</span>
+                <tr key={emp.id}>
+                  <td>
+                    <strong style={{ color: 'var(--text-primary)', display: 'block' }}>{emp.name}</strong>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{emp.role || 'Team Member'}</span>
                   </td>
-                  <td style={{ padding: '12px' }}>
+                  <td>
                     <CountryFlag country={emp.country} size={16} />
-                    <span style={{ color: '#cbd5e1' }}>{emp.country}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{emp.country}</span>
                   </td>
-                  <td style={{ padding: '12px', fontFamily: 'monospace', color: '#38bdf8', fontSize: '0.775rem' }}>
+                  <td style={{ fontFamily: 'monospace', color: 'var(--text-secondary)', fontSize: '0.775rem' }}>
                     {emp.wallet_address}
                   </td>
-                  <td style={{ padding: '12px', fontWeight: 700, color: '#10b981' }}>
+                  <td style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>
                     {formatCurrency(emp.salary, emp.currency)}
                   </td>
-                  <td style={{ padding: '12px', textAlign: 'right' }}>
+                  <td style={{ textAlign: 'right' }}>
                     <button
                       onClick={() => handlePayIndividual(emp)}
+                      className="btn btn-secondary btn-sm"
                       style={{
-                        background: 'rgba(0, 212, 170, 0.12)',
-                        color: '#00d4aa',
-                        border: '1px solid rgba(0, 212, 170, 0.3)',
-                        borderRadius: '10px',
-                        padding: '6px 14px',
-                        fontWeight: 700,
-                        fontSize: '0.775rem',
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        transition: 'all 0.2s ease',
+                        fontWeight: 600,
+                        color: 'var(--accent-teal)',
                       }}
                     >
                       <Zap size={14} /> Pay via ILP
@@ -373,7 +319,7 @@ export default function EmployerDashboard() {
         isOpen={showExpressVisualizer}
         onClose={() => setShowExpressVisualizer(false)}
         senderWallet="https://ilp.interledger-test.dev/a5cb6a41"
-        receiverWallet={selectedRecipient?.wallet_address || 'https://ilp.interledger-test.dev/sarah-johansson'}
+        receiverWallet="https://ilp.interledger-test.dev/a5cb6a41"
         senderName="Payzati Employer Master Wallet"
         receiverName={selectedRecipient?.name || 'All Active Team Members (Batch Payout)'}
         sendAmount={selectedRecipient ? (selectedRecipient.salary / (selectedRecipient.currency === 'NGN' ? 1550 : 130)) : 145000}

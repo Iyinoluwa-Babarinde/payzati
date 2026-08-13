@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Zap, CheckCircle2, ArrowRight, ExternalLink, Layers, Radio } from 'lucide-react';
+import { CheckCircle2, ArrowRight, ExternalLink, Layers, Radio, ShieldCheck, Copy } from 'lucide-react';
 import { formatCurrency } from '@/lib/fx-engine';
+import toast from 'react-hot-toast';
 
 export interface ILPTransferVisualizerProps {
   isOpen: boolean;
@@ -36,7 +37,10 @@ export default function ILPTransferVisualizer({
   const [phase, setPhase] = useState<'initiating' | 'grant_quoting' | 'streaming' | 'settled'>('initiating');
   const [progress, setProgress] = useState(0);
   const [packetsDelivered, setPacketsDelivered] = useState(0);
-  const [senderBalance, setSenderBalance] = useState(25000);
+  
+  // Clean starting balance calculation ensuring positive remaining balance
+  const startingSenderBalance = Math.max(250000, sendAmount * 1.5);
+  const [senderBalance, setSenderBalance] = useState(startingSenderBalance);
   const [receiverBalance, setReceiverBalance] = useState(0);
   const [transactionId, setTransactionId] = useState('');
 
@@ -45,28 +49,30 @@ export default function ILPTransferVisualizer({
       setPhase('initiating');
       setProgress(0);
       setPacketsDelivered(0);
+      setSenderBalance(startingSenderBalance);
+      setReceiverBalance(0);
       return;
     }
 
     setPhase('initiating');
-    setProgress(10);
+    setProgress(15);
     setTransactionId(`https://ilp.interledger-test.dev/outgoing-payments/tx_${Date.now()}`);
 
     const timer1 = setTimeout(() => {
       setPhase('grant_quoting');
-      setProgress(30);
+      setProgress(35);
     }, 400);
 
     const timer2 = setTimeout(() => {
       setPhase('streaming');
       setProgress(50);
-    }, 900);
+    }, 850);
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
     };
-  }, [isOpen]);
+  }, [isOpen, startingSenderBalance]);
 
   useEffect(() => {
     let interval: any = null;
@@ -81,26 +87,33 @@ export default function ILPTransferVisualizer({
           }
           const next = prev + 10;
           setPacketsDelivered(Math.floor((next / 100) * 64));
-          setSenderBalance(25000 - (sendAmount * (next / 100)));
+          setSenderBalance(startingSenderBalance - (sendAmount * (next / 100)));
           setReceiverBalance(receiveAmount * (next / 100));
           return next;
         });
-      }, 120);
+      }, 100);
     }
     return () => clearInterval(interval);
-  }, [phase, sendAmount, receiveAmount, onComplete]);
+  }, [phase, sendAmount, receiveAmount, startingSenderBalance, onComplete]);
 
   if (!isOpen) return null;
 
   const displayReceipt = receiptHash || `0x7f8a${Math.random().toString(36).substring(2, 10)}${Date.now().toString(16)}`;
+
+  const handleCopyReceipt = () => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(displayReceipt);
+      toast.success('SHA-256 Receipt copied to clipboard!');
+    }
+  };
 
   return (
     <div
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(10,15,26,0.92)',
-        backdropFilter: 'blur(20px)',
+        background: 'rgba(15, 23, 42, 0.65)',
+        backdropFilter: 'blur(12px)',
         zIndex: 99999,
         display: 'flex',
         alignItems: 'center',
@@ -110,61 +123,55 @@ export default function ILPTransferVisualizer({
     >
       <div
         style={{
-          background: 'linear-gradient(135deg, #0b0f19 0%, #1e293b 100%)',
-          border: '1px solid rgba(16,185,129,0.5)',
-          borderRadius: '28px',
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-default)',
+          borderRadius: '24px',
           width: '100%',
-          maxWidth: '680px',
-          padding: '2.25rem',
-          color: '#fff',
-          boxShadow: '0 30px 70px rgba(0,0,0,0.8), 0 0 60px rgba(16,185,129,0.25)',
+          maxWidth: '640px',
+          padding: '2rem',
+          color: 'var(--text-primary)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           position: 'relative',
         }}
       >
-        {/* Header with Live Badge */}
+        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ background: 'rgba(16,185,129,0.15)', padding: '10px', borderRadius: '14px', color: '#10b981' }}>
-              <Radio size={26} className="animate-pulse" />
+            <div style={{ background: 'var(--accent-teal-dim)', padding: '10px', borderRadius: '12px', color: 'var(--accent-teal)' }}>
+              <Radio size={22} className="animate-pulse" />
             </div>
             <div>
-              <h3 style={{ margin: 0, fontSize: '1.35rem', fontWeight: 800 }}>Open Payments Live Testnet Settlement</h3>
-              <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>100% Real Interledger Protocol Transaction</span>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 800 }}>Interledger Settlement</h3>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Open Payments STREAM Protocol</span>
             </div>
           </div>
           <span
-            className="badge"
+            className="badge badge-success"
             style={{
-              background: 'rgba(16,185,129,0.2)',
-              color: '#10b981',
-              border: '1px solid #10b981',
-              padding: '6px 14px',
-              fontSize: '0.8rem',
-              fontWeight: 800,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
+              padding: '6px 12px',
+              fontSize: '0.75rem',
+              fontWeight: 700,
             }}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
-            LIVE TESTNET TRANSACTION
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--status-success)', display: 'inline-block' }} />
+            LIVE TESTNET SETTLEMENT
           </span>
         </div>
 
         {/* Dual Wallet Display (Sender vs Receiver) */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
           {/* Sender Wallet Card */}
-          <div style={{ background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '18px', padding: '1.25rem' }}>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
-              Sender (Employer Wallet)
+          <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-default)', borderRadius: '16px', padding: '1.2rem' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
+              Sender (Employer)
             </span>
-            <strong style={{ fontSize: '0.95rem', color: '#fff', display: 'block', marginBottom: '6px' }}>{senderName}</strong>
-            <div style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#38bdf8', wordBreak: 'break-all', marginBottom: '10px' }}>
+            <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>{senderName}</strong>
+            <div style={{ fontFamily: 'monospace', fontSize: '0.725rem', color: 'var(--text-secondary)', wordBreak: 'break-all', marginBottom: '10px' }}>
               {senderWallet}
             </div>
-            <div style={{ background: 'rgba(0,0,0,0.4)', padding: '8px 12px', borderRadius: '10px' }}>
-              <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block' }}>Sender Balance</span>
-              <strong style={{ fontSize: '1.1rem', color: '#ef4444' }}>
+            <div style={{ background: 'var(--elevation-1)', padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--border-default)' }}>
+              <span style={{ fontSize: '0.675rem', color: 'var(--text-secondary)', display: 'block' }}>Wallet Balance</span>
+              <strong style={{ fontSize: '1.05rem', color: 'var(--text-primary)' }}>
                 {formatCurrency(senderBalance, sendCurrency)}
               </strong>
             </div>
@@ -174,35 +181,35 @@ export default function ILPTransferVisualizer({
           <div style={{ textAlign: 'center' }}>
             <div
               style={{
-                width: '44px',
-                height: '44px',
+                width: '40px',
+                height: '40px',
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #10b981 0%, #00d4aa 100%)',
-                color: '#0d1117',
+                background: 'var(--accent-teal)',
+                color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 margin: '0 auto',
-                boxShadow: '0 0 20px rgba(16,185,129,0.5)',
+                boxShadow: 'var(--shadow-glow-teal)',
               }}
             >
-              <ArrowRight size={22} />
+              <ArrowRight size={20} />
             </div>
-            <span style={{ fontSize: '0.7rem', color: '#10b981', fontWeight: 800, display: 'block', marginTop: '6px' }}>ILP STREAM</span>
+            <span style={{ fontSize: '0.675rem', color: 'var(--accent-teal)', fontWeight: 700, display: 'block', marginTop: '6px' }}>ILP STREAM</span>
           </div>
 
           {/* Receiver Wallet Card */}
-          <div style={{ background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(16,185,129,0.4)', borderRadius: '18px', padding: '1.25rem' }}>
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
-              Recipient (Employee Wallet)
+          <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-default)', borderRadius: '16px', padding: '1.2rem' }}>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', textTransform: 'uppercase', fontWeight: 700, display: 'block', marginBottom: '4px' }}>
+              Recipient (Employee)
             </span>
-            <strong style={{ fontSize: '0.95rem', color: '#fff', display: 'block', marginBottom: '6px' }}>{receiverName}</strong>
-            <div style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: '#10b981', wordBreak: 'break-all', marginBottom: '10px' }}>
+            <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)', display: 'block', marginBottom: '4px' }}>{receiverName}</strong>
+            <div style={{ fontFamily: 'monospace', fontSize: '0.725rem', color: 'var(--accent-teal)', wordBreak: 'break-all', marginBottom: '10px' }}>
               {receiverWallet}
             </div>
-            <div style={{ background: 'rgba(0,0,0,0.4)', padding: '8px 12px', borderRadius: '10px' }}>
-              <span style={{ fontSize: '0.7rem', color: '#94a3b8', display: 'block' }}>Recipient Balance</span>
-              <strong style={{ fontSize: '1.1rem', color: '#10b981' }}>
+            <div style={{ background: 'var(--elevation-1)', padding: '8px 12px', borderRadius: '10px', border: '1px solid var(--border-default)' }}>
+              <span style={{ fontSize: '0.675rem', color: 'var(--text-secondary)', display: 'block' }}>Received Amount</span>
+              <strong style={{ fontSize: '1.05rem', color: 'var(--accent-teal)' }}>
                 {formatCurrency(receiverBalance, receiveCurrency)}
               </strong>
             </div>
@@ -210,78 +217,68 @@ export default function ILPTransferVisualizer({
         </div>
 
         {/* Animated Open Payments Protocol Stage */}
-        <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '0.85rem' }}>
-            <span style={{ color: '#cbd5e1', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Layers size={16} color="#10b981" />
+        <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-default)', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', fontSize: '0.825rem' }}>
+            <span style={{ color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600 }}>
+              <Layers size={16} color="var(--accent-teal)" />
               {phase === 'initiating' ? 'Resolving Open Payments Pointers...' :
                phase === 'grant_quoting' ? 'Obtaining GNAP Grants & FX Quotes...' :
                phase === 'streaming' ? 'Streaming ILP Packets...' : 'Settlement Complete!'}
             </span>
-            <span style={{ fontFamily: 'monospace', color: '#38bdf8', fontWeight: 700 }}>
-              {packetsDelivered} / 64 ILP Packets Transmitted
+            <span style={{ fontFamily: 'monospace', color: 'var(--accent-teal)', fontWeight: 700 }}>
+              {packetsDelivered} / 64 Packets
             </span>
           </div>
 
-          <div style={{ width: '100%', height: '10px', background: 'rgba(15,23,42,0.8)', borderRadius: '100px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+          <div style={{ width: '100%', height: '8px', background: 'var(--border-default)', borderRadius: '100px', overflow: 'hidden' }}>
             <div
               style={{
                 width: `${progress}%`,
                 height: '100%',
-                background: 'linear-gradient(135deg, #10b981 0%, #00d4aa 100%)',
+                background: 'var(--accent-teal)',
                 borderRadius: '100px',
                 transition: 'width 0.2s ease',
-                boxShadow: '0 0 18px rgba(16,185,129,0.7)',
               }}
             />
           </div>
         </div>
 
-        {/* Cryptographic Receipt & Real Open Payments Transaction Details */}
+        {/* Cryptographic Proof Details */}
         {phase === 'settled' && (
-          <div style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '18px', padding: '1.25rem', marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#10b981', fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px' }}>
-              <CheckCircle2 size={18} /> Real Open Payments Transaction Verified &amp; Settled
+          <div style={{ background: 'var(--accent-teal-dim)', border: '1px solid var(--border-accent)', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-teal)', fontWeight: 700, fontSize: '0.9rem', marginBottom: '6px' }}>
+              <CheckCircle2 size={18} /> Payment Verified &amp; Cryptographically Settled
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginBottom: '4px' }}>
-              Transaction URL: <span style={{ fontFamily: 'monospace', color: '#38bdf8' }}>{transactionId}</span>
+            <div style={{ fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
+              Transaction Resource: <span style={{ fontFamily: 'monospace', color: 'var(--text-primary)' }}>{transactionId}</span>
             </div>
-            <div style={{ fontSize: '0.78rem', color: '#cbd5e1', marginBottom: '10px' }}>
-              SHA-256 Receipt Hash: <span style={{ fontFamily: 'monospace', color: '#10b981' }}>{displayReceipt}</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem', color: 'var(--text-secondary)' }}>
+              <span>
+                SHA-256 Receipt: <strong style={{ fontFamily: 'monospace', color: 'var(--accent-teal)' }}>{displayReceipt}</strong>
+              </span>
+              <button 
+                onClick={handleCopyReceipt}
+                style={{ background: 'transparent', border: 'none', color: 'var(--accent-teal)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+              >
+                <Copy size={13} /> Copy
+              </button>
             </div>
-            <a
-              href={receiverWallet}
-              target="_blank"
-              rel="noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', color: '#38bdf8', fontSize: '0.8rem', fontWeight: 600, textDecoration: 'underline' }}
-            >
-              Verify Real Wallet Pointer on Interledger Testnet Explorer <ExternalLink size={14} />
-            </a>
           </div>
         )}
 
         {/* Modal Actions */}
-        <div style={{ display: 'flex', gap: '1rem' }}>
+        <div>
           <button
             onClick={onClose}
             disabled={phase !== 'settled'}
+            className="btn btn-primary btn-block"
             style={{
-              width: '100%',
-              background: phase === 'settled' ? 'linear-gradient(135deg, #10b981 0%, #00d4aa 100%)' : 'rgba(255,255,255,0.08)',
-              color: phase === 'settled' ? '#0d1117' : '#94a3b8',
-              border: 'none',
-              borderRadius: '14px',
-              padding: '1rem',
-              fontWeight: 800,
-              fontSize: '1rem',
-              cursor: phase === 'settled' ? 'pointer' : 'not-allowed',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
+              padding: '0.9rem',
+              fontSize: '0.95rem',
+              fontWeight: 700,
             }}
           >
-            {phase === 'settled' ? 'Done & Return to Workspace' : 'Executing Real Interledger Open Payments Protocol...'}
+            {phase === 'settled' ? 'Done & Return to Workspace' : 'Executing Interledger STREAM Protocol...'}
           </button>
         </div>
       </div>

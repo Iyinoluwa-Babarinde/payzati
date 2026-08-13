@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { getCompany } from '@/lib/supabase/queries';
 import styles from './employer.module.css';
 import { Toaster } from 'react-hot-toast';
+import ThemeToggle from '@/components/ThemeToggle';
 import { 
   LayoutDashboard, 
   Users, 
@@ -42,7 +43,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
     async function init() {
       const comp = await getCompany();
       if (cancelled) return;
-      setCompany(comp);
+      setCompany(comp || { name: 'Payzati Global Inc.' });
       setLoading(false);
     }
     init();
@@ -53,7 +54,11 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    window.location.href = '/auth/login';
+    if (typeof window !== 'undefined') {
+      document.cookie = 'payzati_demo_role=; path=/; max-age=0';
+      localStorage.removeItem('payzati_demo_role');
+      window.location.href = '/auth/login';
+    }
   };
 
   if (loading) {
@@ -73,12 +78,12 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
         position="bottom-right"
         toastOptions={{
           style: {
-            background: 'var(--elevation-2)',
+            background: 'var(--elevation-1)',
             color: 'var(--text-primary)',
             border: '1px solid var(--border-default)',
-            backdropFilter: 'blur(12px)',
+            boxShadow: 'var(--shadow-md)',
           },
-          success: { iconTheme: { primary: 'var(--accent-teal)', secondary: '#000' } },
+          success: { iconTheme: { primary: 'var(--accent-teal)', secondary: '#ffffff' } },
         }}
       />
       <aside className={`${styles.sidebar} ${sidebarOpen ? '' : styles.collapsed}`}>
@@ -127,21 +132,32 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
           <button className={styles.mobileMenuBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu size={24} />
           </button>
-          <div className={styles.topbarRight}>
-            <div className={styles.ilpBadge}>
-              <span className={styles.ilpDot}></span>
-              ILP Connected
+          
+          <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+              Employer Workspace
             </div>
-            {company && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', paddingLeft: '1rem', borderLeft: '1px solid var(--border-subtle)', marginLeft: '0.5rem' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'var(--accent-teal)', color: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.875rem' }}>
-                  {company.name.charAt(0).toUpperCase()}
-                </div>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)' }}>{company.name}</span>
+
+            <div className={styles.topbarRight} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <ThemeToggle />
+              
+              <div className={styles.ilpBadge}>
+                <span className={styles.ilpDot}></span>
+                ILP Connected
               </div>
-            )}
+              
+              {company && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', paddingLeft: '0.85rem', borderLeft: '1px solid var(--border-default)' }}>
+                  <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'var(--accent-teal)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
+                    {company.name.charAt(0).toUpperCase()}
+                  </div>
+                  <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-primary)' }}>{company.name}</span>
+                </div>
+              )}
+            </div>
           </div>
         </header>
+        
         <div className={styles.content}>
           <div className={styles.contentWrapper}>
             {children}

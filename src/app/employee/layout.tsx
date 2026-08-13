@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { getEmployeeProfile } from '@/lib/supabase/queries';
 import { Toaster } from 'react-hot-toast';
-import styles from '../employer/employer.module.css'; // Reusing the exact same UI shell as the employer
+import ThemeToggle from '@/components/ThemeToggle';
+import styles from '../employer/employer.module.css';
 import { 
   LayoutDashboard, 
   Receipt, 
@@ -37,8 +38,7 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
       const emp = await getEmployeeProfile();
       if (cancelled) return;
       if (!emp) {
-        // Fallback for demo
-        setEmployee({ name: 'Demo Employee', companies: { name: 'Demo Corp' } });
+        setEmployee({ name: 'Sarah Johansson', companies: { name: 'Payzati Global Inc.' } });
       } else {
         setEmployee(emp);
       }
@@ -52,7 +52,11 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    window.location.href = '/auth/login';
+    if (typeof window !== 'undefined') {
+      document.cookie = 'payzati_demo_role=; path=/; max-age=0';
+      localStorage.removeItem('payzati_demo_role');
+      window.location.href = '/auth/login';
+    }
   };
 
   if (loading) {
@@ -72,12 +76,12 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
         position="bottom-right"
         toastOptions={{
           style: {
-            background: 'var(--elevation-2)',
+            background: 'var(--elevation-1)',
             color: 'var(--text-primary)',
             border: '1px solid var(--border-default)',
-            backdropFilter: 'blur(12px)',
+            boxShadow: 'var(--shadow-md)',
           },
-          success: { iconTheme: { primary: 'var(--accent-teal)', secondary: '#000' } },
+          success: { iconTheme: { primary: 'var(--accent-teal)', secondary: '#ffffff' } },
         }}
       />
       <aside className={`${styles.sidebar} ${sidebarOpen ? '' : styles.collapsed}`}>
@@ -87,7 +91,7 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
               <div className={styles.logoRow}><div className={styles.sq}></div><div className={styles.sq}></div></div>
               <div className={styles.logoRow}><div className={styles.cr}></div><div className={styles.cr}></div></div>
             </div>
-            {sidebarOpen && <span className={styles.logoText}>Payzati <span style={{color:'var(--text-secondary)', fontWeight: 400}}>for Teams</span></span>}
+            {sidebarOpen && <span className={styles.logoText}>Payzati</span>}
           </Link>
           <button className={styles.collapseBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>
             {sidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
@@ -128,20 +132,23 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
           </button>
           
           <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ color: 'var(--text-secondary)' }}>
-              Working at <strong style={{ color: 'var(--accent-teal)' }}>{employee?.companies?.name || 'Your Company'}</strong>
+            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+              Working at <strong style={{ color: 'var(--text-primary)' }}>{employee?.companies?.name || 'Payzati Global Inc.'}</strong>
             </div>
             
-            <div className={styles.topbarRight}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)', background: 'var(--elevation-2)', border: '1px solid var(--border-default)' }}>
-                <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: 'var(--accent-purple)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>
-                  {employee?.name?.charAt(0).toUpperCase() || 'E'}
+            <div className={styles.topbarRight} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+              <ThemeToggle />
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', background: 'var(--elevation-2)', border: '1px solid var(--border-default)' }}>
+                <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'var(--accent-teal)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>
+                  {employee?.name?.charAt(0).toUpperCase() || 'S'}
                 </div>
-                <span style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)' }}>{employee?.name}</span>
+                <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-primary)' }}>{employee?.name}</span>
               </div>
             </div>
           </div>
         </header>
+        
         <div className={styles.content}>
           <div className={styles.contentWrapper}>
             {children}
