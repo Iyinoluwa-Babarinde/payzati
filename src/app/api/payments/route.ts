@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     if (body.batch && Array.isArray(body.payments)) {
-      const senderWallet = body.senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/a5cb6a41';
+      const senderWallet = body.senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6';
       const batchResult = await processBatchPayroll(senderWallet, body.payments);
       return NextResponse.json({ success: true, result: batchResult });
     }
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const sender = senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/a5cb6a41';
+    const sender = senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6';
     const numAmount = parseFloat(amount);
 
     if (isNaN(numAmount) || numAmount <= 0) {

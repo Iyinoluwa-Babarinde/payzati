@@ -47,8 +47,8 @@ export async function processPayment(
   amount: number,
   currency: string
 ): Promise<PaymentResult> {
-  const normalizedSender = normalizePaymentPointer(senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/a5cb6a41');
-  const normalizedReceiver = normalizePaymentPointer(receiverWallet || 'https://ilp.interledger-test.dev/a5cb6a41');
+  const normalizedSender = normalizePaymentPointer(senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6');
+  const normalizedReceiver = normalizePaymentPointer(receiverWallet || 'https://ilp.interledger-test.dev/da071cb6');
 
   console.log(`[ILP LIVE] Initiating real Open Payments transaction: ${normalizedSender} ➔ ${normalizedReceiver} (${amount} ${currency})`);
 

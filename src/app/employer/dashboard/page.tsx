@@ -104,18 +104,18 @@ export default function EmployerDashboard() {
           setEmployees(data);
         } else {
           setEmployees([
-            { id: '1', name: 'Sarah Johansson', country: 'Nigeria', currency: 'NGN', salary: 1550000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Senior Software Engineer' },
-            { id: '2', name: 'David Ochieng', country: 'Kenya', currency: 'KES', salary: 185000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'DevOps Lead' },
-            { id: '3', name: 'Kwame Mensah', country: 'Ghana', currency: 'GHS', salary: 18400, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Product Manager' },
-            { id: '4', name: 'Thabo Ndlovu', country: 'South Africa', currency: 'ZAR', salary: 45000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Security Engineer' },
-            { id: '5', name: 'Youssef Hassan', country: 'Egypt', currency: 'EGP', salary: 38000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'UX Architect' },
+            { id: '1', name: 'Sarah Johansson', country: 'Nigeria', currency: 'NGN', salary: 1550000, wallet_address: 'https://ilp.interledger-test.dev/da071cb6', role: 'Senior Software Engineer' },
+            { id: '2', name: 'David Ochieng', country: 'Kenya', currency: 'KES', salary: 185000, wallet_address: 'https://ilp.interledger-test.dev/da071cb6', role: 'DevOps Lead' },
+            { id: '3', name: 'Kwame Mensah', country: 'Ghana', currency: 'GHS', salary: 18400, wallet_address: 'https://ilp.interledger-test.dev/da071cb6', role: 'Product Manager' },
+            { id: '4', name: 'Thabo Ndlovu', country: 'South Africa', currency: 'ZAR', salary: 45000, wallet_address: 'https://ilp.interledger-test.dev/da071cb6', role: 'Security Engineer' },
+            { id: '5', name: 'Youssef Hassan', country: 'Egypt', currency: 'EGP', salary: 38000, wallet_address: 'https://ilp.interledger-test.dev/da071cb6', role: 'UX Architect' },
           ]);
         }
       } catch (e) {
         setEmployees([
-          { id: '1', name: 'Sarah Johansson', country: 'Nigeria', currency: 'NGN', salary: 1550000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Senior Software Engineer' },
-          { id: '2', name: 'David Ochieng', country: 'Kenya', currency: 'KES', salary: 185000, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'DevOps Lead' },
-          { id: '3', name: 'Kwame Mensah', country: 'Ghana', currency: 'GHS', salary: 18400, wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41', role: 'Product Manager' },
+          { id: '1', name: 'Sarah Johansson', country: 'Nigeria', currency: 'NGN', salary: 1550000, wallet_address: 'https://ilp.interledger-test.dev/da071cb6', role: 'Senior Software Engineer' },
+          { id: '2', name: 'David Ochieng', country: 'Kenya', currency: 'KES', salary: 185000, wallet_address: 'https://ilp.interledger-test.dev/da071cb6', role: 'DevOps Lead' },
+          { id: '3', name: 'Kwame Mensah', country: 'Ghana', currency: 'GHS', salary: 18400, wallet_address: 'https://ilp.interledger-test.dev/da071cb6', role: 'Product Manager' },
         ]);
       }
       setLoading(false);
@@ -159,7 +159,7 @@ export default function EmployerDashboard() {
           <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span>Master Pointer:</span>
             <code style={{ color: 'var(--accent-teal)', background: 'var(--elevation-2)', padding: '2px 8px', borderRadius: '6px', fontSize: '0.75rem', fontFamily: 'monospace' }}>
-              $ilp.interledger-test.dev/a5cb6a41
+              $ilp.interledger-test.dev/da071cb6
             </code>
           </div>
         </div>
@@ -318,8 +318,8 @@ export default function EmployerDashboard() {
       <ILPTransferVisualizer
         isOpen={showExpressVisualizer}
         onClose={() => setShowExpressVisualizer(false)}
-        senderWallet="https://ilp.interledger-test.dev/a5cb6a41"
-        receiverWallet="https://ilp.interledger-test.dev/a5cb6a41"
+        senderWallet="https://ilp.interledger-test.dev/da071cb6"
+        receiverWallet="https://ilp.interledger-test.dev/da071cb6"
         senderName="Payzati Employer Master Wallet"
         receiverName={selectedRecipient?.name || 'All Active Team Members (Batch Payout)'}
         sendAmount={selectedRecipient ? (selectedRecipient.salary / (selectedRecipient.currency === 'NGN' ? 1550 : 130)) : 145000}

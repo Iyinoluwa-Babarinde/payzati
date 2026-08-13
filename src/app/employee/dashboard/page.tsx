@@ -19,7 +19,7 @@ export default function EmployeeDashboard() {
     company_name: 'Payzati Global Inc.',
     salary: 1550000,
     currency: 'NGN',
-    wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41',
+    wallet_address: 'https://ilp.interledger-test.dev/da071cb6',
   });
   const [loading, setLoading] = useState(true);
   const [withdrawAmount, setWithdrawAmount] = useState(450000);
@@ -33,7 +33,7 @@ export default function EmployeeDashboard() {
         setEmployee({
           ...emp,
           company_name: emp.companies?.name || 'Payzati Global Inc.',
-          wallet_address: 'https://ilp.interledger-test.dev/a5cb6a41',
+          wallet_address: 'https://ilp.interledger-test.dev/da071cb6',
         });
       }
       setLoading(false);
@@ -234,8 +234,8 @@ export default function EmployeeDashboard() {
       <ILPTransferVisualizer
         isOpen={showVisualizer}
         onClose={() => setShowVisualizer(false)}
-        senderWallet="https://ilp.interledger-test.dev/a5cb6a41"
-        receiverWallet="https://ilp.interledger-test.dev/a5cb6a41"
+        senderWallet="https://ilp.interledger-test.dev/da071cb6"
+        receiverWallet="https://ilp.interledger-test.dev/da071cb6"
         senderName="Payzati Employer Master Wallet"
         receiverName={`${employee.name} (Employee)`}
         sendAmount={convertCurrency(withdrawAmount, employee.currency, 'USD')}
