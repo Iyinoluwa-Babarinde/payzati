@@ -118,25 +118,6 @@ export default function LandingPage() {
       <section className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
-            <div
-              style={{
-                background: 'rgba(0, 212, 170, 0.12)',
-                color: '#00d4aa',
-                border: '1px solid rgba(0, 212, 170, 0.3)',
-                padding: '8px 18px',
-                borderRadius: '100px',
-                fontSize: '0.825rem',
-                fontWeight: 700,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                marginBottom: '1.25rem',
-                boxShadow: '0 0 24px rgba(0, 212, 170, 0.25)',
-              }}
-            >
-              <Zap size={16} />
-              <span>Live Interledger Stream: <strong>$1,450 USD ➔ 🇳🇬 ₦2,247,500 NGN</strong> (0.8s settlement)</span>
-            </div>
 
             <h1 className={`${styles.heroTitle} text-gradient-teal`}>
               Global payroll.<br/>Instant settlement.
