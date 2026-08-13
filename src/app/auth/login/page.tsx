@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
 import styles from '../auth.module.css';
 
 export default function LoginPage() {
@@ -23,7 +24,10 @@ export default function LoginPage() {
       const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
       if (authError) {
-        setError(authError.message);
+        const msg = authError.message.includes('Failed to fetch') || authError.message.includes('fetch')
+          ? 'Unable to connect to remote server right now. Click "Demo as Employer" or "Demo as Employee" to enter instant demo workspace!'
+          : authError.message;
+        setError(msg);
         setLoading(false);
         return;
       }
@@ -32,7 +36,7 @@ export default function LoginPage() {
       router.push(role === 'employee' ? '/employee/dashboard' : '/employer/dashboard');
     } catch (err: any) {
       console.warn('[Auth] Login network issue:', err);
-      setError('Unable to connect to remote database server. Click "Demo as Employer" or "Demo as Employee" to enter demo workspace.');
+      setError('Unable to connect to remote database server. Click "Demo as Employer" or "Demo as Employee" to enter instant demo workspace.');
       setLoading(false);
     }
   };
@@ -41,7 +45,6 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    // Instant zero-network session cookie & local storage setup
     if (typeof window !== 'undefined') {
       document.cookie = `payzati_demo_role=${role}; path=/; max-age=86400`;
       try {
@@ -49,7 +52,6 @@ export default function LoginPage() {
       } catch (e) {}
     }
 
-    // Direct, zero-error navigation to destination workspace
     const dest = role === 'employee' ? '/employee/dashboard' : '/employer/dashboard';
     window.location.href = dest;
   };
@@ -58,20 +60,40 @@ export default function LoginPage() {
     <div className={styles.authPage}>
       <div className={styles.authContainer}>
         <div className={styles.authCard}>
-          <div className={styles.logoSection}>
-            <div className={styles.logoMark}>
-              <div className={styles.logoSquares}>
-                <div className={styles.square}></div>
-                <div className={styles.square}></div>
+          {/* Back to Home Button */}
+          <Link
+            href="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--accent-teal)',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              marginBottom: '1.25rem',
+              textDecoration: 'none',
+              transition: 'transform 0.2s ease',
+            }}
+          >
+            <ArrowLeft size={16} /> Back to Home
+          </Link>
+
+          <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div className={styles.logoSection}>
+              <div className={styles.logoMark}>
+                <div className={styles.logoSquares}>
+                  <div className={styles.square}></div>
+                  <div className={styles.square}></div>
+                </div>
+                <div className={styles.logoCircles}>
+                  <div className={styles.circle}></div>
+                  <div className={styles.circle}></div>
+                </div>
               </div>
-              <div className={styles.logoCircles}>
-                <div className={styles.circle}></div>
-                <div className={styles.circle}></div>
-              </div>
+              <h1 className={styles.brandName}>Payzati</h1>
+              <p className={styles.brandTagline}>Pay anyone. Anywhere. Instantly.</p>
             </div>
-            <h1 className={styles.brandName}>Payzati</h1>
-            <p className={styles.brandTagline}>Pay anyone. Anywhere. Instantly.</p>
-          </div>
+          </Link>
 
           <form onSubmit={handleLogin} className={styles.authForm}>
             <h2>Welcome Back</h2>

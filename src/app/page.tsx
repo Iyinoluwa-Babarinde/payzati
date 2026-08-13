@@ -118,18 +118,38 @@ export default function LandingPage() {
       <section className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroContent}>
+            <div
+              style={{
+                background: 'rgba(0, 212, 170, 0.12)',
+                color: '#00d4aa',
+                border: '1px solid rgba(0, 212, 170, 0.3)',
+                padding: '8px 18px',
+                borderRadius: '100px',
+                fontSize: '0.825rem',
+                fontWeight: 700,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                marginBottom: '1.25rem',
+                boxShadow: '0 0 24px rgba(0, 212, 170, 0.25)',
+              }}
+            >
+              <Zap size={16} />
+              <span>Live Interledger Stream: <strong>$1,450 USD ➔ 🇳🇬 ₦2,247,500 NGN</strong> (0.8s settlement)</span>
+            </div>
+
             <h1 className={`${styles.heroTitle} text-gradient-teal`}>
               Global payroll.<br/>Instant settlement.
             </h1>
             <p className={styles.heroSubtitle}>
-              Stop paying wire fees. Stop waiting days. Just pay your team.
+              Stop paying wire fees. Stop waiting days. Just pay your team anywhere in Africa &amp; worldwide.
             </p>
             <div className={styles.heroCTA}>
               <Link href="/auth/register" className="btn btn-primary btn-lg">
-                Start now
+                Start now <ArrowRight size={18} style={{ marginLeft: '6px' }} />
               </Link>
-              <Link href="#how-it-works" className="btn btn-secondary btn-lg">
-                See how
+              <Link href="/auth/login" className="btn btn-secondary btn-lg">
+                Try 1-Click Demo
               </Link>
             </div>
           </div>
@@ -148,74 +168,97 @@ export default function LandingPage() {
                   onClick={() => setActiveView('employer')}
                   className={`${styles.viewBtn} ${activeView === 'employer' ? styles.activeViewBtn : ''}`}
                 >
-                  Employer
+                  Employer View
                 </button>
                 <button 
                   onClick={() => setActiveView('employee')}
                   className={`${styles.viewBtn} ${activeView === 'employee' ? styles.activeViewBtn : ''}`}
                 >
-                  Employee
+                  Employee View
                 </button>
               </div>
               
-              <div style={{ width: '80px' }}></div>
+              <div style={{ width: '80px', display: 'flex', justifyContent: 'flex-end' }}>
+                <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: 800, padding: '2px 8px', background: 'rgba(16,185,129,0.15)', borderRadius: '100px', border: '1px solid #10b981' }}>LIVE</span>
+              </div>
             </div>
             
-            <div style={{ background: 'var(--bg-primary)', display: 'flex', height: '380px', overflow: 'hidden' }}>
+            <div style={{ background: 'var(--bg-primary)', display: 'flex', height: '400px', overflow: 'hidden' }}>
               {activeView === 'employer' ? (
                 <>
-                  {/* Employer Sidebar Replica - collapsed to 160px */}
+                  {/* Employer Sidebar Replica */}
                   <div style={{ width: '160px', borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <div style={{ width: '70%', height: '18px', background: 'var(--elevation-2)', borderRadius: '4px', marginBottom: '1.25rem', marginTop: '0.25rem' }}></div>
-                    <div style={{ width: '100%', height: '30px', background: 'var(--accent-teal-dim)', borderRadius: '6px' }}></div>
-                    <div style={{ width: '100%', height: '30px', background: 'var(--elevation-2)', borderRadius: '6px' }}></div>
-                    <div style={{ width: '100%', height: '30px', background: 'var(--elevation-2)', borderRadius: '6px' }}></div>
+                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#00d4aa', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <Globe size={14} /> Payzati Hub
+                    </div>
+                    <div style={{ width: '100%', padding: '6px 10px', background: 'var(--accent-teal-dim)', border: '1px solid rgba(0,212,170,0.3)', borderRadius: '6px', color: '#00d4aa', fontSize: '0.75rem', fontWeight: 700 }}>Dashboard</div>
+                    <div style={{ width: '100%', padding: '6px 10px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>The Roster</div>
+                    <div style={{ width: '100%', padding: '6px 10px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Run Payroll</div>
+                    <div style={{ width: '100%', padding: '6px 10px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>ILP Wallet</div>
                   </div>
                   
                   {/* Employer Main Replica */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
-                    <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'flex-end' }}>
-                      <div style={{ padding: '3px 10px', background: 'var(--accent-teal-dim)', border: '1px solid rgba(0, 212, 170, 0.2)', color: 'var(--accent-teal)', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 700 }}>ILP Connected</div>
+                    <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fff' }}>Global Operations</div>
+                      <div style={{ padding: '3px 10px', background: 'rgba(16,185,129,0.15)', border: '1px solid #10b981', color: '#10b981', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span> Master Wallet: $25,000.00 USD
+                      </div>
                     </div>
-                    <div style={{ padding: '1.5rem', overflow: 'hidden' }}>
-                      {/* Collapsed 2x2 Stats Grid to prevent overflow */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1.25rem' }}>
-                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Total People</div>
-                          <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>142</div>
+                    <div style={{ padding: '1.25rem', overflow: 'hidden' }}>
+                      {/* 4 Stats Grid */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
+                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '8px' }}>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>Team Size</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8' }}>142</div>
                         </div>
-                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Countries</div>
-                          <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>12</div>
+                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '8px' }}>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>Markets</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#00d4aa' }}>5 Countries</div>
                         </div>
-                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Monthly Total</div>
-                          <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>$145k</div>
+                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '8px' }}>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>Monthly</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>$145,000</div>
                         </div>
-                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', marginBottom: '0.25rem', fontWeight: 700, textTransform: 'uppercase' }}>Balance</div>
-                          <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>$12.4k</div>
+                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '8px' }}>
+                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>ILP STREAM</div>
+                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10b981' }}>100% Live</div>
                         </div>
                       </div>
                       
-                      <div className={styles.mockCard} style={{ height: '110px', background: 'var(--elevation-1)' }}>
+                      {/* Live Recent Payout Table */}
+                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '12px' }}>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, marginBottom: '8px', color: '#cbd5e1', display: 'flex', justifyContent: 'space-between' }}>
+                          <span>Recent Interledger Payouts</span>
+                          <span style={{ color: '#00d4aa', fontSize: '0.7rem' }}>Batch PR-9281</span>
+                        </div>
                         <table style={{ width: '100%', fontSize: '0.75rem', textAlign: 'left', borderCollapse: 'collapse' }}>
                           <thead>
-                            <tr style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)' }}>
-                              <th style={{ paddingBottom: '0.35rem' }}>Run</th>
-                              <th style={{ paddingBottom: '0.35rem' }}>Amount</th>
+                            <tr style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.65rem' }}>
+                              <th style={{ paddingBottom: '0.35rem' }}>Employee</th>
+                              <th style={{ paddingBottom: '0.35rem' }}>Market</th>
+                              <th style={{ paddingBottom: '0.35rem' }}>Payout</th>
                               <th style={{ paddingBottom: '0.35rem' }}>Status</th>
                             </tr>
                           </thead>
                           <tbody>
+                            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                              <td style={{ padding: '6px 0', fontWeight: 600 }}>Sarah Johansson</td>
+                              <td><FlagNG size={14} /> Nigeria</td>
+                              <td style={{ fontWeight: 700, color: '#00d4aa' }}>₦2,247,500 NGN</td>
+                              <td><span style={{ color: '#10b981', fontSize: '0.65rem', fontWeight: 800 }}>✓ Settled (0.8s)</span></td>
+                            </tr>
+                            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                              <td style={{ padding: '6px 0', fontWeight: 600 }}>David Ochieng</td>
+                              <td><FlagKE size={14} /> Kenya</td>
+                              <td style={{ fontWeight: 700, color: '#00d4aa' }}>185,000 KES</td>
+                              <td><span style={{ color: '#10b981', fontSize: '0.65rem', fontWeight: 800 }}>✓ Settled (0.6s)</span></td>
+                            </tr>
                             <tr>
-                              <td style={{ padding: '8px 0', fontFamily: 'var(--font-mono)' }}>PR-9281</td>
-                              <td>$145,000.00</td>
-                              <td>
-                                <span className="badge badge-success" style={{ padding: '2px 6px', fontSize: '0.65rem' }}>
-                                  <CheckIcon size={10} style={{ marginRight: '2px' }} /> Success
-                                </span>
-                              </td>
+                              <td style={{ padding: '6px 0', fontWeight: 600 }}>Kwame Mensah</td>
+                              <td><FlagGH size={14} /> Ghana</td>
+                              <td style={{ fontWeight: 700, color: '#00d4aa' }}>18,400 GHS</td>
+                              <td><span style={{ color: '#10b981', fontSize: '0.65rem', fontWeight: 800 }}>✓ Settled (0.9s)</span></td>
                             </tr>
                           </tbody>
                         </table>
@@ -226,37 +269,40 @@ export default function LandingPage() {
               ) : (
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                   {/* Employee Topbar Replica */}
-                  <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 700 }}>Welcome back, Sarah</div>
-                      <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Globex Corp</div>
+                      <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff' }}>Sarah Johansson (Senior Software Engineer)</div>
+                      <div style={{ color: '#38bdf8', fontSize: '0.725rem', fontFamily: 'monospace' }}>$ilp.interledger-test.dev/sarah-johansson</div>
                     </div>
-                    <div style={{ width: '32px', height: '32px', background: 'var(--accent-teal-dim)', borderRadius: '50%', color: 'var(--accent-teal)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>SJ</div>
+                    <div style={{ padding: '4px 10px', background: 'rgba(16,185,129,0.15)', border: '1px solid #10b981', color: '#10b981', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 800 }}>Active EWA Portal</div>
                   </div>
                   {/* Employee Main Replica */}
-                  <div style={{ padding: '1.5rem', display: 'flex', gap: '1rem', flex: 1, overflow: 'hidden' }}>
-                    <div style={{ flex: 2, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)' }}>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Next Payday</div>
-                        <div style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.75rem' }}>in 12 days</div>
-                        <div className={styles.mockProgressContainer}><div className={styles.mockProgressFill} style={{ width: '60%' }}></div></div>
+                  <div style={{ padding: '1.25rem', display: 'flex', gap: '1rem', flex: 1, overflow: 'hidden' }}>
+                    <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '12px' }}>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Accrued Salary (Days 1 to 18 Worked)</div>
+                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#00d4aa', marginBottom: '0.5rem' }}>₦1,348,500 NGN</div>
+                        <div className={styles.mockProgressContainer}><div className={styles.mockProgressFill} style={{ width: '60%', background: 'linear-gradient(90deg, #00d4aa, #10b981)' }}></div></div>
                       </div>
-                      <div className={styles.mockCard} style={{ flex: 1, background: 'var(--elevation-1)' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Recent paystubs</div>
+                      <div className={styles.mockCard} style={{ flex: 1, background: 'var(--elevation-1)', padding: '12px' }}>
+                        <div style={{ fontSize: '0.725rem', fontWeight: 700, marginBottom: '0.5rem', color: '#cbd5e1' }}>Recent ILP Stream Payouts</div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}>
-                          <span>May 2026</span><span style={{ fontWeight: 700 }}>KES 145,000</span>
+                          <span>EWA Advance Withdrawal</span><span style={{ fontWeight: 700, color: '#10b981' }}>+ ₦450,000 NGN</span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.75rem' }}>
-                          <span>Apr 2026</span><span style={{ fontWeight: 700 }}>KES 145,000</span>
+                          <span>Regular Monthly Payroll</span><span style={{ fontWeight: 700, color: '#10b981' }}>+ ₦2,247,500 NGN</span>
                         </div>
                       </div>
                     </div>
-                    <div style={{ flex: 1.2 }}>
-                      <div className={styles.mockCard} style={{ background: 'var(--elevation-2)', borderLeft: '4px solid var(--accent-teal)', height: '100%', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>Wage Access</div>
-                        <div style={{ color: 'var(--text-primary)', fontSize: '0.75rem', marginBottom: '1.25rem', lineHeight: 1.4 }}>Withdraw accrued earnings instantly.</div>
+                    <div style={{ flex: 1 }}>
+                      <div className={styles.mockCard} style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(15,23,42,0.9) 100%)', border: '1px solid rgba(16,185,129,0.4)', height: '100%', padding: '14px', display: 'flex', flexDirection: 'column' }}>
+                        <div style={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: '#10b981', marginBottom: '0.5rem' }}>Earned Wage Access</div>
+                        <div style={{ color: '#e2e8f0', fontSize: '0.75rem', marginBottom: '0.75rem', lineHeight: 1.4 }}>Withdraw up to ₦1,348,500 NGN before payday over Interledger.</div>
+                        <div style={{ background: 'rgba(0,0,0,0.4)', padding: '8px', borderRadius: '8px', marginBottom: '0.75rem', fontSize: '0.7rem', color: '#94a3b8' }}>
+                          Flat fee: <strong style={{ color: '#fff' }}>$1.50 USD</strong> · Instant ILP Stream
+                        </div>
                         <div style={{ marginTop: 'auto' }}>
-                          <button className="btn btn-primary btn-sm btn-block" style={{ width: '100%', fontSize: '0.7rem' }}>Withdraw</button>
+                          <button className="btn btn-primary btn-sm btn-block" style={{ width: '100%', fontSize: '0.75rem', fontWeight: 800, background: 'linear-gradient(135deg, #10b981 0%, #00d4aa 100%)', color: '#0d1117' }}>Withdraw via ILP</button>
                         </div>
                       </div>
                     </div>
@@ -267,6 +313,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
 
       {/* 2. SOCIAL PROOF */}
       <section className={styles.socialProof}>

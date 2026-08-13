@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import styles from '../auth.module.css';
-import { Building, User } from 'lucide-react';
+import { Building, User, ArrowLeft } from 'lucide-react';
 
 export default function RegisterPage() {
   const [step, setStep] = useState(1);
@@ -40,7 +40,10 @@ export default function RegisterPage() {
       });
 
       if (authError) {
-        setError(authError.message);
+        const msg = authError.message.includes('Failed to fetch') || authError.message.includes('fetch')
+          ? 'Unable to connect to remote server right now. Setting up instant demo account...'
+          : authError.message;
+        setError(msg);
         setLoading(false);
         return;
       }
@@ -51,7 +54,6 @@ export default function RegisterPage() {
       }
     } catch (err: any) {
       console.warn('[Auth] Registration network issue:', err);
-      // Fallback demo redirect if Supabase is offline/paused
       document.cookie = `payzati_demo_role=${role}; path=/; max-age=86400`;
       router.push(role === 'employee' ? '/employee/dashboard' : '/employer/dashboard');
     }
@@ -62,14 +64,34 @@ export default function RegisterPage() {
     <div className={styles.authPage}>
       <div className={styles.authContainer}>
         <div className={styles.authCard}>
-          <div className={styles.logoSection}>
-            <div className={styles.logoMark}>
-              <div className={styles.logoSquares}><div className={styles.square}></div><div className={styles.square}></div></div>
-              <div className={styles.logoCircles}><div className={styles.circle}></div><div className={styles.circle}></div></div>
+          {/* Back to Home Button */}
+          <Link
+            href="/"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              color: 'var(--accent-teal)',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              marginBottom: '1.25rem',
+              textDecoration: 'none',
+              transition: 'transform 0.2s ease',
+            }}
+          >
+            <ArrowLeft size={16} /> Back to Home
+          </Link>
+
+          <Link href="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            <div className={styles.logoSection}>
+              <div className={styles.logoMark}>
+                <div className={styles.logoSquares}><div className={styles.square}></div><div className={styles.square}></div></div>
+                <div className={styles.logoCircles}><div className={styles.circle}></div><div className={styles.circle}></div></div>
+              </div>
+              <h1 className={styles.brandName}>Payzati</h1>
+              <p className={styles.brandTagline}>Pay anyone. Anywhere. Instantly.</p>
             </div>
-            <h1 className={styles.brandName}>Payzati</h1>
-            <p className={styles.brandTagline}>Pay anyone. Anywhere. Instantly.</p>
-          </div>
+          </Link>
 
           <form onSubmit={handleRegister} className={styles.authForm}>
             <h2>Create Account</h2>
