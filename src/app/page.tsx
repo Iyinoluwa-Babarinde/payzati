@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Banknote, Zap, Scale, Coins, Unlock, Globe, ArrowRight } from 'lucide-react';
 import styles from './landing.module.css';
+import LiveFXQuoteWidget from '@/components/LiveFXQuoteWidget';
 
 // SVG components to replace emojis
 function CheckIcon({ className = '', size = 16, style }: { className?: string; size?: number; style?: React.CSSProperties }) {
@@ -275,6 +276,40 @@ export default function LandingPage() {
           <span>GLOBEX CORP</span>
           <span>INTERLEDGER</span>
           <span>FINTECH ORG</span>
+        </div>
+      </section>
+
+      {/* LIVE FX QUOTE CALCULATOR FOR DEMO DAY */}
+      <section style={{ padding: '4rem 1.5rem', background: 'linear-gradient(180deg, rgba(13,17,23,0) 0%, rgba(0,212,170,0.04) 50%, rgba(13,17,23,0) 100%)' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
+          <div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0,212,170,0.1)', border: '1px solid rgba(0,212,170,0.3)', color: '#00d4aa', padding: '6px 16px', borderRadius: '100px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '1.25rem' }}>
+              <Zap size={16} /> Interledger Open Payments FX Engine
+            </div>
+            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, lineHeight: 1.2, color: '#fff', marginBottom: '1rem' }}>
+              Instant Quotes. <br />Zero Hidden Spreads.
+            </h2>
+            <p style={{ color: '#94a3b8', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+              Traditional banks markup exchange rates by 3% to 5%. Payzati routes payouts over the Interledger Protocol with a flat 0.2% transparent fee and instant settlement.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,212,170,0.15)', color: '#00d4aa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>✓</div>
+                <span style={{ color: '#cbd5e1', fontWeight: 500 }}>Live market rates refreshed every 5 seconds</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,212,170,0.15)', color: '#00d4aa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>✓</div>
+                <span style={{ color: '#cbd5e1', fontWeight: 500 }}>Supports NGN, KES, GHS, ZAR, EGP, USD, EUR, GBP</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,212,170,0.15)', color: '#00d4aa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>✓</div>
+                <span style={{ color: '#cbd5e1', fontWeight: 500 }}>Open Payments standard API integration</span>
+              </div>
+            </div>
+          </div>
+          <div>
+            <LiveFXQuoteWidget />
+          </div>
         </div>
       </section>
 

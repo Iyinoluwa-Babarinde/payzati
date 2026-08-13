@@ -9,6 +9,7 @@ import {
 import { getCompany } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
 import toast from 'react-hot-toast';
+import ILPInspector from '@/components/ILPInspector';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 function nextFirstOfMonth(): Date {
@@ -410,6 +411,11 @@ export default function WalletPage() {
           </button>
         </div>
       )}
+
+      {/* ── Open Payments & ILP STREAM Inspector ──────────────────────────────── */}
+      <div style={{ marginBottom: '2rem' }}>
+        <ILPInspector />
+      </div>
 
       {/* ── Transaction history ─────────────────────────────────────────────── */}
       <div className="card" style={{ background: 'var(--elevation-1)' }}>

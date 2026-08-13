@@ -25,27 +25,48 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user || null;
+  } catch (e) {
+    // Network or Supabase offline fallback
+  }
 
+  const demoRole = request.cookies.get('payzati_demo_role')?.value;
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth');
-  const isProtectedRoute =
-    request.nextUrl.pathname.startsWith('/employer') ||
-    request.nextUrl.pathname.startsWith('/employee');
+  const isEmployerRoute = request.nextUrl.pathname.startsWith('/employer');
+  const isEmployeeRoute = request.nextUrl.pathname.startsWith('/employee');
+  const isProtectedRoute = isEmployerRoute || isEmployeeRoute;
 
-  if (!user && isProtectedRoute) {
+  const isAuthenticated = !!user || !!demoRole;
+  const activeRole = user?.user_metadata?.role || demoRole || 'employer';
+
+  if (!isAuthenticated && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/auth/login';
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthPage) {
-    const url = request.nextUrl.clone();
-    // Get user role from metadata
-    const role = user.user_metadata?.role || 'employer';
-    url.pathname = role === 'employee' ? '/employee/dashboard' : '/employer/dashboard';
-    return NextResponse.redirect(url);
+  if (isAuthenticated) {
+    if (isAuthPage) {
+      const url = request.nextUrl.clone();
+      url.pathname = activeRole === 'employee' ? '/employee/dashboard' : '/employer/dashboard';
+      return NextResponse.redirect(url);
+    }
+
+    // Role boundary protection
+    if (isEmployerRoute && activeRole !== 'employer') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/employee/dashboard';
+      return NextResponse.redirect(url);
+    }
+
+    if (isEmployeeRoute && activeRole !== 'employee') {
+      const url = request.nextUrl.clone();
+      url.pathname = '/employer/dashboard';
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;

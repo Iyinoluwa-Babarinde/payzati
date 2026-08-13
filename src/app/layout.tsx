@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   title: "Payzati — Pay Anyone. Anywhere. Instantly.",
   description: "Global B2B B2C Payroll & Settlement Platform powered by Interledger Protocol. Instant cross-border salary payments with near-zero fees and automatic tax compliance.",
   keywords: "payroll, global payments, interledger, ILP, cross-border, salary, fintech",
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/icon-192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',

@@ -84,4 +84,9 @@ export function formatCurrency(amount: number, currency: string): string {
   return `${symbol}${formatted}`;
 }
 
+export function convertCurrency(amount: number, fromCurrency: string, toCurrency: string): number {
+  const rate = getExchangeRate(fromCurrency, toCurrency);
+  return amount * rate;
+}
+
 export const SUPPORTED_CURRENCIES = Object.keys(BASE_RATES);

@@ -19,60 +19,39 @@ export default function LoginPage() {
     setLoading(true);
     setError('');
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (authError) {
-      setError(authError.message);
-      setLoading(false);
-      return;
-    }
-
-    const role = data.user?.user_metadata?.role || 'employer';
-    router.push(role === 'employee' ? '/employee/dashboard' : '/employer/dashboard');
-  };
-
-  const handleDemoLogin = async (role: 'employer' | 'employee') => {
-    setLoading(true);
-    setError('');
-    const demoEmail = role === 'employer' ? 'demo-employer@payzati.com' : 'demo-employee@payzati.com';
-    const demoPassword = 'demo123456';
-
-    // Try sign in first, then sign up if not found
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email: demoEmail,
-      password: demoPassword,
-    });
-
-    if (authError) {
-      // Create demo account
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: demoEmail,
-        password: demoPassword,
-        options: {
-          data: {
-            role,
-            full_name: role === 'employer' ? 'Demo Employer' : 'Demo Employee',
-            company_name: 'Payzati Demo Corp',
-          },
-        },
-      });
-
-      if (signUpError) {
-        setError(signUpError.message);
+      if (authError) {
+        setError(authError.message);
         setLoading(false);
         return;
       }
 
-      if (signUpData.user) {
-        router.push(role === 'employee' ? '/employee/dashboard' : '/employer/dashboard');
-        return;
-      }
+      const role = data.user?.user_metadata?.role || 'employer';
+      router.push(role === 'employee' ? '/employee/dashboard' : '/employer/dashboard');
+    } catch (err: any) {
+      console.warn('[Auth] Login network issue:', err);
+      setError('Unable to connect to remote database server. Click "Demo as Employer" or "Demo as Employee" to enter demo workspace.');
+      setLoading(false);
+    }
+  };
+
+  const handleDemoLogin = (role: 'employer' | 'employee') => {
+    setLoading(true);
+    setError('');
+
+    // Instant zero-network session cookie & local storage setup
+    if (typeof window !== 'undefined') {
+      document.cookie = `payzati_demo_role=${role}; path=/; max-age=86400`;
+      try {
+        localStorage.setItem('payzati_demo_role', role);
+      } catch (e) {}
     }
 
-    if (data?.user) {
-      router.push(role === 'employee' ? '/employee/dashboard' : '/employer/dashboard');
-    }
-    setLoading(false);
+    // Direct, zero-error navigation to destination workspace
+    const dest = role === 'employee' ? '/employee/dashboard' : '/employer/dashboard';
+    window.location.href = dest;
   };
 
   return (
