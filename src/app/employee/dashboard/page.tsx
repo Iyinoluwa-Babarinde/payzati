@@ -1,192 +1,296 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatCurrency } from '@/lib/fx-engine';
+import { formatCurrency, convertCurrency } from '@/lib/fx-engine';
 import { createClient } from '@/lib/supabase/client';
 import { getEmployeeProfile } from '@/lib/supabase/queries';
-import { Banknote, Receipt, Check, X, CheckCircle, HelpCircle } from 'lucide-react';
+import { 
+  Wallet, 
+  Zap, 
+  Receipt, 
+  CheckCircle2, 
+  Copy, 
+  ArrowRight, 
+  Sparkles,
+  ShieldCheck,
+  Coins
+} from 'lucide-react';
 import toast from 'react-hot-toast';
+import ILPTransferVisualizer from '@/components/ILPTransferVisualizer';
 
 export default function EmployeeDashboard() {
-  const [employee, setEmployee] = useState<any>(null);
-  const [payrolls, setPayrolls] = useState<any[]>([]);
+  const [employee, setEmployee] = useState<any>({
+    id: 'demo-emp',
+    name: 'Sarah Johansson',
+    role: 'Senior Software Engineer',
+    company_name: 'Payzati Global Inc.',
+    salary: 1550000,
+    currency: 'NGN',
+    wallet_address: 'https://ilp.interledger-test.dev/sarah-johansson',
+  });
   const [loading, setLoading] = useState(true);
-  const [showAdvanceModal, setShowAdvanceModal] = useState(false);
-  const [advanceAmount, setAdvanceAmount] = useState('');
-  
+  const [withdrawAmount, setWithdrawAmount] = useState(450000);
+  const [showVisualizer, setShowVisualizer] = useState(false);
+  const [availableWages, setAvailableWages] = useState(1348500);
+
   useEffect(() => {
     async function loadData() {
       const emp = await getEmployeeProfile();
-      if (!emp) {
+      if (emp) {
         setEmployee({
-          id: 'demo',
-          name: 'Demo Employee',
-          salary: 1500000,
-          currency: 'NGN',
-          bank_name: 'Guaranty Trust Bank',
-          bank_account_number: '0123456789'
+          ...emp,
+          company_name: emp.companies?.name || 'Payzati Global Inc.',
+          wallet_address: emp.wallet_address || `https://ilp.interledger-test.dev/${emp.name.toLowerCase().replace(/\s+/g, '-')}`,
         });
-        setLoading(false);
-        return;
-      }
-      
-      setEmployee(emp);
-      
-      const supabase = createClient();
-      const { data } = await supabase.from('payroll_runs').select('*').eq('company_id', emp.company_id).order('date', { ascending: false }).limit(5);
-      if (data) {
-        const myPayrolls = data.map(pr => ({
-          ...pr,
-          net_received: emp.salary * 0.75,
-          currency: emp.currency
-        }));
-        setPayrolls(myPayrolls);
       }
       setLoading(false);
     }
     loadData();
   }, []);
 
-  const handleRequestAdvance = async () => {
-    if (!advanceAmount || isNaN(Number(advanceAmount))) {
-      toast.error('Please enter a valid amount');
-      return;
+  const handleCopyWallet = () => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(employee.wallet_address);
+      toast.success('Wallet Pointer copied to clipboard!');
     }
-    
-    toast.success(`Request for ${formatCurrency(Number(advanceAmount), employee?.currency || 'USD')} sent to HR.`);
-    setShowAdvanceModal(false);
-    setAdvanceAmount('');
   };
 
-  if (loading) return (
-    <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '2rem' }}>
-        <div className="skeleton skeleton-title"></div>
-        <div className="skeleton skeleton-row" style={{ width: '40%' }}></div>
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div className="card skeleton" style={{ height: '160px' }}></div>
-        <div className="card skeleton" style={{ height: '160px' }}></div>
-      </div>
-      <div className="card skeleton" style={{ height: '300px' }}></div>
-    </div>
-  );
+  const handleWithdraw = () => {
+    setShowVisualizer(true);
+  };
 
-  const today = new Date();
-  const nextPayday = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const handleVisualizerComplete = () => {
+    setAvailableWages(prev => Math.max(0, prev - withdrawAmount));
+    toast.success(`Withdrawn ${formatCurrency(withdrawAmount, employee.currency)} instantly via Interledger!`);
+  };
+
+  const daysWorked = 18;
+  const daysInMonth = 30;
+  const progressPct = Math.round((daysWorked / daysInMonth) * 100);
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: 'var(--text-lg)', marginBottom: '0.25rem' }}>Welcome, {employee?.name.split(' ')[0]}.</h1>
-        <p style={{ color: 'var(--text-secondary)' }}>Here&apos;s a quick look at your earnings and payment history.</p>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div className="card" style={{ background: 'var(--elevation-1)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-            <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Next Payday</div>
-            <div style={{ background: 'var(--accent-teal-dim)', color: 'var(--accent-teal)', padding: '0.25rem 0.5rem', borderRadius: 'var(--radius-sm)', fontSize: 'var(--text-xs)', fontWeight: 700 }}>
-              {Math.ceil((nextPayday.getTime() - today.getTime()) / (1000 * 3600 * 24))} days until payday
-            </div>
+    <div className="animate-fade-in" style={{ maxWidth: '1100px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      
+      {/* 🚀 1. EMPLOYEE HEADER BAR */}
+      <div 
+        style={{
+          background: 'linear-gradient(135deg, rgba(17, 24, 39, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '24px',
+          padding: '1.75rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '1.25rem',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+        }}
+      >
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+            <span style={{ fontSize: '1.35rem', fontWeight: 800, color: '#fff' }}>Welcome back, {employee.name}</span>
+            <span
+              style={{
+                background: 'rgba(16,185,129,0.15)',
+                color: '#10b981',
+                border: '1px solid #10b981',
+                padding: '3px 10px',
+                borderRadius: '100px',
+                fontSize: '0.725rem',
+                fontWeight: 800,
+              }}
+            >
+              ACTIVE ONBOARDED
+            </span>
           </div>
-          <div style={{ fontSize: 'var(--text-lg)', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
-            {nextPayday.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-          </div>
-          <p style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>
-            Your estimated take-home pay: <strong>{formatCurrency(employee.salary * 0.75, employee.currency)}</strong>
-          </p>
-        </div>
-
-        <div className="card" style={{ background: 'var(--elevation-1)', borderLeft: '4px solid var(--accent-purple)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-            <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Need cash early?</div>
-            <div style={{ color: 'var(--text-secondary)' }}><Banknote size={24} color="var(--accent-teal)" /></div>
-          </div>
-          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: 'var(--text-xs)', lineHeight: 1.5 }}>
-            Need to cover an unexpected bill? You can withdraw some of your earned salary early. It arrives in seconds!
-          </p>
-          <button className="btn btn-secondary btn-block" onClick={() => setShowAdvanceModal(true)}>
-            Request early pay
-          </button>
-        </div>
-      </div>
-
-      <div className="card" style={{ padding: 0, overflow: 'hidden', background: 'var(--elevation-1)' }}>
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-subtle)' }}>
-          <h3 style={{ margin: 0 }}>Recent Paystubs</h3>
-        </div>
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Gross Amount</th>
-              <th>Net Received</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {payrolls.length === 0 ? (
-              <tr>
-                <td colSpan={5} style={{textAlign:'center', padding:'3rem'}}>
-                  <div style={{opacity:0.3,marginBottom:'0.5rem', display: 'flex', justifyContent: 'center'}}><Receipt size={48} /></div>
-                  <p style={{color: 'var(--text-secondary)'}}>No paystubs yet. Once you receive your first payment, they&apos;ll appear here!</p>
-                </td>
-              </tr>
-            ) : payrolls.map((pr, i) => (
-              <tr key={pr.id} className="animate-slide-up" style={{animationDelay: `${0.1 * i}s`, opacity: 0, animationFillMode: 'forwards'}}>
-                <td>{new Date(pr.date).toLocaleDateString()}</td>
-                <td>{formatCurrency(employee.salary, employee.currency)}</td>
-                <td style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>{formatCurrency(pr.net_received, employee.currency)}</td>
-                <td>
-                  <span className="badge badge-success">
-                    <CheckCircle size={12} style={{ marginRight: '2px' }} /> Deposited
-                  </span>
-                </td>
-                <td><button className="btn btn-ghost btn-sm">Download PDF</button></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {showAdvanceModal && (
-        <div className="modal-overlay" onClick={() => setShowAdvanceModal(false)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Request early pay</h3>
-              <button className="btn btn-ghost btn-icon" onClick={() => setShowAdvanceModal(false)}><X size={16} /></button>
-            </div>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: 'var(--text-sm)' }}>
-              You can request up to half of your estimated take-home salary early. We&apos;ll automatically deduct this from your next payday.
-            </p>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 700, color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>How much do you need? ({employee.currency})</label>
-              <input 
-                type="number" 
-                placeholder="Enter amount" 
-                value={advanceAmount}
-                onChange={e => setAdvanceAmount(e.target.value)}
-                style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-default)', background: 'var(--elevation-2)', color: 'var(--text-primary)' }}
-              />
-              <div style={{ marginTop: '0.5rem', fontSize: 'var(--text-xs)', color: 'var(--text-tertiary)' }}>
-                Max you can request right now: {formatCurrency(employee.salary * 0.75 * 0.5, employee.currency)}
-              </div>
-            </div>
-            
-            <div style={{ background: 'var(--elevation-2)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', marginBottom: '1.5rem' }}>
-              <div style={{ fontSize: 'var(--text-xs)', textTransform: 'uppercase', color: 'var(--text-secondary)', fontWeight: 700, letterSpacing: '0.5px', marginBottom: '0.5rem' }}>Receiving Bank Account</div>
-              <div style={{ fontWeight: 700, fontSize: 'var(--text-sm)' }}>{employee.bank_name || 'No bank linked'}</div>
-              <div style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-secondary)', fontSize: 'var(--text-xs)' }}>{employee.bank_account_number || 'Please add your bank account details in Settings first'}</div>
-            </div>
-
-            <button className="btn btn-primary btn-lg btn-block" onClick={handleRequestAdvance} disabled={!employee.bank_name}>
-              Send request
+          <div style={{ fontSize: '0.825rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>Working at <strong style={{ color: '#fff' }}>{employee.company_name}</strong></span>
+            <span>·</span>
+            <span style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{employee.wallet_address}</span>
+            <button 
+              onClick={handleCopyWallet}
+              style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center' }}
+              title="Copy Wallet Pointer"
+            >
+              <Copy size={14} />
             </button>
           </div>
         </div>
-      )}
+
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'rgba(0, 212, 170, 0.1)', border: '1px solid rgba(0, 212, 170, 0.3)', padding: '8px 16px', borderRadius: '14px' }}>
+          <ShieldCheck size={20} color="#00d4aa" />
+          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#00d4aa' }}>ILP Open Payments Connected</span>
+        </div>
+      </div>
+
+      {/* 📊 2. METRIC SUMMARY TILES */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div style={{ background: 'rgba(17, 24, 39, 0.75)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '1.25rem' }}>
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Monthly Base Salary</span>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#fff', marginBottom: '4px' }}>
+            {formatCurrency(employee.salary, employee.currency)}
+          </div>
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Gross contracted monthly compensation</span>
+        </div>
+
+        <div style={{ background: 'rgba(17, 24, 39, 0.75)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '1.25rem' }}>
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Accrued to Date (Day {daysWorked}/{daysInMonth})</span>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#00d4aa', marginBottom: '4px' }}>
+            {formatCurrency(availableWages, employee.currency)}
+          </div>
+          <span style={{ fontSize: '0.75rem', color: '#10b981' }}>{progressPct}% of monthly pay cycle completed</span>
+        </div>
+
+        <div style={{ background: 'rgba(17, 24, 39, 0.75)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '20px', padding: '1.25rem' }}>
+          <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700, textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Available for Immediate Cash-Out</span>
+          <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#10b981', marginBottom: '4px' }}>
+            {formatCurrency(availableWages, employee.currency)}
+          </div>
+          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Zero wait · Real-time ILP STREAM withdrawal</span>
+        </div>
+      </div>
+
+      {/* ⚡ 3. UNIFIED EARNED WAGE ACCESS (EWA) COCKPIT */}
+      <div 
+        style={{
+          background: 'linear-gradient(135deg, rgba(16,185,129,0.08) 0%, rgba(17, 24, 39, 0.85) 100%)',
+          border: '1px solid rgba(16,185,129,0.35)',
+          borderRadius: '24px',
+          padding: '1.75rem',
+          backdropFilter: 'blur(16px)',
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Zap size={20} color="#00d4aa" /> Instant Earned Wage Access
+            </h3>
+            <span style={{ fontSize: '0.8rem', color: '#cbd5e1' }}>
+              Withdraw your earned salary before payday. Money arrives instantly in seconds over the Interledger network.
+            </span>
+          </div>
+
+          <div style={{ background: 'rgba(0,0,0,0.4)', padding: '6px 14px', borderRadius: '100px', border: '1px solid rgba(255,255,255,0.1)', fontSize: '0.775rem', color: '#94a3b8' }}>
+            Flat Transfer Fee: <strong style={{ color: '#fff' }}>$1.50 USD</strong> · 0% Interest
+          </div>
+        </div>
+
+        {/* Interactive Slider */}
+        <div style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '1.5rem', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+            <span style={{ fontSize: '0.85rem', color: '#94a3b8', fontWeight: 600 }}>Select Withdrawal Amount:</span>
+            <strong style={{ fontSize: '1.5rem', color: '#00d4aa', fontWeight: 800 }}>
+              {formatCurrency(withdrawAmount, employee.currency)}
+            </strong>
+          </div>
+
+          <input
+            type="range"
+            min={50000}
+            max={availableWages}
+            step={25000}
+            value={withdrawAmount}
+            onChange={e => setWithdrawAmount(Number(e.target.value))}
+            style={{ width: '100%', accentColor: '#00d4aa', cursor: 'pointer', height: '8px', marginBottom: '1rem' }}
+          />
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#94a3b8' }}>
+            <span>Min: {formatCurrency(50000, employee.currency)}</span>
+            <span>Max Accrued: {formatCurrency(availableWages, employee.currency)}</span>
+          </div>
+        </div>
+
+        <button
+          onClick={handleWithdraw}
+          style={{
+            width: '100%',
+            background: 'linear-gradient(135deg, #10b981 0%, #00d4aa 100%)',
+            color: '#0d1117',
+            border: 'none',
+            borderRadius: '16px',
+            padding: '1.1rem',
+            fontWeight: 800,
+            fontSize: '1.05rem',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px',
+            boxShadow: '0 10px 30px rgba(16,185,129,0.35)',
+            transition: 'transform 0.2s ease',
+          }}
+        >
+          <Zap size={20} /> Withdraw {formatCurrency(withdrawAmount, employee.currency)} via Interledger (ILP)
+        </button>
+      </div>
+
+      {/* 📋 4. RECENT CRYPTOGRAPHIC PAYSTUBS LEDGER */}
+      <div 
+        style={{
+          background: 'rgba(17, 24, 39, 0.75)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: '24px',
+          padding: '1.5rem',
+          backdropFilter: 'blur(16px)',
+        }}
+      >
+        <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', fontWeight: 800 }}>Recent Paystubs &amp; ILP Receipts</h3>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+            <thead>
+              <tr style={{ color: '#94a3b8', borderBottom: '1px solid rgba(255,255,255,0.08)', textAlign: 'left' }}>
+                <th style={{ padding: '10px 12px' }}>Date</th>
+                <th style={{ padding: '10px 12px' }}>Type</th>
+                <th style={{ padding: '10px 12px' }}>Gross Salary</th>
+                <th style={{ padding: '10px 12px' }}>Net Received</th>
+                <th style={{ padding: '10px 12px' }}>Cryptographic Proof</th>
+                <th style={{ padding: '10px 12px', textAlign: 'right' }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <td style={{ padding: '12px' }}>Aug 01, 2026</td>
+                <td style={{ padding: '12px', color: '#38bdf8', fontWeight: 600 }}>Monthly Payroll</td>
+                <td style={{ padding: '12px' }}>₦1,550,000</td>
+                <td style={{ padding: '12px', fontWeight: 700, color: '#10b981' }}>₦1,348,500</td>
+                <td style={{ padding: '12px', fontFamily: 'monospace', fontSize: '0.75rem', color: '#94a3b8' }}>
+                  0x7f8a92b0c1e8...
+                </td>
+                <td style={{ padding: '12px', textAlign: 'right' }}>
+                  <span style={{ color: '#10b981', fontWeight: 800, fontSize: '0.75rem' }}>✓ Settled (0.8s)</span>
+                </td>
+              </tr>
+              <tr>
+                <td style={{ padding: '12px' }}>Jul 01, 2026</td>
+                <td style={{ padding: '12px', color: '#38bdf8', fontWeight: 600 }}>Monthly Payroll</td>
+                <td style={{ padding: '12px' }}>₦1,550,000</td>
+                <td style={{ padding: '12px', fontWeight: 700, color: '#10b981' }}>₦1,348,500</td>
+                <td style={{ padding: '12px', fontFamily: 'monospace', fontSize: '0.75rem', color: '#94a3b8' }}>
+                  0x4a19dc81e4b2...
+                </td>
+                <td style={{ padding: '12px', textAlign: 'right' }}>
+                  <span style={{ color: '#10b981', fontWeight: 800, fontSize: '0.75rem' }}>✓ Settled (0.7s)</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Full-Screen Visualizer Modal */}
+      <ILPTransferVisualizer
+        isOpen={showVisualizer}
+        onClose={() => setShowVisualizer(false)}
+        senderWallet="https://ilp.interledger-test.dev/payzati-master-wallet"
+        receiverWallet={employee.wallet_address}
+        senderName="Payzati Employer Master Wallet"
+        receiverName={`${employee.name} (Employee)`}
+        sendAmount={convertCurrency(withdrawAmount, employee.currency, 'USD')}
+        sendCurrency="USD"
+        receiveAmount={withdrawAmount}
+        receiveCurrency={employee.currency}
+        onComplete={handleVisualizerComplete}
+      />
     </div>
   );
 }
