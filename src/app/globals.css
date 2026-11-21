@@ -1,41 +1,44 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* ─── Soft Structuralism / Quiet Luxury Fintech (Mercury × Ramp Light) ─── */
-  --bg-primary: #faf9f6;          /* Warm alabaster canvas */
+  /* ─── Restrained Pitch-Deck Harmony (Warm Ivory × Midnight Navy × Calibrated Emerald) ─── */
+  --bg-primary: #faf9f6;          /* Soft warm ivory canvas */
   --bg-secondary: #ffffff;        /* Crisp porcelain surface */
-  --bg-surface: #f4f3ee;          /* Recessed warm stone */
-  --border-default: rgba(17, 24, 23, 0.09);
-  --border-subtle: rgba(17, 24, 23, 0.055);
-  --border-strong: rgba(17, 24, 23, 0.16);
-  --border-accent: rgba(11, 110, 92, 0.28);
+  --bg-surface: #f3f2ed;          /* Recessed warm stone */
+  --border-default: rgba(19, 32, 72, 0.09);
+  --border-subtle: rgba(19, 32, 72, 0.055);
+  --border-strong: rgba(19, 32, 72, 0.16);
+  --border-accent: rgba(13, 148, 108, 0.28);
 
-  --text-primary: #111817;        /* Deep forest charcoal ink */
-  --text-secondary: #586562;      /* Warm neutral muted ink */
-  --text-tertiary: #879491;
+  --navy-primary: #132048;        /* Restrained Midnight Navy from pitch deck */
+  --navy-deep: #0e1838;
 
-  --accent-teal: #0b6e5c;         /* Disciplined forest emerald */
-  --accent-teal-hover: #085547;
-  --accent-teal-dim: rgba(11, 110, 92, 0.08);
-  --accent-teal-glow: rgba(11, 110, 92, 0.16);
+  --text-primary: #132048;        /* Authoritative midnight navy ink */
+  --text-secondary: #525e75;      /* Calm muted navy-slate */
+  --text-tertiary: #8490a6;
+
+  --accent-teal: #0d8f68;         /* Calibrated Pitch Mint-Emerald (AA accessible on white) */
+  --accent-teal-hover: #0a7454;
+  --accent-teal-dim: rgba(13, 143, 104, 0.08);
+  --accent-teal-glow: rgba(13, 143, 104, 0.18);
 
   /* Surface Elevation */
   --elevation-0: #faf9f6;
   --elevation-1: #ffffff;
   --elevation-2: #f4f3ee;
-  --elevation-3: #e8e6df;
+  --elevation-3: #e7e6df;
 
   /* Status Colors (Desaturated, refined) */
-  --status-success: #0d7a5f;
+  --status-success: #0d8f68;
   --status-warning: #b4690e;
   --status-error: #be3131;
   --status-info: #1d6fa5;
 
   /* Tinted Ambient Shadows */
-  --shadow-sm: 0 1px 2px rgba(17, 24, 23, 0.04), 0 4px 12px -4px rgba(17, 24, 23, 0.05);
-  --shadow-md: 0 2px 4px rgba(17, 24, 23, 0.03), 0 12px 28px -10px rgba(17, 24, 23, 0.08);
-  --shadow-lg: 0 4px 10px rgba(17, 24, 23, 0.04), 0 24px 56px -16px rgba(17, 24, 23, 0.12);
-  --shadow-glow-teal: 0 10px 26px -8px rgba(11, 110, 92, 0.28);
+  --shadow-sm: 0 1px 2px rgba(19, 32, 72, 0.04), 0 4px 12px -4px rgba(19, 32, 72, 0.05);
+  --shadow-md: 0 2px 4px rgba(19, 32, 72, 0.03), 0 12px 28px -10px rgba(19, 32, 72, 0.09);
+  --shadow-lg: 0 4px 10px rgba(19, 32, 72, 0.04), 0 24px 56px -16px rgba(19, 32, 72, 0.14);
+  --shadow-glow-teal: 0 10px 26px -8px rgba(13, 143, 104, 0.28);
 
   /* Concentric Squircle Radii */
   --radius-sm: 10px;
@@ -71,29 +74,29 @@
   --transition-slow: 680ms var(--ease-spring);
 }
 
-/* ─── Matte Obsidian Dark Mode (Optional Toggle) ─── */
+/* ─── Pitch-Deck Midnight Navy Dark Mode (Optional Toggle) ─── */
 .dark {
-  --bg-primary: #0b0e0d;
-  --bg-secondary: #121716;
-  --bg-surface: #181f1d;
-  --border-default: rgba(244, 243, 238, 0.1);
-  --border-subtle: rgba(244, 243, 238, 0.055);
-  --border-strong: rgba(244, 243, 238, 0.18);
-  --border-accent: rgba(45, 212, 174, 0.35);
+  --bg-primary: #0c142e;
+  --bg-secondary: #121d40;
+  --bg-surface: #182652;
+  --border-default: rgba(250, 249, 246, 0.11);
+  --border-subtle: rgba(250, 249, 246, 0.06);
+  --border-strong: rgba(250, 249, 246, 0.2);
+  --border-accent: rgba(16, 185, 129, 0.38);
 
-  --text-primary: #f5f5f2;
-  --text-secondary: #9aa8a4;
-  --text-tertiary: #6a7874;
+  --text-primary: #faf9f6;
+  --text-secondary: #a7b4cc;
+  --text-tertiary: #7585a3;
 
-  --accent-teal: #20b899;
-  --accent-teal-hover: #2dd4b2;
-  --accent-teal-dim: rgba(32, 184, 153, 0.12);
-  --accent-teal-glow: rgba(32, 184, 153, 0.24);
+  --accent-teal: #10b981;
+  --accent-teal-hover: #22c993;
+  --accent-teal-dim: rgba(16, 185, 129, 0.13);
+  --accent-teal-glow: rgba(16, 185, 129, 0.26);
 
-  --elevation-0: #0b0e0d;
-  --elevation-1: #121716;
-  --elevation-2: #181f1d;
-  --elevation-3: #222b29;
+  --elevation-0: #0c142e;
+  --elevation-1: #121d40;
+  --elevation-2: #182652;
+  --elevation-3: #223368;
 
   --status-success: #2dd4a8;
   --status-warning: #eab308;
@@ -456,4 +459,41 @@ h1, h2, h3, h4, h5, h6 {
 
 .animate-slide-up {
   animation: fadeUp 620ms var(--ease-spring) both;
+}
+
+/* ─── WCAG 2.2 Accessibility & Touch-Device Guardrails ─── */
+.skip-link {
+  position: absolute;
+  top: -48px;
+  left: 16px;
+  z-index: 1000;
+  background: var(--navy-primary, #132048);
+  color: #ffffff;
+  padding: 0.65rem 1.15rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 150ms ease-out;
+}
+
+.skip-link:focus {
+  top: 16px;
+}
+
+@media (hover: none) {
+  .btn-primary:hover,
+  .btn-secondary:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 150ms !important;
+  }
 }

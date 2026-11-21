@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowUpRight, Check, Fingerprint, Globe2, Sparkles, Zap } from 'lucide-react';
 import styles from './landing.module.css';
 import LiveFXQuoteWidget from '@/components/LiveFXQuoteWidget';
@@ -30,6 +30,9 @@ export default function LandingPage() {
 
   return (
     <div className={styles.landing}>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       {/* Fluid Island Floating Pill Navbar */}
       <header className={styles.navWrapper}>
         <nav className={`${styles.islandNav} ${scrolled ? styles.islandNavScrolled : ''}`} aria-label="Primary">
@@ -97,13 +100,13 @@ export default function LandingPage() {
       )}
 
       {/* 1. EDITORIAL SPLIT HERO */}
-      <main>
+      <main id="main-content">
         <section className={styles.hero}>
           <motion.div
             className={styles.heroLeft}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.72, ease: SPRING_EASE }}
+            transition={{ duration: 0.58, ease: SPRING_EASE }}
           >
             <span className="eyebrow-pill">
               <Sparkles size={12} strokeWidth={1.75} color="var(--accent-teal)" />
@@ -111,9 +114,8 @@ export default function LandingPage() {
             </span>
 
             <h1 className={styles.heroTitle}>
-              Global payroll,{' '}
-              <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>settled</span>{' '}
-              in seconds.
+              Pay anyone, anywhere,{' '}
+              <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>instantly</span>.
             </h1>
 
             <p className={styles.heroSubtitle}>
@@ -160,15 +162,23 @@ export default function LandingPage() {
             transition={{ duration: 0.85, delay: 0.12, ease: SPRING_EASE }}
           >
             <div className="bezel-core">
-              <div className={styles.previewHeader}>
-                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
-                  payzati.vercel.app
+              <div
+                className={styles.previewHeader}
+                style={{
+                  background: 'var(--navy-primary, #132048)',
+                  color: '#ffffff',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                }}
+              >
+                <span style={{ fontSize: '0.76rem', fontWeight: 600, color: 'rgba(255,255,255,0.78)', fontFamily: 'var(--font-mono)' }}>
+                  Company · London → Lagos
                 </span>
-                <div className={styles.previewSwitcher} role="tablist">
+                <div className={styles.previewSwitcher} style={{ background: 'rgba(255, 255, 255, 0.12)' }} role="tablist">
                   <button
                     role="tab"
                     aria-selected={activeView === 'employer'}
                     className={`${styles.previewTab} ${activeView === 'employer' ? styles.previewTabActive : ''}`}
+                    style={{ color: activeView === 'employer' ? 'var(--navy-primary, #132048)' : 'rgba(255,255,255,0.82)' }}
                     onClick={() => setActiveView('employer')}
                   >
                     Employer
@@ -177,6 +187,7 @@ export default function LandingPage() {
                     role="tab"
                     aria-selected={activeView === 'employee'}
                     className={`${styles.previewTab} ${activeView === 'employee' ? styles.previewTabActive : ''}`}
+                    style={{ color: activeView === 'employee' ? 'var(--navy-primary, #132048)' : 'rgba(255,255,255,0.82)' }}
                     onClick={() => setActiveView('employee')}
                   >
                     Employee
@@ -184,92 +195,108 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {activeView === 'employer' ? (
-                <div className={styles.previewBody}>
-                  <div className={styles.previewBalanceRow}>
-                    <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', display: 'block', marginBottom: '4px' }}>
-                        Active Master Treasury (Testnet EUR)
+              <AnimatePresence mode="popLayout" initial={false}>
+                {activeView === 'employer' ? (
+                  <motion.div
+                    key="employer-preview"
+                    className={styles.previewBody}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.22, ease: SPRING_EASE }}
+                  >
+                    <div className={styles.previewBalanceRow}>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', display: 'block', marginBottom: '4px' }}>
+                          Active Master Treasury (Testnet EUR)
+                        </span>
+                        <div className={styles.previewAmount}>€14,820.40</div>
+                      </div>
+                      <span className="badge badge-success">
+                        <Check size={12} strokeWidth={2.5} /> Ready to settle
                       </span>
-                      <div className={styles.previewAmount}>€14,820.40</div>
                     </div>
-                    <span className="badge badge-success">
-                      <Check size={12} strokeWidth={2.5} /> Ready to settle
-                    </span>
-                  </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                      <div className={styles.previewRow}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Amara Okafor</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Lagos, Nigeria · Product Engineer</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>₦1,247,500</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--status-success)' }}>Payroll sent · 0.7s</div>
+                        </div>
+                      </div>
+
+                      <div className={styles.previewRow}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Amina Ochieng</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Nairobi, Kenya · Brand Designer</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>KES 184,200</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--status-success)' }}>Settled · 0.9s</div>
+                        </div>
+                      </div>
+
+                      <div className={styles.previewRow}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Kwame Mensah</div>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Accra, Ghana · QA Specialist</div>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>GHS 16,450</div>
+                          <div style={{ fontSize: '0.7rem', color: 'var(--accent-teal)', fontWeight: 600 }}>Ready to pay</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button onClick={() => enterDemo('employer')} className="btn btn-primary btn-block">
+                      Open live employer cockpit
+                    </button>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="employee-preview"
+                    className={styles.previewBody}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.22, ease: SPRING_EASE }}
+                  >
+                    <div className={styles.previewBalanceRow}>
+                      <div>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', display: 'block', marginBottom: '4px' }}>
+                          Amara · Earned so far this month
+                        </span>
+                        <div className={styles.previewAmount} style={{ color: 'var(--accent-teal)' }}>₦584,320</div>
+                      </div>
+                      <span className="badge badge-success">0% interest</span>
+                    </div>
+
                     <div className={styles.previewRow}>
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Tunde Adeyemi</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Lagos, Nigeria · Product Engineer</div>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Instant salary withdrawal</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Arrives directly in local currency</div>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>₦1,247,500</div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--status-success)' }}>Settled · 0.7s</div>
-                      </div>
+                      <span className="tabular-nums" style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>₦150,000</span>
                     </div>
 
                     <div className={styles.previewRow}>
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Amina Ochieng</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Nairobi, Kenya · Brand Designer</div>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Verified payment receipt</div>
+                        <div style={{ fontSize: '0.73rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>0x8e4a...9c12 · Open Payments</div>
                       </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>KES 184,200</div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--status-success)' }}>Settled · 0.9s</div>
-                      </div>
+                      <span className="badge badge-success">Verified</span>
                     </div>
 
-                    <div className={styles.previewRow}>
-                      <div>
-                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Kwame Mensah</div>
-                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Accra, Ghana · QA Specialist</div>
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>GHS 16,450</div>
-                        <div style={{ fontSize: '0.7rem', color: 'var(--accent-teal)', fontWeight: 600 }}>Ready to pay</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button onClick={() => enterDemo('employer')} className="btn btn-primary btn-block">
-                    Open live employer cockpit
-                  </button>
-                </div>
-              ) : (
-                <div className={styles.previewBody}>
-                  <div className={styles.previewBalanceRow}>
-                    <div>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', display: 'block', marginBottom: '4px' }}>
-                        Earned so far this month
-                      </span>
-                      <div className={styles.previewAmount} style={{ color: 'var(--accent-teal)' }}>₦584,320</div>
-                    </div>
-                    <span className="badge badge-success">0% interest</span>
-                  </div>
-
-                  <div className={styles.previewRow}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Instant salary withdrawal</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Arrives directly in local currency</div>
-                    </div>
-                    <span className="tabular-nums" style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>₦150,000</span>
-                  </div>
-
-                  <div className={styles.previewRow}>
-                    <div>
-                      <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Verified payment receipt</div>
-                      <div style={{ fontSize: '0.73rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>0x8e4a...9c12 · Open Payments</div>
-                    </div>
-                    <span className="badge badge-success">Verified</span>
-                  </div>
-
-                  <button onClick={() => enterDemo('employee')} className="btn btn-primary btn-block">
-                    Try employee withdrawal flow
-                  </button>
-                </div>
-              )}
+                    <button onClick={() => enterDemo('employee')} className="btn btn-primary btn-block">
+                      Try employee withdrawal flow
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         </section>
