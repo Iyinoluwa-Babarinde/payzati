@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/fx-engine';
+import { DEFAULT_DEMO_TEAM, appendStoredTransaction } from '@/lib/demo-ledger';
 import { getCompany } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
 import { getAdminConfigStatus, initiateMasterAuthorization } from '@/app/admin/actions';
@@ -25,20 +26,20 @@ import ILPTransferVisualizer from '@/components/ILPTransferVisualizer';
 
 export default function EmployerDashboard() {
   const [stats, setStats] = useState({
-    totalEmployees: 0,
-    countries: 0,
-    monthlyPayroll: 0,
+    totalEmployees: DEFAULT_DEMO_TEAM.length,
+    countries: 4,
+    monthlyPayroll: 16500,
     walletAsset: 'USD',
     walletScale: 2,
   });
-  const [employees, setEmployees] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>(DEFAULT_DEMO_TEAM);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [companyName, setCompanyName] = useState('Payzati Global Inc.');
   const [masterWalletPointer, setMasterWalletPointer] = useState('$ilp.interledger-test.dev/payzati');
-  const [budgetApproved, setBudgetApproved] = useState(false);
+  const [budgetApproved, setBudgetApproved] = useState(true);
   const [approving, setApproving] = useState(false);
-  const [demoMode, setDemoMode] = useState(false);
+  const [demoMode, setDemoMode] = useState(true);
   const [showExpressVisualizer, setShowExpressVisualizer] = useState(false);
   const [selectedRecipient, setSelectedRecipient] = useState<any>(null);
   const [customReceiverWallet, setCustomReceiverWallet] = useState('');
@@ -60,7 +61,9 @@ export default function EmployerDashboard() {
       }
 
       if (adminRes.status === 'fulfilled' && adminRes.value) {
-        setBudgetApproved(Boolean(adminRes.value.hasMasterToken && !adminRes.value.isSimulatedToken));
+        if (adminRes.value.hasMasterToken && !adminRes.value.isSimulatedToken) {
+          setBudgetApproved(true);
+        }
       }
 
       if (walletRes.status === 'fulfilled' && walletRes.value.ok) {
@@ -397,12 +400,26 @@ export default function EmployerDashboard() {
                 }),
               });
               const data = await res.json();
+              const txRecord = {
+                id: data?.result?.id || `pay_${Date.now()}`,
+                employee_id: selectedRecipient.id,
+                employee_name: selectedRecipient.name,
+                type: 'payroll' as const,
+                amount: Number(selectedRecipient.salary || 500),
+                currency: selectedRecipient.currency || 'CAD',
+                status: 'completed' as const,
+                description: `Payroll paid by ${companyName}`,
+                receipt: data?.result?.receipt || `0x${Date.now().toString(16)}`,
+                mode: (data?.result?.mode || (demoMode ? 'simulated' : 'live')) as 'live' | 'simulated',
+                quoteId: data?.result?.quoteId,
+                outgoingPaymentUrl: data?.result?.outgoingPaymentUrl,
+                created_at: new Date().toISOString(),
+              };
+              appendStoredTransaction(txRecord);
               if (data?.result?.mode === 'live') {
                 toast.success(`Live Interledger settlement completed for ${selectedRecipient.name}.`);
               } else {
-                toast.success(
-                  data?.result?.notice || `Settled for ${selectedRecipient.name} in Demo Mode.`
-                );
+                toast.success(`Payment sent to ${selectedRecipient.name}.`);
               }
             } catch {
               toast.error('Payment request encountered a network issue.');

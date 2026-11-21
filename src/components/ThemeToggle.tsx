@@ -8,9 +8,12 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     const storedTheme = localStorage.getItem('theme');
-    if (storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    if (storedTheme === 'dark') {
       setTheme('dark');
       document.documentElement.classList.add('dark');
+    } else {
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
     }
   }, []);
 
@@ -27,9 +30,9 @@ export default function ThemeToggle() {
   };
 
   return (
-    <button 
-      onClick={toggleTheme} 
-      className="btn-icon" 
+    <button
+      onClick={toggleTheme}
+      className="btn-icon"
       style={{
         background: 'var(--elevation-2)',
         border: '1px solid var(--border-default)',
@@ -40,6 +43,7 @@ export default function ThemeToggle() {
         justifyContent: 'center',
         borderRadius: '50%',
         transition: 'all var(--transition-fast)',
+        cursor: 'pointer',
       }}
       aria-label="Toggle theme"
       title="Toggle theme"

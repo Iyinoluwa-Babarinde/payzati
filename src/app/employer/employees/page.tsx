@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { SUPPORTED_COUNTRIES } from '@/lib/tax-engine';
 import { formatCurrency } from '@/lib/fx-engine';
+import { DEFAULT_DEMO_TEAM } from '@/lib/demo-ledger';
 import { createClient } from '@/lib/supabase/client';
 import { getCompany } from '@/lib/supabase/queries';
 import { toast } from 'sonner';
@@ -71,14 +72,14 @@ function FlagEG({ size = 16 }: { size?: number }) {
 }
 
 export default function EmployeesPage() {
-  const [employees, setEmployees] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>(DEFAULT_DEMO_TEAM);
   const [company, setCompany] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState<any>(null);
   const [search, setSearch] = useState('');
   const [newEmp, setNewEmp] = useState({ name: '', email: '', country: 'Nigeria', currency: 'NGN', salary: '' });
   const [approveData, setApproveData] = useState({ country: 'Nigeria', currency: 'NGN', salary: '' });
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'active' | 'pending'>('active');
   const supabase = createClient();
 

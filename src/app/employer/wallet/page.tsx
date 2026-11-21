@@ -39,7 +39,7 @@ export default function WalletPage() {
   const [linking, setLinking]                   = useState(false);
   const [transactions, setTransactions]         = useState<any[]>([]);
   const [balance, setBalance]                   = useState(0);
-  const [loading, setLoading]                   = useState(true);
+  const [loading, setLoading]                   = useState(false);
   const [linkedBank, setLinkedBank]             = useState<any>(null);
   const [autoFund, setAutoFund]                 = useState(false);
   const [companyId, setCompanyId]               = useState<string | null>(null);

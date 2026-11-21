@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { calculateTax } from '@/lib/tax-engine';
 import { formatCurrency, convertCurrency } from '@/lib/fx-engine';
+import { DEFAULT_DEMO_TEAM, appendStoredTransaction } from '@/lib/demo-ledger';
 import { createClient } from '@/lib/supabase/client';
 import { getCompany } from '@/lib/supabase/queries';
 import { processBatchPayroll } from '@/lib/ilp/payments';
@@ -27,18 +28,18 @@ import { toast } from 'sonner';
 
 export default function PayrollPage() {
   const [step, setStep] = useState(1);
-  const [employees, setEmployees] = useState<any[]>([]);
-  const [company, setCompany] = useState<any>(null);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [walletBalance, setWalletBalance] = useState(0);
-  const [isAutoFunding, setIsAutoFunding] = useState(false);
-  const [linkedBank, setLinkedBank] = useState<any>(null);
+  const [employees, setEmployees] = useState<any[]>(DEFAULT_DEMO_TEAM);
+  const [company, setCompany] = useState<any>({ id: 'demo-company-id', name: 'Payzati Global Inc.' });
+  const [selected, setSelected] = useState<string[]>(DEFAULT_DEMO_TEAM.map((e) => e.id));
+  const [walletBalance, setWalletBalance] = useState(25000);
+  const [isAutoFunding, setIsAutoFunding] = useState(true);
+  const [linkedBank, setLinkedBank] = useState<any>({ bankName: 'Chase Business Treasury', last4: '8892' });
 
   const [processing, setProcessing] = useState(false);
   const [showVisualizer, setShowVisualizer] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [results, setResults] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const supabase = createClient();
 
@@ -177,9 +178,25 @@ export default function PayrollPage() {
       };
     });
 
-    const res = await processBatchPayroll(senderWallet, payments);
+    const res = await processBatchPayroll(senderWallet, payments, { demoMode: true });
 
     for (const item of res.payments) {
+      if (item.status === 'completed') {
+        appendStoredTransaction({
+          id: item.id,
+          employee_id: (item as any).employeeId,
+          type: 'payroll',
+          amount: Number(item.amount),
+          currency: item.currency,
+          status: 'completed',
+          description: 'Monthly salary paid via Interledger',
+          receipt: item.receipt,
+          mode: item.mode,
+          quoteId: item.quoteId,
+          outgoingPaymentUrl: item.outgoingPaymentUrl,
+          created_at: item.completedAt || new Date().toISOString(),
+        });
+      }
       if (item.status === 'completed' && company) {
         const usdRate =
           item.currency === 'NGN'

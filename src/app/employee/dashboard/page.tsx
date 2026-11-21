@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatCurrency, convertCurrency } from '@/lib/fx-engine';
+import { getStoredTransactions, appendStoredTransaction } from '@/lib/demo-ledger';
 import { getEmployeeProfile } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -40,7 +41,16 @@ export default function EmployeeDashboard() {
   const supabase = createClient();
 
   const loadData = async () => {
-    setLoading(true);
+    // Load local instant transactions first so there is zero flash and all payouts reflect immediately
+    const localTxs = getStoredTransactions();
+    if (localTxs.length > 0) {
+      setTransactions(localTxs);
+      const localWithdrawn = localTxs
+        .filter((t) => t.type === 'withdrawal' && t.status === 'completed')
+        .reduce((sum, t) => sum + Math.abs(Number(t.amount)), 0);
+      setWithdrawnThisMonth(localWithdrawn);
+    }
+
     const emp = await getEmployeeProfile();
     const resolvedEmp = emp
       ? {
@@ -60,7 +70,7 @@ export default function EmployeeDashboard() {
     setEmployee(resolvedEmp);
     setReceiverWalletInput(resolvedEmp.wallet_address);
 
-    if (emp) {
+    if (emp && emp.id !== 'demo-emp-id') {
       const now = new Date();
       const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
@@ -72,8 +82,9 @@ export default function EmployeeDashboard() {
           .order('created_at', { ascending: false });
 
         if (txs && txs.length > 0) {
-          setTransactions(txs);
-          const monthlyWithdrawn = txs
+          const merged = [...localTxs, ...txs.filter((t: any) => !localTxs.some((l) => l.id === t.id))];
+          setTransactions(merged);
+          const monthlyWithdrawn = merged
             .filter(
               (t: any) =>
                 t.type === 'withdrawal' &&
@@ -82,15 +93,11 @@ export default function EmployeeDashboard() {
             )
             .reduce((sum: number, t: any) => sum + Math.abs(Number(t.amount)), 0);
           setWithdrawnThisMonth(monthlyWithdrawn);
-        } else {
-          setTransactions([]);
-          setWithdrawnThisMonth(0);
         }
       } catch {
-        setTransactions([]);
+        // Keep local transactions
       }
     }
-    setLoading(false);
   };
 
   useEffect(() => {
@@ -176,6 +183,23 @@ export default function EmployeeDashboard() {
     } catch {
       // Keep UI updated even in demo mode
     }
+
+    appendStoredTransaction({
+      id: newTx.id,
+      employee_id: newTx.employee_id,
+      employee_name: employee.name,
+      type: 'withdrawal',
+      amount: newTx.amount,
+      currency: newTx.currency,
+      status: 'completed',
+      description: newTx.description,
+      receipt: newTx.receipt,
+      mode: newTx.mode,
+      quoteId: newTx.quoteId,
+      outgoingPaymentUrl: newTx.outgoingPaymentUrl,
+      notice: newTx.notice,
+      created_at: newTx.created_at,
+    });
 
     setTransactions(prev => [newTx, ...prev]);
     setWithdrawnThisMonth(prev => prev + amountToWithdraw);
