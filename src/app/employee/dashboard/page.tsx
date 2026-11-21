@@ -502,14 +502,14 @@ export default function EmployeeDashboard() {
       <ILPTransferVisualizer
         isOpen={showVisualizer}
         onClose={() => setShowVisualizer(false)}
-        senderWallet="https://ilp.interledger-test.dev/da071cb6"
-        receiverWallet={employee?.wallet_address || 'https://ilp.interledger-test.dev/da071cb6'}
+        senderWallet="https://ilp.interledger-test.dev/payzati"
+        receiverWallet={employee?.wallet_address || 'https://ilp.interledger-test.dev/amara'}
         senderName={`${employee?.company_name} Treasury`}
-        receiverName={employee?.name || 'Employee'}
-        sendAmount={Math.max(1, Math.round(convertCurrency(clampedWithdraw, employee?.currency || 'NGN', 'EUR')))}
-        sendCurrency="EUR"
+        receiverName={employee?.name || 'Amara Okafor'}
+        sendAmount={Math.max(1, Math.round(convertCurrency(clampedWithdraw, employee?.currency || 'CAD', 'USD') * 100) / 100)}
+        sendCurrency="USD"
         receiveAmount={clampedWithdraw}
-        receiveCurrency={employee?.currency || 'NGN'}
+        receiveCurrency={employee?.currency || 'CAD'}
         onComplete={handleVisualizerComplete}
       />
     </div>

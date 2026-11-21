@@ -28,7 +28,7 @@ export default function EmployerDashboard() {
     totalEmployees: 0,
     countries: 0,
     monthlyPayroll: 0,
-    walletAsset: 'EUR',
+    walletAsset: 'USD',
     walletScale: 2,
   });
   const [employees, setEmployees] = useState<any[]>([]);

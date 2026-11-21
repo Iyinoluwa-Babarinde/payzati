@@ -15,6 +15,7 @@ export interface FXQuote {
 // Base rates against USD (realistic approximate rates)
 const BASE_RATES: Record<string, number> = {
   USD: 1,
+  CAD: 1.38,
   NGN: 1550,
   KES: 154,
   GHS: 15.5,
@@ -74,7 +75,7 @@ export function getFXQuote(fromCurrency: string, toCurrency: string, amount: num
 
 export function formatCurrency(amount: number, currency: string): string {
   const symbols: Record<string, string> = {
-    USD: '$', NGN: '₦', KES: 'KSh', GHS: 'GH₵', ZAR: 'R', EGP: 'E£', GBP: '£', EUR: '€',
+    USD: '$', CAD: 'CA$', NGN: '₦', KES: 'KSh', GHS: 'GH₵', ZAR: 'R', EGP: 'E£', GBP: '£', EUR: '€',
   };
   const symbol = symbols[currency] || currency;
   const formatted = new Intl.NumberFormat('en-US', {
