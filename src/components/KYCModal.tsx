@@ -52,7 +52,7 @@ export default function KYCModal({ isOpen, onClose, onVerified }: KYCModalProps)
         left: 0,
         right: 0,
         bottom: 0,
-        background: 'rgba(10,15,26,0.85)',
+        background: 'rgba(19, 32, 72, 0.4)',
         backdropFilter: 'blur(16px)',
         zIndex: 9999,
         display: 'flex',
@@ -64,14 +64,14 @@ export default function KYCModal({ isOpen, onClose, onVerified }: KYCModalProps)
     >
       <div
         style={{
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-          border: '1px solid rgba(0,212,170,0.4)',
+          background: 'var(--elevation-1)',
+          border: '1px solid var(--border-default)',
           borderRadius: '24px',
           width: '100%',
           maxWidth: '540px',
           padding: '2rem',
-          color: '#fff',
-          boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
+          color: 'var(--text-primary)',
+          boxShadow: 'var(--shadow-lg)',
           position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}

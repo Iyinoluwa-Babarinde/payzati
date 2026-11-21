@@ -145,7 +145,7 @@ export default function CompliancePage() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [companyId, setCompanyId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedReportCountry, setSelectedReportCountry] = useState<string | null>(null);
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
 

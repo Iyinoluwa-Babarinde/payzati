@@ -181,40 +181,48 @@ export default function EmployerDashboard() {
         </div>
       </div>
 
-      {/* Double-Bezel Master Wallet & Budget Authorization Hero */}
+      {/* Double-Bezel Primary Payroll Hero (Clear Hierarchy: Pay Team First, Budget Compact) */}
       <div className="bezel-shell">
         <div
           className="bezel-core"
           style={{
-            padding: '1.75rem 2rem',
+            padding: '2rem 2.25rem',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            gap: '1.5rem',
+            gap: '1.75rem',
             flexWrap: 'wrap',
             background:
-              'radial-gradient(520px 240px at 92% 0%, rgba(13, 143, 104, 0.08), transparent 68%), var(--elevation-1)',
+              'radial-gradient(560px 260px at 95% 0%, rgba(13, 143, 104, 0.14), transparent 68%), var(--navy-primary, #132048)',
+            color: '#ffffff',
           }}
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Company payout wallet
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'rgba(255,255,255,0.72)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                Next global payroll · {stats.totalEmployees} people · {stats.countries} countries
               </span>
-              {budgetApproved ? (
-                <span className="badge badge-success">
-                  <CheckCircle2 size={12} strokeWidth={2} /> Budget ready
-                </span>
-              ) : (
-                <span className="badge badge-warning">
-                  <ShieldAlert size={12} strokeWidth={2} /> Approval needed for live payouts
-                </span>
-              )}
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '3px 10px',
+                  borderRadius: '9999px',
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  background: budgetApproved ? 'rgba(16, 185, 129, 0.18)' : 'rgba(245, 158, 11, 0.2)',
+                  color: budgetApproved ? '#6ee7b7' : '#fcd34d',
+                }}
+              >
+                {budgetApproved ? <CheckCircle2 size={12} /> : <ShieldAlert size={12} />}
+                {budgetApproved ? 'Wallet connected & ready' : 'Approval needed'}
+              </span>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap' }}>
-              <span className="tabular-nums" style={{ fontSize: '1.9rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
-                {stats.walletAsset} Wallet · Connected
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.85rem', flexWrap: 'wrap' }}>
+              <span className="tabular-nums" style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.03em', color: '#ffffff' }}>
+                {formatCurrency(stats.monthlyPayroll, 'USD')}
               </span>
               <a
                 href="https://ilp.interledger-test.dev/payzati"
@@ -222,8 +230,8 @@ export default function EmployerDashboard() {
                 rel="noreferrer"
                 style={{
                   fontFamily: 'var(--font-mono)',
-                  fontSize: '0.82rem',
-                  color: 'var(--accent-teal)',
+                  fontSize: '0.8rem',
+                  color: '#6ee7b7',
                   textDecoration: 'none',
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -234,27 +242,87 @@ export default function EmployerDashboard() {
               </a>
             </div>
 
-            <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', maxWidth: '58ch' }}>
-              {budgetApproved
-                ? 'Your company wallet is approved. Payments go out instantly.'
-                : 'Approve your company wallet once so Payzati can send live payments automatically.'}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap', fontSize: '0.82rem', color: 'rgba(255,255,255,0.72)' }}>
+              <span>Funded in {stats.walletAsset} · Settled in local currency in under 1 second</span>
+              <button
+                onClick={handleApproveBudget}
+                disabled={approving}
+                style={{
+                  background: 'rgba(255,255,255,0.1)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  color: '#ffffff',
+                  borderRadius: '9999px',
+                  padding: '3px 11px',
+                  fontSize: '0.73rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                }}
+              >
+                <KeyRound size={12} />
+                {approving ? 'Opening...' : budgetApproved ? 'Wallet settings' : 'Approve budget'}
+              </button>
+            </div>
           </div>
 
           <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-            <button
-              onClick={handleApproveBudget}
-              disabled={approving}
-              className="btn btn-primary btn-lg"
-            >
-              <KeyRound size={16} strokeWidth={1.75} />
-              {approving ? 'Opening wallet...' : budgetApproved ? 'Update budget' : 'Approve payout budget'}
+            <Link href="/employer/payroll" className="btn btn-primary btn-lg">
+              <span>Pay whole team</span>
               <span className="btn-icon-nest">
-                <ArrowUpRight size={15} strokeWidth={1.75} />
+                <ArrowUpRight size={16} strokeWidth={2} />
               </span>
-            </button>
+            </Link>
+            <Link
+              href="/employer/employees"
+              className="btn btn-lg"
+              style={{
+                background: 'rgba(255,255,255,0.12)',
+                color: '#ffffff',
+                border: '1px solid rgba(255,255,255,0.2)',
+                paddingRight: '1.35rem',
+              }}
+            >
+              <Plus size={16} strokeWidth={2} /> Add team member
+            </Link>
           </div>
         </div>
+      </div>
+
+      {/* 4-Step Guided Flow Strip (Matches Demo Story Step-by-Step) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.95rem' }}>
+        <Link href="/employer/employees" className="bezel-shell" style={{ textDecoration: 'none' }}>
+          <div className="bezel-core" style={{ padding: '1.15rem 1.25rem', height: '100%' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-teal)' }}>STEP 01</span>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', margin: '4px 0' }}>Add team &amp; salaries</div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>Set local currency pay for {stats.totalEmployees} staff across {stats.countries} countries.</p>
+          </div>
+        </Link>
+
+        <Link href="/employer/compliance" className="bezel-shell" style={{ textDecoration: 'none' }}>
+          <div className="bezel-core" style={{ padding: '1.15rem 1.25rem', height: '100%' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-teal)' }}>STEP 02</span>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', margin: '4px 0' }}>Automatic tax compliance</div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>Canada CRA, Nigeria PAYE, Kenya &amp; Ghana taxes calculated automatically.</p>
+          </div>
+        </Link>
+
+        <Link href="/employer/payroll" className="bezel-shell" style={{ textDecoration: 'none' }}>
+          <div className="bezel-core" style={{ padding: '1.15rem 1.25rem', height: '100%' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-teal)' }}>STEP 03</span>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', margin: '4px 0' }}>Instant batch payout</div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>Pay everyone at once in seconds over Interledger.</p>
+          </div>
+        </Link>
+
+        <Link href="/employee/dashboard" className="bezel-shell" style={{ textDecoration: 'none' }}>
+          <div className="bezel-core" style={{ padding: '1.15rem 1.25rem', height: '100%' }}>
+            <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-teal)' }}>STEP 04</span>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', margin: '4px 0' }}>Employee sees pay arrive</div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>Switch to Amara&apos;s view to withdraw earned wages &amp; verify receipts.</p>
+          </div>
+        </Link>
       </div>
 
       {/* Asymmetrical Metrics Bento */}

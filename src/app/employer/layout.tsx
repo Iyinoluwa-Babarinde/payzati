@@ -22,13 +22,13 @@ import {
 
 const primaryNavItems = [
   { href: '/employer/dashboard', label: 'Overview', icon: LayoutDashboard },
-  { href: '/employer/employees', label: 'Team', icon: Users },
-  { href: '/employer/payroll', label: 'Payroll', icon: Banknote },
-  { href: '/employer/wallet', label: 'Wallet', icon: Wallet },
+  { href: '/employer/employees', label: '1. Team & Salaries', icon: Users },
+  { href: '/employer/compliance', label: '2. Tax Compliance', icon: Scale },
+  { href: '/employer/payroll', label: '3. Run Payroll', icon: Banknote },
+  { href: '/employer/wallet', label: '4. Wallet', icon: Wallet },
 ];
 
 const secondaryNavItems = [
-  { href: '/employer/compliance', label: 'Compliance', icon: Scale },
   { href: '/employer/settings', label: 'Settings', icon: Settings },
 ];
 

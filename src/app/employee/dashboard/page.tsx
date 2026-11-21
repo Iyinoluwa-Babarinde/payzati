@@ -282,51 +282,49 @@ export default function EmployeeDashboard() {
         </div>
       )}
 
-      {/* Summary Metric Bento */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.1rem' }}>
-        <div className="bezel-shell">
-          <div className="bezel-core" style={{ padding: '1.35rem 1.5rem' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
-              Monthly salary
+      {/* Machined Midnight Navy Hero Balance Card (Matches Pitch Deck Slide 1) */}
+      <div className="bezel-shell">
+        <div
+          className="bezel-core"
+          style={{
+            padding: '2rem 2.25rem',
+            background:
+              'radial-gradient(500px 240px at 95% 0%, rgba(16, 185, 129, 0.16), transparent 68%), var(--navy-primary, #132048)',
+            color: '#ffffff',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: '1.5rem',
+            flexWrap: 'wrap',
+          }}
+        >
+          <div>
+            <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.72)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', marginBottom: '6px' }}>
+              Available to withdraw now · Day {currentDay} of {daysInMonth}
             </span>
-            <div className="tabular-nums" style={{ fontSize: '1.6rem', fontWeight: 800 }}>
-              {formatCurrency(baseSalary, employee?.currency || 'NGN')}
+            <div className="tabular-nums" style={{ fontSize: '2.45rem', fontWeight: 800, letterSpacing: '-0.03em', color: '#ffffff', lineHeight: 1.1 }}>
+              {formatCurrency(availableWages, employee?.currency || 'CAD')}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Standard pay cycle</span>
-          </div>
-        </div>
-
-        <div className="bezel-shell">
-          <div className="bezel-core" style={{ padding: '1.35rem 1.5rem' }}>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
-              Earned so far (Day {currentDay} of {daysInMonth})
-            </span>
-            <div className="tabular-nums" style={{ fontSize: '1.6rem', fontWeight: 800 }}>
-              {formatCurrency(accruedToDate, employee?.currency || 'NGN')}
-            </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--status-success)' }}>{progressPct}% of month completed</span>
-          </div>
-        </div>
-
-        <div className="bezel-shell">
-          <div
-            className="bezel-core"
-            style={{
-              padding: '1.35rem 1.5rem',
-              background: 'radial-gradient(280px 140px at 90% 10%, rgba(11, 110, 92, 0.08), transparent 70%), var(--elevation-1)',
-            }}
-          >
-            <span style={{ fontSize: '0.75rem', color: 'var(--accent-teal)', fontWeight: 700, display: 'block', marginBottom: '6px' }}>
-              Available to withdraw now
-            </span>
-            <div className="tabular-nums" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
-              {formatCurrency(availableWages, employee?.currency || 'NGN')}
-            </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+            <div style={{ marginTop: '8px', fontSize: '0.82rem', color: '#6ee7b7', fontWeight: 500 }}>
               {withdrawnThisMonth > 0
-                ? `${formatCurrency(withdrawnThisMonth, employee?.currency || 'NGN')} already withdrawn`
-                : '0% interest · Instant arrival'}
-            </span>
+                ? `${formatCurrency(withdrawnThisMonth, employee?.currency || 'CAD')} already withdrawn this month · 0% interest`
+                : '0% interest · Arrives in your account in under 1 second'}
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
+            <div>
+              <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.62)', display: 'block', marginBottom: '2px' }}>Monthly salary</span>
+              <strong className="tabular-nums" style={{ fontSize: '1.15rem', color: '#ffffff' }}>
+                {formatCurrency(baseSalary, employee?.currency || 'CAD')}
+              </strong>
+            </div>
+            <div style={{ borderLeft: '1px solid rgba(255,255,255,0.14)', paddingLeft: '1.5rem' }}>
+              <span style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.62)', display: 'block', marginBottom: '2px' }}>Earned so far ({progressPct}%)</span>
+              <strong className="tabular-nums" style={{ fontSize: '1.15rem', color: '#ffffff' }}>
+                {formatCurrency(accruedToDate, employee?.currency || 'CAD')}
+              </strong>
+            </div>
           </div>
         </div>
       </div>
