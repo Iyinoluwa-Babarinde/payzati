@@ -17,7 +17,7 @@ const BASE_RATES: Record<string, number> = {
   USD: 1,
   CAD: 1.38,
   NGN: 1550,
-  KES: 154,
+  KES: 129.5,
   GHS: 15.5,
   ZAR: 18.2,
   EGP: 48.5,

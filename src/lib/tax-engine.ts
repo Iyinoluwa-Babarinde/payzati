@@ -118,6 +118,27 @@ function calculateEgyptTax(annualGross: number): number {
   return tax;
 }
 
+// Canada CRA Federal Tax Brackets (Annual → monthly)
+function calculateCanadaTax(annualGross: number): number {
+  const basicPersonalAmount = 15705;
+  const taxable = Math.max(annualGross - basicPersonalAmount, 0);
+  const brackets = [
+    { limit: 55867, rate: 0.15 },
+    { limit: 55866, rate: 0.205 },
+    { limit: 61472, rate: 0.26 },
+    { limit: 73547, rate: 0.29 },
+    { limit: Infinity, rate: 0.33 },
+  ];
+  let tax = 0, remaining = taxable;
+  for (const bracket of brackets) {
+    if (remaining <= 0) break;
+    const t = Math.min(remaining, bracket.limit);
+    tax += t * bracket.rate;
+    remaining -= t;
+  }
+  return tax;
+}
+
 export function calculateTax(monthlySalary: number, country: string, currency: string): TaxBreakdown {
   const annualSalary = monthlySalary * 12;
   let incomeTax = 0;
@@ -165,6 +186,14 @@ export function calculateTax(monthlySalary: number, country: string, currency: s
       );
       break;
     }
+    case 'canada': {
+      incomeTax = calculateCanadaTax(annualSalary) / 12;
+      socialContributions.push(
+        { name: 'CPP (5.95%)', amount: Math.min(monthlySalary * 0.0595, 322.29) },
+        { name: 'EI (1.66%)', amount: Math.min(monthlySalary * 0.0166, 87.43) }
+      );
+      break;
+    }
     default: {
       incomeTax = monthlySalary * 0.15;
       socialContributions.push({ name: 'Estimated Social (5%)', amount: monthlySalary * 0.05 });
@@ -187,6 +216,7 @@ export function calculateTax(monthlySalary: number, country: string, currency: s
 
 export const SUPPORTED_COUNTRIES = [
   { code: 'NG', name: 'Nigeria', currency: 'NGN', flag: '🇳🇬' },
+  { code: 'CA', name: 'Canada', currency: 'CAD', flag: '🇨🇦' },
   { code: 'KE', name: 'Kenya', currency: 'KES', flag: '🇰🇪' },
   { code: 'GH', name: 'Ghana', currency: 'GHS', flag: '🇬🇭' },
   { code: 'ZA', name: 'South Africa', currency: 'ZAR', flag: '🇿🇦' },
