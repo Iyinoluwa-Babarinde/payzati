@@ -4,21 +4,20 @@ import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { getCompany } from '@/lib/supabase/queries';
+import { getCompany, clearProfileCache } from '@/lib/supabase/queries';
 import styles from './employer.module.css';
-import { Toaster } from 'react-hot-toast';
 import ThemeToggle from '@/components/ThemeToggle';
-import { 
-  LayoutDashboard, 
-  Users, 
-  Banknote, 
-  Wallet, 
-  Scale, 
-  Settings, 
-  LogOut, 
-  ChevronLeft, 
+import {
+  LayoutDashboard,
+  Users,
+  Banknote,
+  Wallet,
+  Scale,
+  Settings,
+  LogOut,
+  ChevronLeft,
   ChevronRight,
-  Menu
+  Menu,
 } from 'lucide-react';
 
 const primaryNavItems = [
@@ -37,25 +36,28 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [company, setCompany] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [company, setCompany] = useState<any>({ name: 'Payzati Global Inc.' });
 
+  // Load once on mount without blocking render — tab switches are instantaneous
   useEffect(() => {
     let cancelled = false;
 
     async function init() {
       const comp = await getCompany();
-      if (cancelled) return;
-      setCompany(comp || { name: 'Payzati Global Inc.' });
-      setLoading(false);
+      if (!cancelled && comp?.name) {
+        setCompany(comp);
+      }
     }
     init();
 
-    return () => { cancelled = true; };
-  }, [pathname]);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSignOut = async () => {
     const supabase = createClient();
+    clearProfileCache();
     await supabase.auth.signOut();
     if (typeof window !== 'undefined') {
       document.cookie = 'payzati_demo_role=; path=/; max-age=0';
@@ -64,37 +66,14 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-primary)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <div className="skeleton" style={{ width: '48px', height: '48px', borderRadius: '50%' }}></div>
-          <span style={{ color: 'var(--text-secondary)', fontSize: 'var(--text-sm)' }}>Loading workspace...</span>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className={styles.layout}>
-      <Toaster 
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            background: 'var(--elevation-1)',
-            color: 'var(--text-primary)',
-            border: '1px solid var(--border-default)',
-            boxShadow: 'var(--shadow-md)',
-          },
-          success: { iconTheme: { primary: 'var(--accent-teal)', secondary: '#ffffff' } },
-        }}
-      />
       <aside className={`${styles.sidebar} ${sidebarOpen ? '' : styles.collapsed}`}>
         <div className={styles.sidebarHeader}>
           <Link href="/employer/dashboard" className={styles.sidebarLogo}>
             <div className={styles.logoMark}>
-              <div className={styles.logoRow}><div className={styles.sq}></div><div className={styles.sq}></div></div>
-              <div className={styles.logoRow}><div className={styles.cr}></div><div className={styles.cr}></div></div>
+              <div className={styles.logoRow}><div className={styles.sq} /><div className={styles.sq} /></div>
+              <div className={styles.logoRow}><div className={styles.cr} /><div className={styles.cr} /></div>
             </div>
             {sidebarOpen && <span className={styles.logoText}>Payzati</span>}
           </Link>
@@ -104,7 +83,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
         </div>
 
         <nav className={styles.sidebarNav}>
-          {primaryNavItems.map(item => {
+          {primaryNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
             return (
@@ -122,7 +101,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
           })}
 
           <div style={{ marginTop: 'auto', paddingTop: '1rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
-            {secondaryNavItems.map(item => {
+            {secondaryNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
               return (
@@ -155,7 +134,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
           <button className={styles.mobileMenuBtn} onClick={() => setSidebarOpen(!sidebarOpen)}>
             <Menu size={22} strokeWidth={1.65} />
           </button>
-          
+
           <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
             <div style={{ display: 'inline-flex', padding: '3px', borderRadius: '9999px', background: 'var(--elevation-2)', border: '1px solid var(--border-default)' }}>
               <span style={{ padding: '4px 12px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700, background: 'var(--elevation-1)', color: 'var(--text-primary)', boxShadow: 'var(--shadow-sm)' }}>
@@ -175,7 +154,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
 
             <div className={styles.topbarRight} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
               <ThemeToggle />
-              
+
               {company && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', paddingLeft: '0.85rem', borderLeft: '1px solid var(--border-default)' }}>
                   <div style={{ width: '30px', height: '30px', borderRadius: '10px', background: 'var(--accent-teal)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.8rem' }}>
@@ -187,7 +166,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
             </div>
           </div>
         </header>
-        
+
         <div className={styles.content}>
           <div className={styles.contentWrapper}>
             {children}

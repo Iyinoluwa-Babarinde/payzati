@@ -10,7 +10,7 @@ import LinkOrganization from '../LinkOrganization';
 import OnboardingTracker from '../OnboardingTracker';
 import ILPTransferVisualizer from '@/components/ILPTransferVisualizer';
 import { CheckCircle, Zap } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export default function EarnedWagePage() {
   const [employee, setEmployee] = useState<any>(null);

@@ -17,16 +17,23 @@ import {
   Sparkles,
   Zap,
 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import ILPTransferVisualizer from '@/components/ILPTransferVisualizer';
 
 export default function EmployeeDashboard() {
-  const [employee, setEmployee] = useState<any>(null);
+  const [employee, setEmployee] = useState<any>({
+    id: 'demo-emp',
+    name: 'Tunde Adeyemi',
+    company_name: 'Payzati Global Inc.',
+    salary: 850000,
+    currency: 'NGN',
+    wallet_address: 'https://ilp.interledger-test.dev/da071cb6',
+  });
   const [transactions, setTransactions] = useState<any[]>([]);
   const [withdrawnThisMonth, setWithdrawnThisMonth] = useState(0);
   const [withdrawAmount, setWithdrawAmount] = useState(50000);
   const [showVisualizer, setShowVisualizer] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [editingWallet, setEditingWallet] = useState(false);
   const [receiverWalletInput, setReceiverWalletInput] = useState('');
   const [expandedReceiptId, setExpandedReceiptId] = useState<string | null>(null);

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Search, Zap, ShieldCheck, CheckCircle2, RefreshCw, Layers, ArrowUpRight, Play, Square } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export default function ILPInspector() {
   const [pointer, setPointer] = useState('$ilp.interledger-test.dev/da071cb6');

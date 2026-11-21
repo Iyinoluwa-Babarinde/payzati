@@ -23,7 +23,7 @@ import {
   Landmark,
   ArrowUpRight,
 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export default function PayrollPage() {
   const [step, setStep] = useState(1);

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { getEmployeeProfile } from '@/lib/supabase/queries';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { FileText, ShieldCheck, CheckCircle2, Award } from 'lucide-react';
 import KYCModal from '@/components/KYCModal';
 

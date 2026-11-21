@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { getFXQuote, formatCurrency, FXQuote } from '@/lib/fx-engine';
 import { ArrowRightLeft, RefreshCw, Zap, ShieldCheck, CheckCircle, Sparkles } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', flag: '🇺🇸' },

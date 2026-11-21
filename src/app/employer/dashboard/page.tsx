@@ -16,7 +16,7 @@ import {
   Wallet,
   Zap,
 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/fx-engine';
 import { getCompany } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
@@ -33,7 +33,7 @@ export default function EmployerDashboard() {
   });
   const [employees, setEmployees] = useState<any[]>([]);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [companyName, setCompanyName] = useState('Payzati Global Inc.');
   const [masterWalletPointer, setMasterWalletPointer] = useState('$ilp.interledger-test.dev/da071cb6');
   const [budgetApproved, setBudgetApproved] = useState(false);
@@ -46,59 +46,47 @@ export default function EmployerDashboard() {
   useEffect(() => {
     async function loadData() {
       const supabase = createClient();
-      const company = await getCompany();
-      if (company?.name) {
-        setCompanyName(company.name);
+
+      // Parallelize all queries concurrently for instant non-blocking load
+      const [companyRes, adminRes, walletRes, empsRes] = await Promise.allSettled([
+        getCompany(),
+        getAdminConfigStatus(),
+        fetch('https://ilp.interledger-test.dev/da071cb6', { headers: { Accept: 'application/json' } }),
+        supabase.from('employees').select('*').order('created_at', { ascending: false }),
+      ]);
+
+      if (companyRes.status === 'fulfilled' && companyRes.value?.name) {
+        setCompanyName(companyRes.value.name);
       }
 
-      // 1. Check live Interledger grant status
-      try {
-        const cfg = await getAdminConfigStatus();
-        setBudgetApproved(Boolean(cfg.hasMasterToken && !cfg.isSimulatedToken));
-      } catch {
-        setBudgetApproved(false);
+      if (adminRes.status === 'fulfilled' && adminRes.value) {
+        setBudgetApproved(Boolean(adminRes.value.hasMasterToken && !adminRes.value.isSimulatedToken));
       }
 
-      // 2. Fetch live Open Payments pointer metadata
-      try {
-        const resp = await fetch('https://ilp.interledger-test.dev/da071cb6', {
-          headers: { Accept: 'application/json' },
-        });
-        if (resp.ok) {
-          const walletData = await resp.json();
+      if (walletRes.status === 'fulfilled' && walletRes.value.ok) {
+        try {
+          const walletData = await walletRes.value.json();
           setStats(prev => ({
             ...prev,
             walletAsset: walletData.assetCode || 'EUR',
             walletScale: walletData.assetScale ?? 2,
           }));
           setMasterWalletPointer('$ilp.interledger-test.dev/da071cb6');
-        }
-      } catch {
-        // Keep defaults if offline
+        } catch {}
       }
 
-      // 3. Load real employees from Supabase
-      try {
-        const { data: emps } = await supabase
-          .from('employees')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (emps && emps.length > 0) {
-          setEmployees(emps);
-          const uniqueCountries = new Set(emps.map((e: any) => e.country).filter(Boolean));
-          const totalMonthly = emps.reduce((sum: number, e: any) => sum + Number(e.salary || 0), 0);
-          setStats(prev => ({
-            ...prev,
-            totalEmployees: emps.length,
-            countries: uniqueCountries.size,
-            monthlyPayroll: totalMonthly,
-          }));
-        }
-      } catch {
-        // Fallback handled by empty state
+      if (empsRes.status === 'fulfilled' && empsRes.value.data && empsRes.value.data.length > 0) {
+        const emps = empsRes.value.data;
+        setEmployees(emps);
+        const uniqueCountries = new Set(emps.map((e: any) => e.country).filter(Boolean));
+        const totalMonthly = emps.reduce((sum: number, e: any) => sum + Number(e.salary || 0), 0);
+        setStats(prev => ({
+          ...prev,
+          totalEmployees: emps.length,
+          countries: uniqueCountries.size,
+          monthlyPayroll: totalMonthly,
+        }));
       }
-      setLoading(false);
     }
 
     loadData();

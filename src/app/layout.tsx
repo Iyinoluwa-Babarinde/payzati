@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import NavigationProgress from "@/components/NavigationProgress";
 import PWARegister from "@/components/PWARegister";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://payzati.com'),
@@ -46,8 +47,8 @@ export default function RootLayout({
         <PWARegister />
         <NavigationProgress />
         {children}
+        <Toaster position="bottom-right" richColors closeButton />
       </body>
     </html>
   );
 }
-

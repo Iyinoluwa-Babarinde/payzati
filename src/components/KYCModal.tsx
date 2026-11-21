@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle2, User, Building, FileCheck, X, Sparkles, RefreshCw, Award, Lock } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export interface KYCModalProps {
   isOpen: boolean;

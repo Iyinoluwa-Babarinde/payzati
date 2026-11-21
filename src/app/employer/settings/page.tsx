@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ShieldCheck, Award, CheckCircle2 } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import KYCModal from '@/components/KYCModal';
 
 export default function SettingsPage() {

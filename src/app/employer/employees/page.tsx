@@ -5,7 +5,7 @@ import { SUPPORTED_COUNTRIES } from '@/lib/tax-engine';
 import { formatCurrency } from '@/lib/fx-engine';
 import { createClient } from '@/lib/supabase/client';
 import { getCompany } from '@/lib/supabase/queries';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 import { 
   Users, 
   Search, 

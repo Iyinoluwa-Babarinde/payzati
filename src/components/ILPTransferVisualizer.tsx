@@ -14,7 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/fx-engine';
-import toast from 'react-hot-toast';
+import { toast } from 'sonner';
 
 export interface ILPTransferVisualizerProps {
   isOpen: boolean;
