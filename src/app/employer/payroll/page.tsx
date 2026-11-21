@@ -253,7 +253,14 @@ export default function PayrollPage() {
     setResults(settledPayments);
     setProcessing(false);
     setCompleted(true);
-    toast.success('Batch payroll settled and synced to employee paystubs.');
+    const liveCount = settledPayments.filter((p) => p.mode === 'live').length;
+    if (liveCount > 0) {
+      toast.success(`${liveCount} live Interledger payout(s) settled and synced!`);
+    } else {
+      const firstNotice = settledPayments.find((p) => p.notice)?.notice;
+      toast.error(firstNotice || 'Approve your payout budget on Overview first to move live funds.');
+    }
+    return settledPayments;
   };
 
   if (loading) {
@@ -726,20 +733,20 @@ export default function PayrollPage() {
         onClose={() => {
           setShowVisualizer(false);
           setStep(4);
-          processPayroll();
         }}
         senderWallet={
-          process.env.NEXT_PUBLIC_PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6'
+          process.env.NEXT_PUBLIC_PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/payzati'
         }
-        receiverWallet={selectedEmps[0]?.wallet_address || 'https://ilp.interledger-test.dev/da071cb6'}
+        receiverWallet={selectedEmps[0]?.wallet_address || 'https://ilp.interledger-test.dev/amara'}
         senderName="Payzati Master Treasury"
         receiverName={`Batch Payout (${selectedEmps.length} Team Members)`}
-        sendAmount={estimatedTotalUSD}
-        sendCurrency="EUR"
-        receiveAmount={selectedEmps[0]?.salary || 1250000}
-        receiveCurrency={selectedEmps[0]?.currency || 'NGN'}
-        onComplete={() => {
-          // Handled upon close
+        sendAmount={Math.round(estimatedTotalUSD * 100) / 100}
+        sendCurrency="USD"
+        receiveAmount={selectedEmps[0]?.salary || 6500}
+        receiveCurrency={selectedEmps[0]?.currency || 'CAD'}
+        onComplete={async () => {
+          const settled = await processPayroll();
+          return settled?.[0];
         }}
       />
 

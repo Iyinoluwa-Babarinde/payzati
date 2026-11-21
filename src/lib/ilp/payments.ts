@@ -2,6 +2,7 @@
 
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
+import { convertCurrency } from '@/lib/fx-engine';
 import { getAuthenticatedClient, getUnauthenticatedClient, normalizePaymentPointer } from './client';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
@@ -130,8 +131,14 @@ export async function processPayment(
     }
 
     // Step 3: Create Incoming Payment Resource on Receiver's Resource Server
+    // Convert from requested currency (e.g. NGN/KES/GHS) into receiver wallet's real assetCode (e.g. CAD)
+    const receiverAsset = receiverAddress.assetCode || currency;
     const receiverScale = typeof receiverAddress.assetScale === 'number' ? receiverAddress.assetScale : 2;
-    const incomingValue = String(Math.max(1, Math.round(amount * Math.pow(10, receiverScale))));
+    const convertedAmount =
+      currency.toUpperCase() === receiverAsset.toUpperCase()
+        ? amount
+        : convertCurrency(amount, currency, receiverAsset);
+    const incomingValue = String(Math.max(1, Math.round(convertedAmount * Math.pow(10, receiverScale))));
 
     const incomingPayment = await client.incomingPayment.create(
       {
@@ -142,11 +149,11 @@ export async function processPayment(
         walletAddress: receiverAddress.id,
         incomingAmount: {
           value: incomingValue,
-          assetCode: receiverAddress.assetCode || currency,
+          assetCode: receiverAsset,
           assetScale: receiverScale,
         },
         metadata: {
-          description: `Payzati Payroll Settlement (${amount} ${currency})`,
+          description: `Payzati Payroll (${Math.round(amount)} ${currency} -> ${receiverAsset})`,
         },
       }
     );
