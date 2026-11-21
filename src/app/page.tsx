@@ -102,12 +102,7 @@ export default function LandingPage() {
       {/* 1. EDITORIAL SPLIT HERO */}
       <main id="main-content">
         <section className={styles.hero}>
-          <motion.div
-            className={styles.heroLeft}
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.58, ease: SPRING_EASE }}
-          >
+          <div className={`${styles.heroLeft} animate-fade-in`}>
             <span className="eyebrow-pill">
               <Sparkles size={12} strokeWidth={1.75} color="var(--accent-teal)" />
               Interledger Open Payments · Live Testnet
@@ -152,15 +147,10 @@ export default function LandingPage() {
                 <span className={styles.trustLabel}>Verifiable ILP receipts</span>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Double-Bezel Interactive Workspace Preview */}
-          <motion.div
-            className="bezel-shell"
-            initial={{ opacity: 0, y: 28 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.85, delay: 0.12, ease: SPRING_EASE }}
-          >
+          <div className="bezel-shell animate-slide-up">
             <div className="bezel-core">
               <div
                 className={styles.previewHeader}
@@ -195,7 +185,7 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <AnimatePresence mode="popLayout" initial={false}>
+              <AnimatePresence mode="wait" initial={false}>
                 {activeView === 'employer' ? (
                   <motion.div
                     key="employer-preview"
@@ -298,7 +288,7 @@ export default function LandingPage() {
                 )}
               </AnimatePresence>
             </div>
-          </motion.div>
+          </div>
         </section>
 
         {/* 2. ASYMMETRICAL BENTO GRID */}
@@ -315,14 +305,7 @@ export default function LandingPage() {
           </div>
 
           <div className={styles.bentoGrid}>
-            <motion.div
-              className={`bezel-shell ${styles.col7}`}
-              id="fx-rates"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.65, ease: SPRING_EASE }}
-            >
+            <div className={`bezel-shell ${styles.col7}`} id="fx-rates">
               <div className={`bezel-core ${styles.bentoInner}`}>
                 <div>
                   <Globe2 size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
@@ -333,15 +316,9 @@ export default function LandingPage() {
                 </div>
                 <LiveFXQuoteWidget />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              className={`bezel-shell ${styles.col5}`}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.65, delay: 0.08, ease: SPRING_EASE }}
-            >
+            <div className={`bezel-shell ${styles.col5}`}>
               <div className={`bezel-core ${styles.bentoInner}`}>
                 <div>
                   <Zap size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
@@ -360,15 +337,9 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              className={`bezel-shell ${styles.col5}`}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.65, ease: SPRING_EASE }}
-            >
+            <div className={`bezel-shell ${styles.col5}`}>
               <div className={`bezel-core ${styles.bentoInner}`}>
                 <div>
                   <Fingerprint size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
@@ -381,16 +352,9 @@ export default function LandingPage() {
                   POST /outgoing-payments · 201 Created
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              className={`bezel-shell ${styles.col7}`}
-              id="how-it-works"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.65, delay: 0.08, ease: SPRING_EASE }}
-            >
+            <div className={`bezel-shell ${styles.col7}`} id="how-it-works">
               <div className={`bezel-core ${styles.bentoInner}`}>
                 <div>
                   <h3 className={styles.bentoHeading}>Three steps from wallet to payday</h3>
@@ -423,7 +387,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
 

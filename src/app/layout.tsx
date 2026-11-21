@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import NavigationProgress from "@/components/NavigationProgress";
 import PWARegister from "@/components/PWARegister";
-import { Toaster } from "sonner";
+import ClientToaster from "@/components/ClientToaster";
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://payzati.com'),
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           type="application/ld+json"
@@ -41,13 +41,13 @@ export default function RootLayout({
             }),
           }}
         />
-        <meta name="theme-color" content="#0b6e5c" />
+        <meta name="theme-color" content="#0d8f68" />
       </head>
       <body>
         <PWARegister />
         <NavigationProgress />
         {children}
-        <Toaster position="bottom-right" richColors closeButton />
+        <ClientToaster />
       </body>
     </html>
   );
