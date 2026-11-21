@@ -82,6 +82,33 @@ export async function processPayment(
       throw new Error('Open Payments credentials are not configured on the server.');
     }
 
+    // Step 0: Verify Pre-Approved Outgoing Payment Grant Token FIRST (prevents dangling PENDING incoming payments)
+    let masterToken: string | null = null;
+    try {
+      const cookieStore = await cookies();
+      masterToken = cookieStore.get('payzati_master_ilp_token')?.value || null;
+    } catch {
+      // Non-request context
+    }
+
+    if (!masterToken) {
+      try {
+        const supabase = await createServerClient();
+        const { data: tokenRow } = await supabase
+          .from('system_config')
+          .select('value')
+          .eq('key', 'master_ilp_token')
+          .single();
+        masterToken = tokenRow?.value ? String(tokenRow.value) : null;
+      } catch {
+        // Handled below
+      }
+    }
+
+    if (!masterToken || masterToken.startsWith('simulated_')) {
+      throw new Error('Click "Approve budget" on Employer Overview first to authorize live outgoing transfers.');
+    }
+
     // Step 1: Resolve Sender & Receiver Wallet Address Metadata
     const [senderAddress, receiverAddress] = await Promise.all([
       unauthClient.walletAddress.get({ url: normalizedSender }),
@@ -151,34 +178,7 @@ export async function processPayment(
       }
     );
 
-    // Step 6: Load Pre-Approved Outgoing Payment Grant Token (HTTP-only cookie first, then Supabase)
-    let masterToken: string | null = null;
-    try {
-      const cookieStore = await cookies();
-      masterToken = cookieStore.get('payzati_master_ilp_token')?.value || null;
-    } catch {
-      // Non-request context
-    }
-
-    if (!masterToken) {
-      try {
-        const supabase = await createServerClient();
-        const { data: tokenRow } = await supabase
-          .from('system_config')
-          .select('value')
-          .eq('key', 'master_ilp_token')
-          .single();
-        masterToken = tokenRow?.value ? String(tokenRow.value) : null;
-      } catch {
-        // Handled below
-      }
-    }
-
-    if (!masterToken || masterToken.startsWith('simulated_')) {
-      throw new Error('Payroll budget not approved on Interledger Testnet yet. Click "Approve payout budget" first.');
-    }
-
-    // Step 7: Create Real Outgoing Payment on Sender's Resource Server
+    // Step 6: Create Real Outgoing Payment on Sender's Resource Server (fulfills the PENDING incoming payment)
     const outgoingPayment = await client.outgoingPayment.create(
       {
         url: senderAddress.resourceServer,
