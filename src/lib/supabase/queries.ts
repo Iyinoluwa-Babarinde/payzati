@@ -24,13 +24,13 @@ const DEFAULT_DEMO_COMPANY = {
 
 const DEFAULT_DEMO_EMPLOYEE = {
   id: 'demo-emp-id',
-  name: 'Tunde Adeyemi',
-  email: 'demo-employee@payzati.com',
-  country: 'Nigeria',
-  currency: 'NGN',
-  salary: 850000,
+  name: 'Amara Okafor',
+  email: 'amara@payzati.com',
+  country: 'Canada',
+  currency: 'CAD',
+  salary: 6500,
   status: 'active',
-  wallet_address: 'https://ilp.interledger-test.dev/da071cb6',
+  wallet_address: 'https://ilp.interledger-test.dev/amara',
   companies: { name: 'Payzati Global Inc.' },
 };
 

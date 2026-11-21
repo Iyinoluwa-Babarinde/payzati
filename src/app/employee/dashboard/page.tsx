@@ -23,15 +23,15 @@ import ILPTransferVisualizer from '@/components/ILPTransferVisualizer';
 export default function EmployeeDashboard() {
   const [employee, setEmployee] = useState<any>({
     id: 'demo-emp',
-    name: 'Tunde Adeyemi',
+    name: 'Amara Okafor',
     company_name: 'Payzati Global Inc.',
-    salary: 850000,
-    currency: 'NGN',
-    wallet_address: 'https://ilp.interledger-test.dev/da071cb6',
+    salary: 6500,
+    currency: 'CAD',
+    wallet_address: 'https://ilp.interledger-test.dev/amara',
   });
   const [transactions, setTransactions] = useState<any[]>([]);
   const [withdrawnThisMonth, setWithdrawnThisMonth] = useState(0);
-  const [withdrawAmount, setWithdrawAmount] = useState(50000);
+  const [withdrawAmount, setWithdrawAmount] = useState(250);
   const [showVisualizer, setShowVisualizer] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editingWallet, setEditingWallet] = useState(false);
@@ -46,15 +46,15 @@ export default function EmployeeDashboard() {
       ? {
           ...emp,
           company_name: emp.companies?.name || 'Payzati Global Inc.',
-          wallet_address: emp.wallet_address || 'https://ilp.interledger-test.dev/da071cb6',
+          wallet_address: emp.wallet_address || 'https://ilp.interledger-test.dev/amara',
         }
       : {
           id: 'demo-emp',
-          name: 'Tunde Adeyemi',
+          name: 'Amara Okafor',
           company_name: 'Payzati Global Inc.',
-          salary: 850000,
-          currency: 'NGN',
-          wallet_address: 'https://ilp.interledger-test.dev/da071cb6',
+          salary: 6500,
+          currency: 'CAD',
+          wallet_address: 'https://ilp.interledger-test.dev/amara',
         };
 
     setEmployee(resolvedEmp);
@@ -125,8 +125,8 @@ export default function EmployeeDashboard() {
   };
 
   const handleVisualizerComplete = async () => {
-    const senderWallet = process.env.NEXT_PUBLIC_PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6';
-    const targetWallet = employee.wallet_address || senderWallet;
+    const senderWallet = process.env.NEXT_PUBLIC_PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/payzati';
+    const targetWallet = employee.wallet_address || 'https://ilp.interledger-test.dev/amara';
     const amountToWithdraw = Math.min(withdrawAmount, availableWages);
 
     const res = await fetch('/api/payments', {
@@ -135,8 +135,8 @@ export default function EmployeeDashboard() {
       body: JSON.stringify({
         senderWallet,
         receiverWallet: targetWallet,
-        amount: Math.max(1, Math.round(convertCurrency(amountToWithdraw, employee.currency || 'NGN', 'EUR'))),
-        currency: 'EUR',
+        amount: Math.max(1, Math.round(amountToWithdraw)),
+        currency: employee.currency || 'CAD',
       }),
     });
 
@@ -327,9 +327,9 @@ export default function EmployeeDashboard() {
 
             <input
               type="range"
-              min={availableWages > 0 ? 10000 : 0}
-              max={availableWages || 10000}
-              step={5000}
+              min={availableWages > 0 ? (employee?.currency === 'NGN' ? 10000 : 25) : 0}
+              max={availableWages || (employee?.currency === 'NGN' ? 10000 : 100)}
+              step={employee?.currency === 'NGN' ? 5000 : 25}
               value={clampedWithdraw}
               disabled={availableWages <= 0}
               onChange={e => setWithdrawAmount(Number(e.target.value))}
@@ -337,8 +337,8 @@ export default function EmployeeDashboard() {
             />
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
-              <span>Min: {formatCurrency(10000, employee?.currency || 'NGN')}</span>
-              <span>Max available: {formatCurrency(availableWages, employee?.currency || 'NGN')}</span>
+              <span>Min: {formatCurrency(employee?.currency === 'NGN' ? 10000 : 25, employee?.currency || 'CAD')}</span>
+              <span>Max available: {formatCurrency(availableWages, employee?.currency || 'CAD')}</span>
             </div>
           </div>
 

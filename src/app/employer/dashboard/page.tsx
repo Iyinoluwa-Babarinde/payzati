@@ -35,7 +35,7 @@ export default function EmployerDashboard() {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [companyName, setCompanyName] = useState('Payzati Global Inc.');
-  const [masterWalletPointer, setMasterWalletPointer] = useState('$ilp.interledger-test.dev/da071cb6');
+  const [masterWalletPointer, setMasterWalletPointer] = useState('$ilp.interledger-test.dev/payzati');
   const [budgetApproved, setBudgetApproved] = useState(false);
   const [approving, setApproving] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
@@ -51,7 +51,7 @@ export default function EmployerDashboard() {
       const [companyRes, adminRes, walletRes, empsRes] = await Promise.allSettled([
         getCompany(),
         getAdminConfigStatus(),
-        fetch('https://ilp.interledger-test.dev/da071cb6', { headers: { Accept: 'application/json' } }),
+        fetch('https://ilp.interledger-test.dev/payzati', { headers: { Accept: 'application/json' } }),
         supabase.from('employees').select('*').order('created_at', { ascending: false }),
       ]);
 
@@ -71,7 +71,7 @@ export default function EmployerDashboard() {
             walletAsset: walletData.assetCode || 'EUR',
             walletScale: walletData.assetScale ?? 2,
           }));
-          setMasterWalletPointer('$ilp.interledger-test.dev/da071cb6');
+          setMasterWalletPointer('$ilp.interledger-test.dev/payzati');
         } catch {}
       }
 
@@ -214,7 +214,7 @@ export default function EmployerDashboard() {
                 {stats.walletAsset} Wallet · Connected
               </span>
               <a
-                href="https://ilp.interledger-test.dev/da071cb6"
+                href="https://ilp.interledger-test.dev/payzati"
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -375,7 +375,7 @@ export default function EmployerDashboard() {
         <ILPTransferVisualizer
           isOpen={showExpressVisualizer}
           onClose={() => setShowExpressVisualizer(false)}
-          senderWallet="https://ilp.interledger-test.dev/da071cb6"
+          senderWallet="https://ilp.interledger-test.dev/payzati"
           receiverWallet={customReceiverWallet || selectedRecipient.wallet_address || 'https://ilp.interledger-test.dev/da071cb6'}
           senderName={`${companyName} Treasury`}
           receiverName={selectedRecipient.name}
@@ -389,7 +389,7 @@ export default function EmployerDashboard() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  senderWallet: 'https://ilp.interledger-test.dev/da071cb6',
+                  senderWallet: 'https://ilp.interledger-test.dev/payzati',
                   receiverWallet: customReceiverWallet || selectedRecipient.wallet_address,
                   amount: Math.max(1, Math.round(Number(selectedRecipient.salary || 50) / 1600)),
                   currency: stats.walletAsset,

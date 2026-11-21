@@ -52,10 +52,10 @@ export async function processPayment(
   options?: { demoMode?: boolean }
 ): Promise<PaymentResult> {
   const normalizedSender = normalizePaymentPointer(
-    senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6'
+    senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/payzati'
   );
   const normalizedReceiver = normalizePaymentPointer(
-    receiverWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6'
+    receiverWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/payzati'
   );
 
   if (options?.demoMode) {
