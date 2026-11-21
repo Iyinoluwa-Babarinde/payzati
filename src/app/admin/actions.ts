@@ -33,8 +33,8 @@ export async function initiateMasterAuthorization(limitAmount: number = 50000, o
         access: [
           {
             type: 'outgoing-payment',
-            actions: ['create', 'read', 'list'],
-            identifier: masterWallet,
+            actions: ['create', 'read'],
+            identifier: walletAddress.id,
             limits: {
               debitAmount: {
                 value: debitValue,
