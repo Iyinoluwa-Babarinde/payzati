@@ -17,18 +17,24 @@ import {
   Zap,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { formatCurrency } from '@/lib/fx-engine';
+import { formatCurrency, convertCurrency } from '@/lib/fx-engine';
 import { DEFAULT_DEMO_TEAM, getStoredTeam, saveStoredTeam, appendStoredTransaction } from '@/lib/demo-ledger';
 import { getCompany } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
 import { getAdminConfigStatus, initiateMasterAuthorization } from '@/app/admin/actions';
 import ILPTransferVisualizer from '@/components/ILPTransferVisualizer';
 
+function computeMonthlyUSD(list: any[]): number {
+  return Math.round(
+    list.reduce((sum, e) => sum + convertCurrency(Number(e.salary || 0), e.currency || 'USD', 'USD'), 0) * 100
+  ) / 100;
+}
+
 export default function EmployerDashboard() {
   const [stats, setStats] = useState({
     totalEmployees: DEFAULT_DEMO_TEAM.length,
     countries: 4,
-    monthlyPayroll: 16500,
+    monthlyPayroll: computeMonthlyUSD(DEFAULT_DEMO_TEAM),
     walletAsset: 'USD',
     walletScale: 2,
   });
@@ -38,6 +44,7 @@ export default function EmployerDashboard() {
   const [companyName, setCompanyName] = useState('Payzati Global Inc.');
   const [masterWalletPointer, setMasterWalletPointer] = useState('$ilp.interledger-test.dev/payzati');
   const [budgetApproved, setBudgetApproved] = useState(false);
+  const [budgetLimitUSD, setBudgetLimitUSD] = useState<number>(50000);
   const [approving, setApproving] = useState(false);
   const [demoMode, setDemoMode] = useState(false);
   const [showExpressVisualizer, setShowExpressVisualizer] = useState(false);
@@ -49,12 +56,11 @@ export default function EmployerDashboard() {
       const localTeam = getStoredTeam();
       setEmployees(localTeam);
       const uniqueCountries = new Set(localTeam.map((e: any) => e.country).filter(Boolean));
-      const totalMonthly = localTeam.reduce((sum: number, e: any) => sum + Number(e.salary || 0), 0);
       setStats(prev => ({
         ...prev,
         totalEmployees: localTeam.length,
         countries: uniqueCountries.size,
-        monthlyPayroll: totalMonthly,
+        monthlyPayroll: computeMonthlyUSD(localTeam),
       }));
     };
 
@@ -105,12 +111,11 @@ export default function EmployerDashboard() {
         setEmployees(merged);
         saveStoredTeam(merged);
         const uniqueCountries = new Set(merged.map((e: any) => e.country).filter(Boolean));
-        const totalMonthly = merged.reduce((sum: number, e: any) => sum + Number(e.salary || 0), 0);
         setStats(prev => ({
           ...prev,
           totalEmployees: merged.length,
           countries: uniqueCountries.size,
-          monthlyPayroll: totalMonthly,
+          monthlyPayroll: computeMonthlyUSD(merged),
         }));
       }
     }
@@ -125,7 +130,8 @@ export default function EmployerDashboard() {
   const handleApproveBudget = async () => {
     setApproving(true);
     try {
-      const redirectUrl = await initiateMasterAuthorization(500000, window.location.origin);
+      const limit = Math.max(100, Number(budgetLimitUSD) || 50000);
+      const redirectUrl = await initiateMasterAuthorization(limit, window.location.origin);
       if (redirectUrl) {
         window.location.href = redirectUrl;
       }
@@ -269,19 +275,38 @@ export default function EmployerDashboard() {
               </a>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flexWrap: 'wrap', fontSize: '0.82rem', color: 'rgba(255,255,255,0.72)' }}>
-              <span>Funded in {stats.walletAsset} · Settled in local currency in under 1 second</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap', fontSize: '0.82rem', color: 'rgba(255,255,255,0.78)' }}>
+              <span>Monthly spend limit (USD):</span>
+              <input
+                type="number"
+                min={100}
+                step={500}
+                value={budgetLimitUSD}
+                onChange={(e) => setBudgetLimitUSD(Number(e.target.value))}
+                aria-label="Monthly budget limit in USD"
+                className="tabular-nums"
+                style={{
+                  width: '115px',
+                  padding: '4px 10px',
+                  borderRadius: '9999px',
+                  background: 'rgba(255,255,255,0.12)',
+                  border: '1px solid rgba(255,255,255,0.24)',
+                  color: '#ffffff',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                }}
+              />
               <button
                 onClick={handleApproveBudget}
                 disabled={approving}
                 style={{
-                  background: 'rgba(255,255,255,0.1)',
-                  border: '1px solid rgba(255,255,255,0.18)',
+                  background: 'rgba(16, 185, 129, 0.22)',
+                  border: '1px solid rgba(110, 231, 183, 0.45)',
                   color: '#ffffff',
                   borderRadius: '9999px',
-                  padding: '3px 11px',
-                  fontSize: '0.73rem',
-                  fontWeight: 600,
+                  padding: '5px 14px',
+                  fontSize: '0.76rem',
+                  fontWeight: 700,
                   cursor: 'pointer',
                   display: 'inline-flex',
                   alignItems: 'center',
@@ -289,7 +314,7 @@ export default function EmployerDashboard() {
                 }}
               >
                 <KeyRound size={12} />
-                {approving ? 'Opening...' : budgetApproved ? 'Wallet settings' : 'Approve budget'}
+                {approving ? 'Opening wallet...' : budgetApproved ? 'Update budget' : 'Approve budget'}
               </button>
             </div>
           </div>
@@ -387,7 +412,7 @@ export default function EmployerDashboard() {
               <Wallet size={16} strokeWidth={1.65} color="var(--accent-teal)" />
             </div>
             <div className="tabular-nums" style={{ fontSize: '1.75rem', fontWeight: 800 }}>
-              {formatCurrency(stats.monthlyPayroll, employees[0]?.currency || 'NGN')}
+              {formatCurrency(stats.monthlyPayroll, 'USD')}
             </div>
             <span style={{ fontSize: '0.76rem', color: 'var(--text-tertiary)' }}>Sum of active team salaries</span>
           </div>
