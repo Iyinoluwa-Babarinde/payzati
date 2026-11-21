@@ -30,7 +30,12 @@ export default function AdminCallback() {
           return;
         }
 
-        await processMasterCallback(window.location.href);
+        const res = await processMasterCallback(window.location.href);
+        if (!res?.ok) {
+          setPhase('error');
+          setMessage(res?.error || 'Unable to complete wallet approval. Please try again.');
+          return;
+        }
         setPhase('success');
         setMessage('Payout budget approved. Returning to your workspace...');
         setTimeout(() => {

@@ -1,6 +1,7 @@
 'use server';
 
 import crypto from 'crypto';
+import { cookies } from 'next/headers';
 import { getAuthenticatedClient, getUnauthenticatedClient, normalizePaymentPointer } from './client';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
@@ -150,17 +151,31 @@ export async function processPayment(
       }
     );
 
-    // Step 6: Load Pre-Approved Outgoing Payment Grant Token from Supabase
-    const supabase = await createServerClient();
-    const { data: tokenRow } = await supabase
-      .from('system_config')
-      .select('value')
-      .eq('key', 'master_ilp_token')
-      .single();
+    // Step 6: Load Pre-Approved Outgoing Payment Grant Token (HTTP-only cookie first, then Supabase)
+    let masterToken: string | null = null;
+    try {
+      const cookieStore = await cookies();
+      masterToken = cookieStore.get('payzati_master_ilp_token')?.value || null;
+    } catch {
+      // Non-request context
+    }
 
-    const masterToken = tokenRow?.value ? String(tokenRow.value) : null;
+    if (!masterToken) {
+      try {
+        const supabase = await createServerClient();
+        const { data: tokenRow } = await supabase
+          .from('system_config')
+          .select('value')
+          .eq('key', 'master_ilp_token')
+          .single();
+        masterToken = tokenRow?.value ? String(tokenRow.value) : null;
+      } catch {
+        // Handled below
+      }
+    }
+
     if (!masterToken || masterToken.startsWith('simulated_')) {
-      throw new Error('Payroll budget not approved on Interledger Testnet yet. Click "Approve Payroll Budget" in Wallet first.');
+      throw new Error('Payroll budget not approved on Interledger Testnet yet. Click "Approve payout budget" first.');
     }
 
     // Step 7: Create Real Outgoing Payment on Sender's Resource Server

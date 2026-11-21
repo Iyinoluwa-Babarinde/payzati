@@ -1,61 +1,101 @@
 'use server';
 
-import { getAuthenticatedClient, normalizePaymentPointer } from '@/lib/ilp/client';
+import { cookies } from 'next/headers';
+import { getAuthenticatedClient } from '@/lib/ilp/client';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
-export async function processMasterCallback(url: string) {
-  const parsedUrl = new URL(url);
-  const interactRef = parsedUrl.searchParams.get('interact_ref');
-  const hash = parsedUrl.searchParams.get('hash');
+export async function processMasterCallback(url: string): Promise<{ ok: boolean; error?: string }> {
+  try {
+    const parsedUrl = new URL(url);
+    const interactRef = parsedUrl.searchParams.get('interact_ref');
 
-  if (!interactRef) {
-    throw new Error('No interact_ref found in URL');
-  }
+    if (!interactRef) {
+      return { ok: false, error: 'No approval code was returned from Interledger.' };
+    }
 
-  const supabase = await createServerClient();
+    const cookieStore = await cookies();
 
-  if (interactRef.startsWith('simulated_ref')) {
-    // Add real-time timing delay (1.5 seconds) to make the handshake feel alive during demo
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Save the final simulated token
-    await supabase.from('system_config').upsert({
-      key: 'master_ilp_token',
-      value: 'simulated_long_lived_token_for_demo_day_123456789'
+    // 1. Read grant continue details from HTTP-only cookie first, then Supabase fallback
+    let continueInfo: { uri: string; access_token: string } | null = null;
+    const rawCookie = cookieStore.get('payzati_grant_continue')?.value;
+    if (rawCookie) {
+      try {
+        continueInfo = JSON.parse(rawCookie);
+      } catch {
+        continueInfo = null;
+      }
+    }
+
+    if (!continueInfo) {
+      try {
+        const supabase = await createServerClient();
+        const { data } = await supabase
+          .from('system_config')
+          .select('value')
+          .eq('key', 'master_grant_continue')
+          .single();
+        if (data?.value?.uri && data?.value?.access_token) {
+          continueInfo = data.value;
+        }
+      } catch {
+        // Handled below
+      }
+    }
+
+    if (!continueInfo) {
+      return {
+        ok: false,
+        error: 'Approval session expired. Please return to Company Overview and click Approve payout budget again.',
+      };
+    }
+
+    const client = await getAuthenticatedClient();
+    if (!client) {
+      return { ok: false, error: 'Server Open Payments keys (ILP_PRIVATE_KEY / ILP_KEY_ID) are missing or invalid.' };
+    }
+
+    const grant = await client.grant.continue(
+      {
+        url: continueInfo.uri,
+        accessToken: continueInfo.access_token,
+      },
+      { interact_ref: interactRef }
+    );
+
+    const finalGrant = grant as any;
+    const accessToken = finalGrant?.access_token?.value;
+    if (!accessToken) {
+      return { ok: false, error: 'Interledger did not return a spending token. Please try approving again.' };
+    }
+
+    // 2. Save final master token in HTTP-only cookie (works in Demo Mode & Production)
+    cookieStore.set('payzati_master_ilp_token', accessToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
     });
-    return true;
+
+    // Clear temporary continue cookie
+    cookieStore.delete('payzati_grant_continue');
+
+    // 3. Also persist to Supabase system_config as backup
+    try {
+      const supabase = await createServerClient();
+      await supabase.from('system_config').upsert({
+        key: 'master_ilp_token',
+        value: accessToken,
+      });
+    } catch {
+      // Cookie already persisted the live token
+    }
+
+    return { ok: true };
+  } catch (e: any) {
+    return {
+      ok: false,
+      error: e?.message || 'Unable to finish wallet approval with Interledger.',
+    };
   }
-
-  const client = await getAuthenticatedClient();
-  if (!client) throw new Error('Authenticated client credentials missing or invalid');
-
-  const rawMasterWallet = process.env.PAYZATI_WALLET_ADDRESS;
-  if (!rawMasterWallet) throw new Error('PAYZATI_WALLET_ADDRESS not set');
-  
-  const { data, error } = await supabase.from('system_config').select('value').eq('key', 'master_grant_continue').single();
-  if (error || !data) throw new Error('Could not find continue details in database');
-  
-  const continueInfo = data.value;
-
-  const grant = await client.grant.continue(
-    {
-      url: continueInfo.uri,
-      accessToken: continueInfo.access_token,
-    },
-    { interact_ref: interactRef }
-  );
-
-  // Cast as any to resolve union type narrowing errors for TypeScript compiler
-  const finalGrant = grant as any;
-  if (!finalGrant.access_token) {
-    throw new Error('Grant continuation did not return an access token');
-  }
-
-  // Save the final token
-  await supabase.from('system_config').upsert({
-    key: 'master_ilp_token',
-    value: finalGrant.access_token.value
-  });
-
-  return true;
 }

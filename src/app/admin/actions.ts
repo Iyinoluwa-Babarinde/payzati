@@ -1,5 +1,6 @@
 'use server';
 
+import { cookies } from 'next/headers';
 import { getAuthenticatedClient, getUnauthenticatedClient, normalizePaymentPointer } from '@/lib/ilp/client';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
@@ -56,14 +57,31 @@ export async function initiateMasterAuthorization(limitAmount: number = 1000, or
   );
 
   if ('interact' in grant && grant.interact?.redirect) {
-    const supabase = await createServerClient();
-    await supabase.from('system_config').upsert({
-      key: 'master_grant_continue',
-      value: {
-        uri: grant.continue.uri,
-        access_token: grant.continue.access_token.value,
-      },
+    const continuePayload = {
+      uri: grant.continue.uri,
+      access_token: grant.continue.access_token.value,
+    };
+
+    // 1. Save in HTTP-only cookie (works reliably even in unauthenticated Demo Mode)
+    const cookieStore = await cookies();
+    cookieStore.set('payzati_grant_continue', JSON.stringify(continuePayload), {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: 600,
     });
+
+    // 2. Also save to Supabase system_config as backup
+    try {
+      const supabase = await createServerClient();
+      await supabase.from('system_config').upsert({
+        key: 'master_grant_continue',
+        value: continuePayload,
+      });
+    } catch {
+      // Cookie already holds the continue details
+    }
 
     return grant.interact.redirect;
   }
@@ -77,18 +95,31 @@ export async function getAdminConfigStatus() {
   let isSimulatedToken = false;
 
   try {
-    const supabase = await createServerClient();
-    const { data } = await supabase
-      .from('system_config')
-      .select('value')
-      .eq('key', 'master_ilp_token')
-      .single();
-    if (data?.value) {
+    const cookieStore = await cookies();
+    const cookieToken = cookieStore.get('payzati_master_ilp_token')?.value;
+    if (cookieToken) {
       hasMasterToken = true;
-      isSimulatedToken = String(data.value).startsWith('simulated_');
+      isSimulatedToken = cookieToken.startsWith('simulated_');
     }
   } catch {
-    // system_config table may not have a token yet
+    // Ignore cookie read issues
+  }
+
+  if (!hasMasterToken) {
+    try {
+      const supabase = await createServerClient();
+      const { data } = await supabase
+        .from('system_config')
+        .select('value')
+        .eq('key', 'master_ilp_token')
+        .single();
+      if (data?.value) {
+        hasMasterToken = true;
+        isSimulatedToken = String(data.value).startsWith('simulated_');
+      }
+    } catch {
+      // system_config table may not have a token yet
+    }
   }
 
   return {
@@ -97,6 +128,6 @@ export async function getAdminConfigStatus() {
     hasKeyId: !!process.env.ILP_KEY_ID,
     hasMasterToken,
     isSimulatedToken,
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://payzati.vercel.app',
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://payzatidemo.vercel.app',
   };
 }
