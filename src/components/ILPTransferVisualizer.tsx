@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CheckCircle2,
@@ -60,6 +60,12 @@ export default function ILPTransferVisualizer({
   const [senderBalance, setSenderBalance] = useState(startingSenderBalance);
   const [receiverBalance, setReceiverBalance] = useState(0);
   const [transactionId, setTransactionId] = useState('');
+  const onCompleteRef = useRef(onComplete);
+  const hasFiredComplete = useRef(false);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   // Handle ESC key for interruptibility (Apple HIG & Emil principles)
   const handleKeyDown = useCallback(
@@ -83,6 +89,7 @@ export default function ILPTransferVisualizer({
       setPacketsDelivered(0);
       setSenderBalance(startingSenderBalance);
       setReceiverBalance(0);
+      hasFiredComplete.current = false;
       return;
     }
 
@@ -114,7 +121,6 @@ export default function ILPTransferVisualizer({
           if (prev >= 100) {
             clearInterval(interval);
             setPhase('settled');
-            if (onComplete) onComplete();
             return 100;
           }
           const next = prev + 10;
@@ -123,10 +129,17 @@ export default function ILPTransferVisualizer({
           setReceiverBalance(receiveAmount * (next / 100));
           return next;
         });
-      }, 100);
+      }, 90);
     }
     return () => clearInterval(interval);
-  }, [phase, sendAmount, receiveAmount, startingSenderBalance, onComplete]);
+  }, [phase, sendAmount, receiveAmount, startingSenderBalance]);
+
+  useEffect(() => {
+    if (phase === 'settled' && !hasFiredComplete.current) {
+      hasFiredComplete.current = true;
+      onCompleteRef.current?.();
+    }
+  }, [phase]);
 
   const displayReceipt =
     receiptHash || `0x7f8a${Math.random().toString(36).substring(2, 10)}${Date.now().toString(16)}`;
