@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', flag: '🇺🇸' },
+  { code: 'CAD', name: 'Canadian Dollar', flag: '🇨🇦' },
   { code: 'GBP', name: 'British Pound', flag: '🇬🇧' },
   { code: 'EUR', name: 'Euro', flag: '🇪🇺' },
   { code: 'NGN', name: 'Nigerian Naira', flag: '🇳🇬' },

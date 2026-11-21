@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { calculateTax } from '@/lib/tax-engine';
 import { formatCurrency, convertCurrency } from '@/lib/fx-engine';
-import { DEFAULT_DEMO_TEAM, getStoredTeam, appendStoredTransaction } from '@/lib/demo-ledger';
+import { DEFAULT_DEMO_TEAM, getStoredTeam, getLiveTreasuryBalance, appendStoredTransaction } from '@/lib/demo-ledger';
 import { createClient } from '@/lib/supabase/client';
 import { getCompany } from '@/lib/supabase/queries';
 import { processBatchPayroll } from '@/lib/ilp/payments';
@@ -31,7 +31,7 @@ export default function PayrollPage() {
   const [employees, setEmployees] = useState<any[]>(DEFAULT_DEMO_TEAM);
   const [company, setCompany] = useState<any>({ id: 'demo-company-id', name: 'Payzati Global Inc.' });
   const [selected, setSelected] = useState<string[]>(DEFAULT_DEMO_TEAM.map((e) => e.id));
-  const [walletBalance, setWalletBalance] = useState(25000);
+  const [walletBalance, setWalletBalance] = useState(() => getLiveTreasuryBalance());
   const [isAutoFunding, setIsAutoFunding] = useState(true);
   const [linkedBank, setLinkedBank] = useState<any>({ bankName: 'Chase Business Treasury', last4: '8892' });
 
@@ -110,17 +110,7 @@ export default function PayrollPage() {
           setSelected(demoEmps.map((e) => e.id));
         }
 
-        try {
-          const { data: txs } = await supabase
-            .from('transactions')
-            .select('amount')
-            .eq('company_id', comp.id)
-            .eq('status', 'completed');
-          const bal = (txs || []).reduce((sum, tx) => sum + tx.amount, 0);
-          setWalletBalance(Math.max(bal, 25000));
-        } catch {
-          setWalletBalance(25000);
-        }
+        setWalletBalance(getLiveTreasuryBalance());
 
         try {
           const { data: bData } = await supabase

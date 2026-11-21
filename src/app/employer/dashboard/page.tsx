@@ -125,7 +125,7 @@ export default function EmployerDashboard() {
   const handleApproveBudget = async () => {
     setApproving(true);
     try {
-      const redirectUrl = await initiateMasterAuthorization(50000, window.location.origin);
+      const redirectUrl = await initiateMasterAuthorization(500000, window.location.origin);
       if (redirectUrl) {
         window.location.href = redirectUrl;
       }
@@ -489,7 +489,7 @@ export default function EmployerDashboard() {
                 body: JSON.stringify({
                   senderWallet: 'https://ilp.interledger-test.dev/payzati',
                   receiverWallet: customReceiverWallet || selectedRecipient.wallet_address || 'https://ilp.interledger-test.dev/amara',
-                  amount: selectedRecipient.currency === 'CAD' ? 25 : Math.max(5, Math.round(Number(selectedRecipient.salary || 50) / 1600)),
+                  amount: Number(selectedRecipient.salary || 6500),
                   currency: selectedRecipient.currency || 'CAD',
                   demoMode,
                 }),

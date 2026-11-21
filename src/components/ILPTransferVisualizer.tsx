@@ -14,6 +14,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { formatCurrency } from '@/lib/fx-engine';
+import { getLiveTreasuryBalance } from '@/lib/demo-ledger';
 import { toast } from 'sonner';
 
 export interface LivePaymentProof {
@@ -65,7 +66,7 @@ export default function ILPTransferVisualizer({
   const [progress, setProgress] = useState(0);
   const [packetsDelivered, setPacketsDelivered] = useState(0);
 
-  const startingSenderBalance = Math.max(25000, sendAmount * 1.5);
+  const startingSenderBalance = Math.max(getLiveTreasuryBalance(), sendAmount * 1.5);
   const [senderBalance, setSenderBalance] = useState(startingSenderBalance);
   const [receiverBalance, setReceiverBalance] = useState(0);
   const [transactionId, setTransactionId] = useState('');

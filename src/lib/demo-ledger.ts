@@ -64,6 +64,23 @@ export const DEFAULT_DEMO_TEAM = [
 
 const STORAGE_KEY = 'payzati_live_txs';
 const TEAM_STORAGE_KEY = 'payzati_live_team';
+export const INITIAL_TESTNET_BALANCE_USD = 10000000; // $10,000,000 USD funded in $ilp.interledger-test.dev/payzati
+
+export function getLiveTreasuryBalance(): number {
+  const txs = getStoredTransactions();
+  const totalOutUSD = txs.reduce((sum, tx) => {
+    const amt = Math.abs(Number(tx.amount || 0));
+    const rate =
+      tx.currency === 'CAD' ? 1.38 :
+      tx.currency === 'NGN' ? 1550 :
+      tx.currency === 'KES' ? 129.5 :
+      tx.currency === 'GHS' ? 15.5 :
+      tx.currency === 'GBP' ? 0.79 :
+      tx.currency === 'EUR' ? 0.92 : 1;
+    return sum + amt / rate;
+  }, 0);
+  return Math.max(0, Math.round((INITIAL_TESTNET_BALANCE_USD - totalOutUSD) * 100) / 100);
+}
 
 function emitSync() {
   if (typeof window !== 'undefined') {
