@@ -489,6 +489,7 @@ export default function EmployerDashboard() {
               } else {
                 toast.success(`Payment sent to ${selectedRecipient.name}.`);
               }
+              return data?.result;
             } catch {
               toast.error('Payment request encountered a network issue.');
             }

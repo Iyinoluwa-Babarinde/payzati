@@ -210,6 +210,7 @@ export default function EmployeeDashboard() {
     setWithdrawnThisMonth(prev => prev + amountToWithdraw);
     setExpandedReceiptId(newTx.id);
     toast.success(`Withdrew ${formatCurrency(amountToWithdraw, employee.currency || 'CAD')} to your account.`);
+    return result || newTx;
   };
 
   if (loading) {

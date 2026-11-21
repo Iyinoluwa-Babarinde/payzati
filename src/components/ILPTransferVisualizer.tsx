@@ -16,6 +16,15 @@ import {
 import { formatCurrency } from '@/lib/fx-engine';
 import { toast } from 'sonner';
 
+export interface LivePaymentProof {
+  id?: string;
+  incomingPaymentId?: string;
+  quoteId?: string;
+  outgoingPaymentUrl?: string;
+  receipt?: string;
+  mode?: 'live' | 'simulated';
+}
+
 export interface ILPTransferVisualizerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -28,7 +37,7 @@ export interface ILPTransferVisualizerProps {
   receiveAmount?: number;
   receiveCurrency?: string;
   receiptHash?: string;
-  onComplete?: () => void;
+  onComplete?: () => Promise<LivePaymentProof | void> | LivePaymentProof | void;
 }
 
 const SPRING_TRANSITION = {
@@ -60,6 +69,7 @@ export default function ILPTransferVisualizer({
   const [senderBalance, setSenderBalance] = useState(startingSenderBalance);
   const [receiverBalance, setReceiverBalance] = useState(0);
   const [transactionId, setTransactionId] = useState('');
+  const [liveProof, setLiveProof] = useState<LivePaymentProof | null>(null);
   const onCompleteRef = useRef(onComplete);
   const hasFiredComplete = useRef(false);
 
@@ -89,6 +99,7 @@ export default function ILPTransferVisualizer({
       setPacketsDelivered(0);
       setSenderBalance(startingSenderBalance);
       setReceiverBalance(0);
+      setLiveProof(null);
       hasFiredComplete.current = false;
       return;
     }
@@ -137,7 +148,14 @@ export default function ILPTransferVisualizer({
   useEffect(() => {
     if (phase === 'settled' && !hasFiredComplete.current) {
       hasFiredComplete.current = true;
-      onCompleteRef.current?.();
+      Promise.resolve(onCompleteRef.current?.()).then((proof) => {
+        if (proof && typeof proof === 'object') {
+          setLiveProof(proof);
+          if (proof.outgoingPaymentUrl || proof.id) {
+            setTransactionId(proof.outgoingPaymentUrl || proof.id || '');
+          }
+        }
+      });
     }
   }, [phase]);
 
@@ -552,23 +570,41 @@ export default function ILPTransferVisualizer({
                       color: 'var(--accent-teal)',
                       fontWeight: 700,
                       fontSize: '0.875rem',
-                      marginBottom: '6px',
+                      marginBottom: '8px',
                     }}
                   >
                     <CheckCircle2 size={17} strokeWidth={2} /> Payment delivered &amp; verified
                   </div>
-                  <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                    Transfer ID:{' '}
-                    <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
-                      {transactionId}
-                    </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', fontSize: '0.74rem', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                    {liveProof?.incomingPaymentId && (
+                      <div style={{ wordBreak: 'break-all' }}>
+                        <strong>1. Incoming Payment:</strong>{' '}
+                        <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
+                          {liveProof.incomingPaymentId}
+                        </span>
+                      </div>
+                    )}
+                    {liveProof?.quoteId && (
+                      <div style={{ wordBreak: 'break-all' }}>
+                        <strong>2. Locked Quote:</strong>{' '}
+                        <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
+                          {liveProof.quoteId}
+                        </span>
+                      </div>
+                    )}
+                    <div style={{ wordBreak: 'break-all' }}>
+                      <strong>{liveProof?.incomingPaymentId ? '3. Outgoing Payment:' : 'Transfer ID:'}</strong>{' '}
+                      <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
+                        {liveProof?.outgoingPaymentUrl || transactionId}
+                      </span>
+                    </div>
                   </div>
                   <div
                     style={{
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      fontSize: '0.76rem',
+                      fontSize: '0.75rem',
                       color: 'var(--text-secondary)',
                       flexWrap: 'wrap',
                       gap: '0.5rem',
@@ -577,7 +613,7 @@ export default function ILPTransferVisualizer({
                     <span>
                       Receipt code:{' '}
                       <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-teal)' }}>
-                        {displayReceipt.substring(0, 32)}...
+                        {(liveProof?.receipt || displayReceipt).substring(0, 32)}...
                       </strong>
                     </span>
                     <button
