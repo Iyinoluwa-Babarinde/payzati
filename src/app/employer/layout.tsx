@@ -168,7 +168,7 @@ export default function EmployerLayout({ children }: { children: React.ReactNode
         </header>
 
         <div className={styles.content}>
-          <div className={styles.contentWrapper}>
+          <div key={pathname} className={`${styles.contentWrapper} page-transition`}>
             {children}
           </div>
         </div>
