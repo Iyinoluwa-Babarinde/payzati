@@ -29,12 +29,13 @@ export async function getUnauthenticatedClient(): Promise<UnauthenticatedClient>
 
 export async function getAuthenticatedClient(): Promise<AuthenticatedClient | null> {
   if (authenticatedClient) return authenticatedClient;
-  const rawWalletAddress = process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6';
-  const privateKey = process.env.ILP_PRIVATE_KEY || 'MC4CAQAwBQYDK2VwBCIEIIB8Rg/+4W2SOu2hLxCP/LcxUQupAtYnN2++WQBGPXF6';
-  const keyId = process.env.ILP_KEY_ID || 'ff520a2e-7260-4f78-b98d-02d3afb5a1ed';
+
+  const rawWalletAddress = process.env.PAYZATI_WALLET_ADDRESS;
+  const privateKey = process.env.ILP_PRIVATE_KEY;
+  const keyId = process.env.ILP_KEY_ID;
 
   if (!rawWalletAddress || !privateKey || !keyId) {
-    console.warn('[ILP] Missing credentials — unable to create authenticated client');
+    console.warn('[ILP] Missing environment credentials (PAYZATI_WALLET_ADDRESS, ILP_PRIVATE_KEY, ILP_KEY_ID)');
     return null;
   }
 
@@ -43,12 +44,12 @@ export async function getAuthenticatedClient(): Promise<AuthenticatedClient | nu
   try {
     let keyObject: crypto.KeyObject;
     if (privateKey.includes('BEGIN PRIVATE KEY') || privateKey.includes('BEGIN')) {
-      keyObject = crypto.createPrivateKey(privateKey);
+      keyObject = crypto.createPrivateKey(privateKey.replace(/\\n/g, '\n'));
     } else {
       keyObject = crypto.createPrivateKey({
         key: Buffer.from(privateKey.replace(/\s+/g, ''), 'base64'),
         format: 'der',
-        type: 'pkcs8'
+        type: 'pkcs8',
       });
     }
 

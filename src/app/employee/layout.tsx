@@ -131,16 +131,28 @@ export default function EmployeeLayout({ children }: { children: React.ReactNode
             <Menu size={24} />
           </button>
           
-          <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-              Working at <strong style={{ color: 'var(--text-primary)' }}>{employee?.companies?.name || 'Payzati Global Inc.'}</strong>
+          <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', alignItems: 'center', gap: '1rem' }}>
+            <div style={{ display: 'inline-flex', padding: '3px', borderRadius: '9999px', background: 'var(--elevation-2)', border: '1px solid var(--border-default)' }}>
+              <button
+                onClick={() => {
+                  document.cookie = 'payzati_demo_role=employer; path=/; max-age=86400';
+                  localStorage.setItem('payzati_demo_role', 'employer');
+                  router.push('/employer/dashboard');
+                }}
+                style={{ border: 'none', background: 'transparent', padding: '4px 12px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', cursor: 'pointer' }}
+              >
+                ← Switch to Employer
+              </button>
+              <span style={{ padding: '4px 12px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700, background: 'var(--elevation-1)', color: 'var(--text-primary)', boxShadow: 'var(--shadow-sm)' }}>
+                Employee
+              </span>
             </div>
             
             <div className={styles.topbarRight} style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
               <ThemeToggle />
               
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.35rem 0.85rem', borderRadius: 'var(--radius-full)', background: 'var(--elevation-2)', border: '1px solid var(--border-default)' }}>
-                <div style={{ width: '26px', height: '26px', borderRadius: '50%', background: 'var(--accent-teal)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>
+                <div style={{ width: '26px', height: '26px', borderRadius: '8px', background: 'var(--accent-teal)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '0.75rem' }}>
                   {employee?.name?.charAt(0).toUpperCase() || 'S'}
                 </div>
                 <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--text-primary)' }}>{employee?.name}</span>

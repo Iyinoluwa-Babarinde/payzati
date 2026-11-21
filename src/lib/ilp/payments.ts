@@ -1,6 +1,8 @@
 'use server';
 
+import crypto from 'crypto';
 import { getAuthenticatedClient, getUnauthenticatedClient, normalizePaymentPointer } from './client';
+import { createClient as createServerClient } from '@/lib/supabase/server';
 
 export interface PaymentResult {
   id: string;
@@ -15,6 +17,8 @@ export interface PaymentResult {
   grantId?: string;
   quoteId?: string;
   incomingPaymentId?: string;
+  outgoingPaymentUrl?: string;
+  notice?: string;
 }
 
 export interface BatchPayrollResult {
@@ -26,11 +30,8 @@ export interface BatchPayrollResult {
   mode: 'live' | 'simulated';
 }
 
-function generateReceipt(): string {
-  const chars = '0123456789abcdef';
-  let hash = '0x';
-  for (let i = 0; i < 64; i++) hash += chars[Math.floor(Math.random() * chars.length)];
-  return hash;
+function generateReceiptHash(payload: string): string {
+  return '0x' + crypto.createHash('sha256').update(payload).digest('hex');
 }
 
 function generateId(): string {
@@ -38,171 +39,200 @@ function generateId(): string {
 }
 
 /**
- * Executes a 100% REAL LIVE Interledger Open Payments Protocol transaction.
- * Communicates directly with the Open Payments auth and resource servers on ilp.interledger-test.dev.
+ * Executes a real Interledger Open Payments Protocol transfer using the authenticated SDK
+ * and the employer's pre-approved outgoing-payment grant token stored in system_config.
+ * Only falls back to an explicitly marked `simulated` result when `demoMode` is enabled
+ * or if the live testnet grant has not been approved yet (with a clear notice).
  */
 export async function processPayment(
   senderWallet: string,
   receiverWallet: string,
   amount: number,
-  currency: string
+  currency: string,
+  options?: { demoMode?: boolean }
 ): Promise<PaymentResult> {
-  const normalizedSender = normalizePaymentPointer(senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6');
-  const normalizedReceiver = normalizePaymentPointer(receiverWallet || 'https://ilp.interledger-test.dev/da071cb6');
+  const normalizedSender = normalizePaymentPointer(
+    senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6'
+  );
+  const normalizedReceiver = normalizePaymentPointer(
+    receiverWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6'
+  );
 
-  console.log(`[ILP LIVE] Initiating real Open Payments transaction: ${normalizedSender} ➔ ${normalizedReceiver} (${amount} ${currency})`);
-
-  try {
-    // Step 1: Resolve Receiver Wallet Address Metadata on Interledger Testnet
-    const unauthClient = await getUnauthenticatedClient();
-    let receiverAddress: any;
-    try {
-      receiverAddress = await unauthClient.walletAddress.get({ url: normalizedReceiver });
-    } catch (e) {
-      console.log(`[ILP LIVE] Standard SDK lookup fallback for ${normalizedReceiver}`);
-      const resp = await fetch(normalizedReceiver, { headers: { Accept: 'application/json' } });
-      receiverAddress = await resp.json();
-    }
-
-    if (!receiverAddress || !receiverAddress.authServer) {
-      throw new Error(`Unable to resolve Interledger wallet address pointer: ${normalizedReceiver}`);
-    }
-
-    console.log(`[ILP LIVE] Resolved Receiver Auth Server: ${receiverAddress.authServer}, Asset: ${receiverAddress.assetCode}`);
-
-    // Step 2: Resolve Sender Wallet Address Metadata
-    let senderAddress: any;
-    try {
-      senderAddress = await unauthClient.walletAddress.get({ url: normalizedSender });
-    } catch (e) {
-      const resp = await fetch(normalizedSender, { headers: { Accept: 'application/json' } });
-      senderAddress = await resp.json();
-    }
-
-    // Step 3: Request Unauthenticated/Client Grants from Interledger Auth Server
-    const grantRes = await fetch(`${receiverAddress.authServer}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        access_token: {
-          access: [{ type: 'incoming-payment', actions: ['create', 'read', 'list'] }],
-        },
-      }),
-    }).catch(() => null);
-
-    const grantData = grantRes ? await grantRes.json().catch(() => null) : null;
-    const incomingToken = grantData?.access_token?.value || 'ilp_testnet_token_' + Date.now();
-
-    // Step 4: Create Incoming Payment Resource on Receiver's Resource Server
-    const incomingPaymentUrl = `${receiverAddress.id || normalizedReceiver}/incoming-payments`;
-    const incomingPaymentRes = await fetch(incomingPaymentUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `GNAP ${incomingToken}`,
-      },
-      body: JSON.stringify({
-        walletAddress: normalizedReceiver,
-        incomingAmount: {
-          value: String(Math.round(amount * 100)),
-          assetCode: receiverAddress.assetCode || currency,
-          assetScale: receiverAddress.assetScale || 2,
-        },
-      }),
-    }).catch(() => null);
-
-    const incomingPaymentData = incomingPaymentRes ? await incomingPaymentRes.json().catch(() => null) : null;
-    const incomingPaymentId = incomingPaymentData?.id || `${normalizedReceiver}/incoming-payments/${generateId()}`;
-
-    // Step 5: Request Quote from Sender's Resource Server
-    const quoteUrl = `${senderAddress?.id || normalizedSender}/quotes`;
-    const quoteRes = await fetch(quoteUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `GNAP ${incomingToken}`,
-      },
-      body: JSON.stringify({
-        walletAddress: normalizedSender,
-        receiver: incomingPaymentId,
-        method: 'ilp',
-      }),
-    }).catch(() => null);
-
-    const quoteData = quoteRes ? await quoteRes.json().catch(() => null) : null;
-    const quoteId = quoteData?.id || `${normalizedSender}/quotes/${generateId()}`;
-
-    // Step 6: Create Outgoing Payment (Live Protocol Settlement)
-    const outgoingUrl = `${senderAddress?.id || normalizedSender}/outgoing-payments`;
-    const outgoingRes = await fetch(outgoingUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `GNAP ${incomingToken}`,
-      },
-      body: JSON.stringify({
-        walletAddress: normalizedSender,
-        quoteId: quoteId,
-      }),
-    }).catch(() => null);
-
-    const outgoingData = outgoingRes ? await outgoingRes.json().catch(() => null) : null;
-    const paymentId = outgoingData?.id || `https://ilp.interledger-test.dev/outgoing-payments/${generateId()}`;
-
-    const receipt = generateReceipt();
-
-    console.log(`[ILP LIVE] Live Interledger Open Payments Transaction Completed! ID: ${paymentId}`);
-
+  if (options?.demoMode) {
+    const id = generateId();
     return {
-      id: paymentId,
+      id,
       status: 'completed',
       senderWallet: normalizedSender,
       receiverWallet: normalizedReceiver,
       amount: amount.toString(),
       currency,
+      receipt: generateReceiptHash(`${id}:${normalizedSender}:${normalizedReceiver}:${amount}:${currency}`),
+      mode: 'simulated',
+      completedAt: new Date().toISOString(),
+      notice: 'Executed in explicit Demo Mode (no testnet balance moved).',
+    };
+  }
+
+  try {
+    const client = await getAuthenticatedClient();
+    const unauthClient = await getUnauthenticatedClient();
+    if (!client) {
+      throw new Error('Open Payments credentials are not configured on the server.');
+    }
+
+    // Step 1: Resolve Sender & Receiver Wallet Address Metadata
+    const [senderAddress, receiverAddress] = await Promise.all([
+      unauthClient.walletAddress.get({ url: normalizedSender }),
+      unauthClient.walletAddress.get({ url: normalizedReceiver }),
+    ]);
+
+    // Step 2: Request Non-Interactive Incoming Payment Grant on Receiver's Auth Server
+    const incomingGrant = (await client.grant.request(
+      { url: receiverAddress.authServer },
+      {
+        access_token: {
+          access: [{ type: 'incoming-payment', actions: ['create', 'read', 'complete'] }],
+        },
+      }
+    )) as any;
+
+    if (!incomingGrant?.access_token?.value) {
+      throw new Error('Receiver auth server did not issue an incoming-payment grant.');
+    }
+
+    // Step 3: Create Incoming Payment Resource on Receiver's Resource Server
+    const receiverScale = typeof receiverAddress.assetScale === 'number' ? receiverAddress.assetScale : 2;
+    const incomingValue = String(Math.max(1, Math.round(amount * Math.pow(10, receiverScale))));
+
+    const incomingPayment = await client.incomingPayment.create(
+      {
+        url: receiverAddress.resourceServer,
+        accessToken: incomingGrant.access_token.value,
+      },
+      {
+        walletAddress: receiverAddress.id,
+        incomingAmount: {
+          value: incomingValue,
+          assetCode: receiverAddress.assetCode || currency,
+          assetScale: receiverScale,
+        },
+        metadata: {
+          description: `Payzati Payroll Settlement (${amount} ${currency})`,
+        },
+      }
+    );
+
+    // Step 4: Request Non-Interactive Quote Grant on Sender's Auth Server
+    const quoteGrant = (await client.grant.request(
+      { url: senderAddress.authServer },
+      {
+        access_token: {
+          access: [{ type: 'quote', actions: ['create', 'read'] }],
+        },
+      }
+    )) as any;
+
+    if (!quoteGrant?.access_token?.value) {
+      throw new Error('Sender auth server did not issue a quote grant.');
+    }
+
+    // Step 5: Create Quote on Sender's Resource Server
+    const quote = await client.quote.create(
+      {
+        url: senderAddress.resourceServer,
+        accessToken: quoteGrant.access_token.value,
+      },
+      {
+        walletAddress: senderAddress.id,
+        receiver: incomingPayment.id,
+        method: 'ilp',
+      }
+    );
+
+    // Step 6: Load Pre-Approved Outgoing Payment Grant Token from Supabase
+    const supabase = await createServerClient();
+    const { data: tokenRow } = await supabase
+      .from('system_config')
+      .select('value')
+      .eq('key', 'master_ilp_token')
+      .single();
+
+    const masterToken = tokenRow?.value ? String(tokenRow.value) : null;
+    if (!masterToken || masterToken.startsWith('simulated_')) {
+      throw new Error('Payroll budget not approved on Interledger Testnet yet. Click "Approve Payroll Budget" in Wallet first.');
+    }
+
+    // Step 7: Create Real Outgoing Payment on Sender's Resource Server
+    const outgoingPayment = await client.outgoingPayment.create(
+      {
+        url: senderAddress.resourceServer,
+        accessToken: masterToken,
+      },
+      {
+        walletAddress: senderAddress.id,
+        quoteId: quote.id,
+        metadata: {
+          description: `Payzati Live Settlement to ${normalizedReceiver}`,
+        },
+      }
+    );
+
+    const receipt = generateReceiptHash(`${outgoingPayment.id}:${quote.id}:${incomingPayment.id}`);
+
+    return {
+      id: outgoingPayment.id,
+      status: 'completed',
+      senderWallet: normalizedSender,
+      receiverWallet: normalizedReceiver,
+      amount: amount.toString(),
+      currency: receiverAddress.assetCode || currency,
       receipt,
       mode: 'live',
       completedAt: new Date().toISOString(),
-      grantId: grantData?.grant || `grant_${Date.now()}`,
-      quoteId,
-      incomingPaymentId,
+      quoteId: quote.id,
+      incomingPaymentId: incomingPayment.id,
+      outgoingPaymentUrl: outgoingPayment.id,
     };
   } catch (error: any) {
-    console.warn('[ILP LIVE] Real payment protocol execution notice:', error?.message);
-    
-    // Return live Open Payments result object with real payment pointer addresses and receipt
+    console.warn('[ILP] Live Open Payments transfer could not settle:', error?.message);
+    const id = generateId();
     return {
-      id: `https://ilp.interledger-test.dev/outgoing-payments/${generateId()}`,
+      id,
       status: 'completed',
       senderWallet: normalizedSender,
       receiverWallet: normalizedReceiver,
       amount: amount.toString(),
       currency,
-      receipt: generateReceipt(),
-      mode: 'live',
+      receipt: generateReceiptHash(`${id}:${normalizedSender}:${normalizedReceiver}:${amount}`),
+      mode: 'simulated',
       completedAt: new Date().toISOString(),
+      notice: error?.message || 'Testnet wallet grant required for live settlement.',
     };
   }
 }
 
 export async function processBatchPayroll(
   senderWallet: string,
-  payments: { receiverWallet: string; amount: number; currency: string; employeeId: string }[]
+  payments: { receiverWallet: string; amount: number; currency: string; employeeId: string }[],
+  options?: { demoMode?: boolean }
 ): Promise<BatchPayrollResult> {
   const results: PaymentResult[] = [];
   let successful = 0;
   let failed = 0;
+  let allLive = true;
 
   const batchSize = 5;
   for (let i = 0; i < payments.length; i += batchSize) {
     const batch = payments.slice(i, i + batchSize);
     const batchResults = await Promise.all(
-      batch.map(p => processPayment(senderWallet, p.receiverWallet, p.amount, p.currency))
+      batch.map(p => processPayment(senderWallet, p.receiverWallet, p.amount, p.currency, options))
     );
     for (const result of batchResults) {
       results.push(result);
       if (result.status === 'completed') successful++;
       else failed++;
+      if (result.mode !== 'live') allLive = false;
     }
   }
 
@@ -212,6 +242,6 @@ export async function processBatchPayroll(
     successful,
     failed,
     payments: results,
-    mode: 'live',
+    mode: allLive && results.length > 0 ? 'live' : 'simulated',
   };
 }

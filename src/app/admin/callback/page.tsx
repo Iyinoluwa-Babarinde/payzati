@@ -17,10 +17,10 @@ export default function AdminCallback() {
         }
 
         await processMasterCallback(url);
-        setStatus('Authorization Complete! Master Token Saved.');
+        setStatus('Payroll budget approved! Returning to your workspace...');
         setTimeout(() => {
-          window.location.href = '/admin';
-        }, 2000);
+          window.location.href = '/employer/dashboard';
+        }, 1600);
       } catch (e: any) {
         setError(e.message);
         setStatus('Authorization Failed');

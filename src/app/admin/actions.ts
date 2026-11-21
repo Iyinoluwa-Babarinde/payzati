@@ -3,83 +3,100 @@
 import { getAuthenticatedClient, getUnauthenticatedClient, normalizePaymentPointer } from '@/lib/ilp/client';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
-export async function initiateMasterAuthorization(limitUSD: number = 10000000) {
+export async function initiateMasterAuthorization(limitAmount: number = 1000, originUrl?: string) {
   const rawMasterWallet = process.env.PAYZATI_WALLET_ADDRESS;
-  if (!rawMasterWallet) throw new Error('PAYZATI_WALLET_ADDRESS not set in environment variables');
+  if (!rawMasterWallet) throw new Error('PAYZATI_WALLET_ADDRESS is not configured in environment variables.');
 
   const masterWallet = normalizePaymentPointer(rawMasterWallet);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3007';
+  const siteUrl = (
+    originUrl ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3007')
+  ).replace(/\/$/, '');
 
-  try {
-    const unauthClient = await getUnauthenticatedClient();
-    const client = await getAuthenticatedClient();
-    if (!client) throw new Error('Authenticated client credentials missing or invalid');
-
-    const walletAddress = await unauthClient.walletAddress.get({ url: masterWallet });
-
-    // Value calculation: amount * 10^scale (USD has scale 2)
-    const debitValue = String(Math.round(limitUSD * 100));
-
-    // Request a long-lived outgoing payment grant
-    const grant = await client.grant.request(
-      { url: walletAddress.authServer },
-      {
-        access_token: {
-          access: [
-            {
-              type: 'outgoing-payment',
-              actions: ['create', 'read', 'list'],
-              identifier: masterWallet,
-              limits: {
-                debitAmount: {
-                  value: debitValue,
-                  assetCode: 'USD',
-                  assetScale: 2,
-                },
-              },
-            },
-          ],
-        },
-        interact: {
-          start: ['redirect'],
-          finish: {
-            method: 'redirect',
-            uri: `${siteUrl}/admin/callback`,
-            nonce: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
-          },
-        },
-      }
-    );
-
-    if ('interact' in grant) {
-      // Save the continue details in the database so we can resume the grant later
-      const supabase = await createServerClient();
-      await supabase.from('system_config').upsert({
-        key: 'master_grant_continue',
-        value: {
-          uri: grant.continue.uri,
-          access_token: grant.continue.access_token.value
-        }
-      });
-
-      return grant.interact.redirect;
-    }
-  } catch (error: any) {
-    console.warn('[ILP] Authorization handshake failed, falling back to dynamic simulation mode:', error.message);
-    // Dynamic simulated approval redirect (with real-time timing in callback)
-    const mockRef = 'simulated_ref_' + Math.random().toString(36).substring(2, 9);
-    return `${siteUrl}/admin/callback?interact_ref=${mockRef}&hash=simulated_hash`;
+  const unauthClient = await getUnauthenticatedClient();
+  const client = await getAuthenticatedClient();
+  if (!client) {
+    throw new Error('Open Payments credentials (ILP_PRIVATE_KEY / ILP_KEY_ID) are missing or invalid.');
   }
 
-  throw new Error('Failed to get interaction redirect URL');
+  const walletAddress = await unauthClient.walletAddress.get({ url: masterWallet });
+  const assetCode = walletAddress.assetCode || 'EUR';
+  const assetScale = typeof walletAddress.assetScale === 'number' ? walletAddress.assetScale : 2;
+  const debitValue = String(Math.round(limitAmount * Math.pow(10, assetScale)));
+
+  const grant = await client.grant.request(
+    { url: walletAddress.authServer },
+    {
+      access_token: {
+        access: [
+          {
+            type: 'outgoing-payment',
+            actions: ['create', 'read', 'list'],
+            identifier: masterWallet,
+            limits: {
+              debitAmount: {
+                value: debitValue,
+                assetCode,
+                assetScale,
+              },
+            },
+          },
+        ],
+      },
+      interact: {
+        start: ['redirect'],
+        finish: {
+          method: 'redirect',
+          uri: `${siteUrl}/admin/callback`,
+          nonce: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+        },
+      },
+    }
+  );
+
+  if ('interact' in grant && grant.interact?.redirect) {
+    const supabase = await createServerClient();
+    await supabase.from('system_config').upsert({
+      key: 'master_grant_continue',
+      value: {
+        uri: grant.continue.uri,
+        access_token: grant.continue.access_token.value,
+      },
+    });
+
+    return grant.interact.redirect;
+  }
+
+  throw new Error('Interledger Testnet did not return an interactive approval URL.');
 }
 
 export async function getAdminConfigStatus() {
   const rawMasterWallet = process.env.PAYZATI_WALLET_ADDRESS;
+  let hasMasterToken = false;
+  let isSimulatedToken = false;
+
+  try {
+    const supabase = await createServerClient();
+    const { data } = await supabase
+      .from('system_config')
+      .select('value')
+      .eq('key', 'master_ilp_token')
+      .single();
+    if (data?.value) {
+      hasMasterToken = true;
+      isSimulatedToken = String(data.value).startsWith('simulated_');
+    }
+  } catch {
+    // system_config table may not have a token yet
+  }
+
   return {
     walletAddress: rawMasterWallet ? normalizePaymentPointer(rawMasterWallet) : '',
     hasPrivateKey: !!process.env.ILP_PRIVATE_KEY,
     hasKeyId: !!process.env.ILP_KEY_ID,
-    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3007'
+    hasMasterToken,
+    isSimulatedToken,
+    siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://payzati.vercel.app',
   };
 }

@@ -2,660 +2,439 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Banknote, Zap, Scale, Coins, Unlock, Globe, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { ArrowUpRight, Check, Fingerprint, Globe2, Sparkles, Zap } from 'lucide-react';
 import styles from './landing.module.css';
 import LiveFXQuoteWidget from '@/components/LiveFXQuoteWidget';
 
-// SVG components to replace emojis
-function CheckIcon({ className = '', size = 16, style }: { className?: string; size?: number; style?: React.CSSProperties }) {
-  return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="3" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-      style={style}
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
-function GlobeIcon({ className = '', size = 16 }: { className?: string; size?: number }) {
-  return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <circle cx="12" cy="12" r="10" />
-      <line x1="2" y1="12" x2="22" y2="12" />
-      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-    </svg>
-  );
-}
-
-// Styled circular flag vectors
-function FlagNG({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={styles.flagSvg}>
-      <circle cx="12" cy="12" r="12" fill="#008751" />
-      <rect x="8" y="0" width="8" height="24" fill="#FFFFFF" />
-    </svg>
-  );
-}
-
-function FlagKE({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={styles.flagSvg}>
-      <circle cx="12" cy="12" r="12" fill="#000000" />
-      <rect x="0" y="6" width="24" height="12" fill="#FF0000" />
-      <rect x="0" y="12" width="24" height="6" fill="#006600" />
-      <path d="M10 12 L12 8 L14 12 L12 16 Z" fill="#FFFFFF" />
-    </svg>
-  );
-}
-
-function FlagGH({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" className={styles.flagSvg}>
-      <circle cx="12" cy="12" r="12" fill="#E2231A" />
-      <rect x="0" y="8" width="24" height="16" fill="#FCD116" />
-      <rect x="0" y="16" width="24" height="8" fill="#006B3F" />
-      <polygon points="12,10 13.5,13 16.5,13 14,15 15,18 12,16 9,18 10,15 7.5,13 10.5,13" fill="#000000" />
-    </svg>
-  );
-}
+const SPRING_EASE = [0.32, 0.72, 0, 1] as const;
 
 export default function LandingPage() {
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [activeView, setActiveView] = useState<'employer' | 'employee'>('employer');
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 30);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  const enterDemo = (role: 'employer' | 'employee') => {
+    document.cookie = `payzati_demo_role=${role}; path=/; max-age=86400`;
+    localStorage.setItem('payzati_demo_role', role);
+    router.push(role === 'employer' ? '/employer/dashboard' : '/employee/dashboard');
+  };
 
   return (
     <div className={styles.landing}>
-      {/* Navbar */}
-      <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>
-        <div className={styles.navContent}>
-          <Link href="/" className={`${styles.navLogo} ${styles.navItem}`}>
-            <div className={styles.logoMark}>
-              <div className={styles.logoRow}><div className={styles.sq}></div><div className={styles.sq}></div></div>
-              <div className={styles.logoRow}><div className={styles.cr}></div><div className={styles.cr}></div></div>
-            </div>
+      {/* Fluid Island Floating Pill Navbar */}
+      <header className={styles.navWrapper}>
+        <nav className={`${styles.islandNav} ${scrolled ? styles.islandNavScrolled : ''}`} aria-label="Primary">
+          <Link href="/" className={styles.navLogo}>
+            <span className={styles.logoMark} aria-hidden="true">
+              <span className={styles.sq} />
+              <span className={styles.sq} />
+              <span className={styles.cr} />
+              <span className={styles.cr} />
+            </span>
             <span>Payzati</span>
           </Link>
-          <div className={`${styles.navLinks} ${styles.navItem}`}>
+
+          <div className={styles.navLinks}>
+            <a href="#features">Platform</a>
             <a href="#how-it-works">How it works</a>
-            <a href="#features">Inside</a>
-            <a href="#pricing">Pricing</a>
+            <a href="#fx-rates">Live FX</a>
           </div>
-          <div className={styles.navItem} style={{ gap: '1rem' }}>
-            <Link href="/auth/login" className="btn btn-ghost btn-sm">Log in</Link>
-            <Link href="/auth/register" className="btn btn-primary btn-sm">Try it free</Link>
+
+          <div className={styles.navActions}>
+            <Link href="/auth/login" className="btn btn-ghost btn-sm">
+              Sign in
+            </Link>
+            <button onClick={() => enterDemo('employer')} className="btn btn-primary btn-sm">
+              Try live demo
+            </button>
           </div>
-        </div>
-      </nav>
 
-      {/* 1. HERO */}
-      <section className={styles.hero}>
-        <div className={styles.heroInner}>
-          <div className={styles.heroContent}>
+          <button
+            className={`${styles.menuToggle} ${menuOpen ? styles.menuOpen : ''}`}
+            onClick={() => setMenuOpen(prev => !prev)}
+            aria-label="Toggle menu"
+          >
+            <span className={`${styles.menuLine} ${styles.menuLineTop}`} />
+            <span className={`${styles.menuLine} ${styles.menuLineBottom}`} />
+          </button>
+        </nav>
+      </header>
 
-            <h1 className={`${styles.heroTitle} text-gradient-teal`}>
-              Global payroll.<br/>Instant settlement.
+      {/* Mobile Glass Overlay */}
+      {menuOpen && (
+        <motion.div
+          className={styles.mobileOverlay}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, ease: SPRING_EASE }}
+        >
+          <a href="#features" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>Platform</a>
+          <a href="#how-it-works" className={styles.mobileLink} onClick={() => setMenuOpen(false)}>How it works</a>
+          <button
+            className="btn btn-primary btn-lg"
+            onClick={() => { setMenuOpen(false); enterDemo('employer'); }}
+          >
+            Launch Employer Demo
+            <span className="btn-icon-nest"><ArrowUpRight size={16} strokeWidth={1.75} /></span>
+          </button>
+          <button
+            className="btn btn-secondary btn-lg"
+            onClick={() => { setMenuOpen(false); enterDemo('employee'); }}
+          >
+            Preview Employee App
+            <span className="btn-icon-nest"><ArrowUpRight size={16} strokeWidth={1.75} /></span>
+          </button>
+        </motion.div>
+      )}
+
+      {/* 1. EDITORIAL SPLIT HERO */}
+      <main>
+        <section className={styles.hero}>
+          <motion.div
+            className={styles.heroLeft}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.72, ease: SPRING_EASE }}
+          >
+            <span className="eyebrow-pill">
+              <Sparkles size={12} strokeWidth={1.75} color="var(--accent-teal)" />
+              Interledger Open Payments · Live Testnet
+            </span>
+
+            <h1 className={styles.heroTitle}>
+              Global payroll,{' '}
+              <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>settled</span>{' '}
+              in seconds.
             </h1>
+
             <p className={styles.heroSubtitle}>
-              Stop paying wire fees. Stop waiting days. Just pay your team anywhere in Africa &amp; worldwide.
+              Pay remote teams across Nigeria, Kenya, Ghana, and worldwide without 5-day bank wires or 8% FX markups. Employees see their salary arrive in local currency—zero crypto knowledge required.
             </p>
-            <div className={styles.heroCTA}>
-              <Link href="/auth/register" className="btn btn-primary btn-lg">
-                Start now <ArrowRight size={18} style={{ marginLeft: '6px' }} />
-              </Link>
-              <Link href="/auth/login" className="btn btn-secondary btn-lg">
-                Try 1-Click Demo
-              </Link>
+
+            <div className={styles.heroCTAs}>
+              <button onClick={() => enterDemo('employer')} className="btn btn-primary btn-lg">
+                Launch employer demo
+                <span className="btn-icon-nest">
+                  <ArrowUpRight size={16} strokeWidth={1.75} />
+                </span>
+              </button>
+
+              <button onClick={() => enterDemo('employee')} className="btn btn-secondary btn-lg">
+                Preview employee view
+                <span className="btn-icon-nest">
+                  <ArrowUpRight size={16} strokeWidth={1.75} />
+                </span>
+              </button>
             </div>
-          </div>
-          
-          {/* Product Visual / Demo Mockup */}
-          <div className={styles.productVisual}>
-            <div className={styles.browserHeader} style={{ justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', gap: '6px', width: '80px' }}>
-                <div className={`${styles.dot} ${styles.dotR}`}></div>
-                <div className={`${styles.dot} ${styles.dotY}`}></div>
-                <div className={`${styles.dot} ${styles.dotG}`}></div>
+
+            <div className={styles.trustStrip}>
+              <div className={styles.trustStat}>
+                <span className={styles.trustValue}>0.8s</span>
+                <span className={styles.trustLabel}>Avg. settlement time</span>
               </div>
-              
-              <div className={styles.viewSelector}>
-                <button 
-                  onClick={() => setActiveView('employer')}
-                  className={`${styles.viewBtn} ${activeView === 'employer' ? styles.activeViewBtn : ''}`}
-                >
-                  Employer View
-                </button>
-                <button 
-                  onClick={() => setActiveView('employee')}
-                  className={`${styles.viewBtn} ${activeView === 'employee' ? styles.activeViewBtn : ''}`}
-                >
-                  Employee View
-                </button>
+              <div className={styles.trustStat}>
+                <span className={styles.trustValue}>$0.02</span>
+                <span className={styles.trustLabel}>Protocol network fee</span>
               </div>
-              
-              <div style={{ width: '80px', display: 'flex', justifyContent: 'flex-end' }}>
-                <span style={{ fontSize: '0.65rem', color: '#10b981', fontWeight: 800, padding: '2px 8px', background: 'rgba(16,185,129,0.15)', borderRadius: '100px', border: '1px solid #10b981' }}>LIVE</span>
+              <div className={styles.trustStat}>
+                <span className={styles.trustValue}>100%</span>
+                <span className={styles.trustLabel}>Verifiable ILP receipts</span>
               </div>
             </div>
-            
-            <div style={{ background: 'var(--bg-primary)', display: 'flex', height: '400px', overflow: 'hidden' }}>
+          </motion.div>
+
+          {/* Double-Bezel Interactive Workspace Preview */}
+          <motion.div
+            className="bezel-shell"
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.85, delay: 0.12, ease: SPRING_EASE }}
+          >
+            <div className="bezel-core">
+              <div className={styles.previewHeader}>
+                <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+                  payzati.vercel.app
+                </span>
+                <div className={styles.previewSwitcher} role="tablist">
+                  <button
+                    role="tab"
+                    aria-selected={activeView === 'employer'}
+                    className={`${styles.previewTab} ${activeView === 'employer' ? styles.previewTabActive : ''}`}
+                    onClick={() => setActiveView('employer')}
+                  >
+                    Employer
+                  </button>
+                  <button
+                    role="tab"
+                    aria-selected={activeView === 'employee'}
+                    className={`${styles.previewTab} ${activeView === 'employee' ? styles.previewTabActive : ''}`}
+                    onClick={() => setActiveView('employee')}
+                  >
+                    Employee
+                  </button>
+                </div>
+              </div>
+
               {activeView === 'employer' ? (
-                <>
-                  {/* Employer Sidebar Replica */}
-                  <div style={{ width: '160px', borderRight: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#00d4aa', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Globe size={14} /> Payzati Hub
-                    </div>
-                    <div style={{ width: '100%', padding: '6px 10px', background: 'var(--accent-teal-dim)', border: '1px solid rgba(0,212,170,0.3)', borderRadius: '6px', color: '#00d4aa', fontSize: '0.75rem', fontWeight: 700 }}>Dashboard</div>
-                    <div style={{ width: '100%', padding: '6px 10px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>The Roster</div>
-                    <div style={{ width: '100%', padding: '6px 10px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Run Payroll</div>
-                    <div style={{ width: '100%', padding: '6px 10px', color: 'var(--text-secondary)', fontSize: '0.75rem' }}>ILP Wallet</div>
-                  </div>
-                  
-                  {/* Employer Main Replica */}
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-primary)' }}>
-                    <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#fff' }}>Global Operations</div>
-                      <div style={{ padding: '3px 10px', background: 'rgba(16,185,129,0.15)', border: '1px solid #10b981', color: '#10b981', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></span> Master Wallet: $25,000.00 USD
-                      </div>
-                    </div>
-                    <div style={{ padding: '1.25rem', overflow: 'hidden' }}>
-                      {/* 4 Stats Grid */}
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem', marginBottom: '1rem' }}>
-                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '8px' }}>
-                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>Team Size</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#38bdf8' }}>142</div>
-                        </div>
-                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '8px' }}>
-                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>Markets</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#00d4aa' }}>5 Countries</div>
-                        </div>
-                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '8px' }}>
-                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>Monthly</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>$145,000</div>
-                        </div>
-                        <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '8px' }}>
-                          <div style={{ color: 'var(--text-secondary)', fontSize: '0.65rem', fontWeight: 700, textTransform: 'uppercase' }}>ILP STREAM</div>
-                          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#10b981' }}>100% Live</div>
-                        </div>
-                      </div>
-                      
-                      {/* Live Recent Payout Table */}
-                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '12px' }}>
-                        <div style={{ fontSize: '0.75rem', fontWeight: 700, marginBottom: '8px', color: '#cbd5e1', display: 'flex', justifyContent: 'space-between' }}>
-                          <span>Recent Interledger Payouts</span>
-                          <span style={{ color: '#00d4aa', fontSize: '0.7rem' }}>Batch PR-9281</span>
-                        </div>
-                        <table style={{ width: '100%', fontSize: '0.75rem', textAlign: 'left', borderCollapse: 'collapse' }}>
-                          <thead>
-                            <tr style={{ color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.65rem' }}>
-                              <th style={{ paddingBottom: '0.35rem' }}>Employee</th>
-                              <th style={{ paddingBottom: '0.35rem' }}>Market</th>
-                              <th style={{ paddingBottom: '0.35rem' }}>Payout</th>
-                              <th style={{ paddingBottom: '0.35rem' }}>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                              <td style={{ padding: '6px 0', fontWeight: 600 }}>Sarah Johansson</td>
-                              <td><FlagNG size={14} /> Nigeria</td>
-                              <td style={{ fontWeight: 700, color: '#00d4aa' }}>₦2,247,500 NGN</td>
-                              <td><span style={{ color: '#10b981', fontSize: '0.65rem', fontWeight: 800 }}>✓ Settled (0.8s)</span></td>
-                            </tr>
-                            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                              <td style={{ padding: '6px 0', fontWeight: 600 }}>David Ochieng</td>
-                              <td><FlagKE size={14} /> Kenya</td>
-                              <td style={{ fontWeight: 700, color: '#00d4aa' }}>185,000 KES</td>
-                              <td><span style={{ color: '#10b981', fontSize: '0.65rem', fontWeight: 800 }}>✓ Settled (0.6s)</span></td>
-                            </tr>
-                            <tr>
-                              <td style={{ padding: '6px 0', fontWeight: 600 }}>Kwame Mensah</td>
-                              <td><FlagGH size={14} /> Ghana</td>
-                              <td style={{ fontWeight: 700, color: '#00d4aa' }}>18,400 GHS</td>
-                              <td><span style={{ color: '#10b981', fontSize: '0.65rem', fontWeight: 800 }}>✓ Settled (0.9s)</span></td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                  {/* Employee Topbar Replica */}
-                  <div style={{ padding: '0.85rem 1.25rem', borderBottom: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className={styles.previewBody}>
+                  <div className={styles.previewBalanceRow}>
                     <div>
-                      <div style={{ fontSize: '1rem', fontWeight: 800, color: '#fff' }}>Sarah Johansson (Senior Software Engineer)</div>
-                      <div style={{ color: '#38bdf8', fontSize: '0.725rem', fontFamily: 'monospace' }}>$ilp.interledger-test.dev/sarah-johansson</div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', display: 'block', marginBottom: '4px' }}>
+                        Active Master Treasury (Testnet EUR)
+                      </span>
+                      <div className={styles.previewAmount}>€14,820.40</div>
                     </div>
-                    <div style={{ padding: '4px 10px', background: 'rgba(16,185,129,0.15)', border: '1px solid #10b981', color: '#10b981', borderRadius: '100px', fontSize: '0.7rem', fontWeight: 800 }}>Active EWA Portal</div>
+                    <span className="badge badge-success">
+                      <Check size={12} strokeWidth={2.5} /> Ready to settle
+                    </span>
                   </div>
-                  {/* Employee Main Replica */}
-                  <div style={{ padding: '1.25rem', display: 'flex', gap: '1rem', flex: 1, overflow: 'hidden' }}>
-                    <div style={{ flex: 1.5, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      <div className={styles.mockCard} style={{ background: 'var(--elevation-1)', padding: '12px' }}>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', marginBottom: '0.25rem' }}>Accrued Salary (Days 1 to 18 Worked)</div>
-                        <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#00d4aa', marginBottom: '0.5rem' }}>₦1,348,500 NGN</div>
-                        <div className={styles.mockProgressContainer}><div className={styles.mockProgressFill} style={{ width: '60%', background: 'linear-gradient(90deg, #00d4aa, #10b981)' }}></div></div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                    <div className={styles.previewRow}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Tunde Adeyemi</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Lagos, Nigeria · Product Engineer</div>
                       </div>
-                      <div className={styles.mockCard} style={{ flex: 1, background: 'var(--elevation-1)', padding: '12px' }}>
-                        <div style={{ fontSize: '0.725rem', fontWeight: 700, marginBottom: '0.5rem', color: '#cbd5e1' }}>Recent ILP Stream Payouts</div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)', fontSize: '0.75rem' }}>
-                          <span>EWA Advance Withdrawal</span><span style={{ fontWeight: 700, color: '#10b981' }}>+ ₦450,000 NGN</span>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '6px 0', fontSize: '0.75rem' }}>
-                          <span>Regular Monthly Payroll</span><span style={{ fontWeight: 700, color: '#10b981' }}>+ ₦2,247,500 NGN</span>
-                        </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>₦1,247,500</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--status-success)' }}>Settled · 0.7s</div>
                       </div>
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div className={styles.mockCard} style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.12) 0%, rgba(15,23,42,0.9) 100%)', border: '1px solid rgba(16,185,129,0.4)', height: '100%', padding: '14px', display: 'flex', flexDirection: 'column' }}>
-                        <div style={{ fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', color: '#10b981', marginBottom: '0.5rem' }}>Earned Wage Access</div>
-                        <div style={{ color: '#e2e8f0', fontSize: '0.75rem', marginBottom: '0.75rem', lineHeight: 1.4 }}>Withdraw up to ₦1,348,500 NGN before payday over Interledger.</div>
-                        <div style={{ background: 'rgba(0,0,0,0.4)', padding: '8px', borderRadius: '8px', marginBottom: '0.75rem', fontSize: '0.7rem', color: '#94a3b8' }}>
-                          Flat fee: <strong style={{ color: '#fff' }}>$1.50 USD</strong> · Instant ILP Stream
-                        </div>
-                        <div style={{ marginTop: 'auto' }}>
-                          <button className="btn btn-primary btn-sm btn-block" style={{ width: '100%', fontSize: '0.75rem', fontWeight: 800, background: 'linear-gradient(135deg, #10b981 0%, #00d4aa 100%)', color: '#0d1117' }}>Withdraw via ILP</button>
-                        </div>
+
+                    <div className={styles.previewRow}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Amina Ochieng</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Nairobi, Kenya · Brand Designer</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>KES 184,200</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--status-success)' }}>Settled · 0.9s</div>
+                      </div>
+                    </div>
+
+                    <div className={styles.previewRow}>
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Kwame Mensah</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Accra, Ghana · QA Specialist</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div className="tabular-nums" style={{ fontWeight: 700, fontSize: '0.875rem' }}>GHS 16,450</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--accent-teal)', fontWeight: 600 }}>Ready to pay</div>
                       </div>
                     </div>
                   </div>
+
+                  <button onClick={() => enterDemo('employer')} className="btn btn-primary btn-block">
+                    Open live employer cockpit
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.previewBody}>
+                  <div className={styles.previewBalanceRow}>
+                    <div>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', display: 'block', marginBottom: '4px' }}>
+                        Earned so far this month
+                      </span>
+                      <div className={styles.previewAmount} style={{ color: 'var(--accent-teal)' }}>₦584,320</div>
+                    </div>
+                    <span className="badge badge-success">0% interest</span>
+                  </div>
+
+                  <div className={styles.previewRow}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Instant salary withdrawal</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Arrives directly in local currency</div>
+                    </div>
+                    <span className="tabular-nums" style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>₦150,000</span>
+                  </div>
+
+                  <div className={styles.previewRow}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: '0.875rem' }}>Verified payment receipt</div>
+                      <div style={{ fontSize: '0.73rem', color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)' }}>0x8e4a...9c12 · Open Payments</div>
+                    </div>
+                    <span className="badge badge-success">Verified</span>
+                  </div>
+
+                  <button onClick={() => enterDemo('employee')} className="btn btn-primary btn-block">
+                    Try employee withdrawal flow
+                  </button>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </section>
 
-
-      {/* 2. SOCIAL PROOF */}
-      <section className={styles.socialProof}>
-        <h3 className={styles.socialProofTitle}>Trusted by</h3>
-        <div className={styles.socialLogos}>
-          <span>AFRICA TECH</span>
-          <span>GLOBEX CORP</span>
-          <span>INTERLEDGER</span>
-          <span>FINTECH ORG</span>
-        </div>
-      </section>
-
-      {/* LIVE FX QUOTE CALCULATOR FOR DEMO DAY */}
-      <section style={{ padding: '4rem 1.5rem', background: 'linear-gradient(180deg, rgba(13,17,23,0) 0%, rgba(0,212,170,0.04) 50%, rgba(13,17,23,0) 100%)' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
-          <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(0,212,170,0.1)', border: '1px solid rgba(0,212,170,0.3)', color: '#00d4aa', padding: '6px 16px', borderRadius: '100px', fontSize: '0.85rem', fontWeight: 700, marginBottom: '1.25rem' }}>
-              <Zap size={16} /> Interledger Open Payments FX Engine
-            </div>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 800, lineHeight: 1.2, color: '#fff', marginBottom: '1rem' }}>
-              Instant Quotes. <br />Zero Hidden Spreads.
+        {/* 2. ASYMMETRICAL BENTO GRID */}
+        <section id="features" className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <span className="eyebrow-pill">Built for real operators</span>
+            <h2 className={styles.sectionTitle}>
+              Payroll infrastructure that{' '}
+              <span className="serif-accent">disappears</span> into the background.
             </h2>
-            <p style={{ color: '#94a3b8', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-              Traditional banks markup exchange rates by 3% to 5%. Payzati routes payouts over the Interledger Protocol with a flat 0.2% transparent fee and instant settlement.
+            <p className={styles.sectionLead}>
+              Employers approve one payroll budget. Employees withdraw what they have earned in plain everyday language—while Interledger handles cross-currency settlement behind the scenes.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,212,170,0.15)', color: '#00d4aa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>✓</div>
-                <span style={{ color: '#cbd5e1', fontWeight: 500 }}>Live market rates refreshed every 5 seconds</span>
+          </div>
+
+          <div className={styles.bentoGrid}>
+            <motion.div
+              className={`bezel-shell ${styles.col7}`}
+              id="fx-rates"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.65, ease: SPRING_EASE }}
+            >
+              <div className={`bezel-core ${styles.bentoInner}`}>
+                <div>
+                  <Globe2 size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
+                  <h3 className={styles.bentoHeading}>Real-time FX quotes, zero hidden spreads</h3>
+                  <p className={styles.bentoText}>
+                    See the exact local amount your team receives before a single cent leaves your master wallet.
+                  </p>
+                </div>
+                <LiveFXQuoteWidget />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,212,170,0.15)', color: '#00d4aa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>✓</div>
-                <span style={{ color: '#cbd5e1', fontWeight: 500 }}>Supports NGN, KES, GHS, ZAR, EGP, USD, EUR, GBP</span>
+            </motion.div>
+
+            <motion.div
+              className={`bezel-shell ${styles.col5}`}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.65, delay: 0.08, ease: SPRING_EASE }}
+            >
+              <div className={`bezel-core ${styles.bentoInner}`}>
+                <div>
+                  <Zap size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
+                  <h3 className={styles.bentoHeading}>Earned wage access, built in</h3>
+                  <p className={styles.bentoText}>
+                    Workers don&apos;t need to wait 30 days for payday or take high-interest loans. Accrued earnings update daily and withdraw in one tap.
+                  </p>
+                </div>
+                <div style={{ padding: '1.1rem', borderRadius: '14px', background: 'var(--elevation-2)', border: '1px solid var(--border-subtle)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '8px' }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>Pay cycle progress</span>
+                    <span className="tabular-nums" style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>Day 21 of 30</span>
+                  </div>
+                  <div style={{ height: '6px', borderRadius: '9999px', background: 'var(--elevation-3)', overflow: 'hidden' }}>
+                    <div style={{ width: '70%', height: '100%', background: 'var(--accent-teal)', borderRadius: '9999px' }} />
+                  </div>
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(0,212,170,0.15)', color: '#00d4aa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>✓</div>
-                <span style={{ color: '#cbd5e1', fontWeight: 500 }}>Open Payments standard API integration</span>
+            </motion.div>
+
+            <motion.div
+              className={`bezel-shell ${styles.col5}`}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.65, ease: SPRING_EASE }}
+            >
+              <div className={`bezel-core ${styles.bentoInner}`}>
+                <div>
+                  <Fingerprint size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
+                  <h3 className={styles.bentoHeading}>Cryptographic audit receipts</h3>
+                  <p className={styles.bentoText}>
+                    Every payout generates a verifiable Open Payments Outgoing Payment ID, Quote ID, and SHA-256 receipt tucked cleanly into a proof drawer.
+                  </p>
+                </div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', padding: '0.85rem 1rem', borderRadius: '12px', background: 'var(--elevation-2)', color: 'var(--text-secondary)' }}>
+                  POST /outgoing-payments · 201 Created
+                </div>
               </div>
-            </div>
-          </div>
-          <div>
-            <LiveFXQuoteWidget />
-          </div>
-        </div>
-      </section>
+            </motion.div>
 
-      {/* 3. PROBLEM / PAIN */}
-      <section className={styles.problemSection}>
-        <div className={styles.painBox}>
-          <h3>Cross-border payroll is broken.</h3>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '1.25rem' }}>
-            Your team is waiting days for their money while you pay exorbitant fees. We fixed it.
-          </p>
-        </div>
-      </section>
+            <motion.div
+              className={`bezel-shell ${styles.col7}`}
+              id="how-it-works"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.65, delay: 0.08, ease: SPRING_EASE }}
+            >
+              <div className={`bezel-core ${styles.bentoInner}`}>
+                <div>
+                  <h3 className={styles.bentoHeading}>Three steps from wallet to payday</h3>
+                  <p className={styles.bentoText}>
+                    Designed so a first-time user understands every action without reading a manual.
+                  </p>
+                </div>
 
-      {/* 4. HOW IT WORKS */}
-      <section id="how-it-works" className={styles.section}>
-        <h2 className={styles.sectionTitle}>How it works.</h2>
-        <p className={styles.sectionSubtitle}>Fund. Review. Send.</p>
-        
-        <div className={styles.stepsContainer}>
-          <div className={styles.stepGlass}>
-            <div className={styles.stepNum}>1</div>
-            <h3 style={{ marginBottom: '1rem' }}>Fund balance.</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>We hold it securely on the Interledger network.</p>
+                <div className={styles.stepsGrid}>
+                  <div>
+                    <span className={styles.stepNum}>01</span>
+                    <div style={{ fontWeight: 700, marginBottom: '4px' }}>Approve budget once</div>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                      Authorize your master Interledger wallet spending limit in one click.
+                    </p>
+                  </div>
+                  <div>
+                    <span className={styles.stepNum}>02</span>
+                    <div style={{ fontWeight: 700, marginBottom: '4px' }}>Add your team</div>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                      Set local currency salaries and receiving wallet pointers.
+                    </p>
+                  </div>
+                  <div>
+                    <span className={styles.stepNum}>03</span>
+                    <div style={{ fontWeight: 700, marginBottom: '4px' }}>Settle in seconds</div>
+                    <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+                      Run batch payroll or let staff withdraw earned wages anytime.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
-          <div className={styles.stepGlass}>
-            <div className={styles.stepNum}>2</div>
-            <h3 style={{ marginBottom: '1rem' }}>Review roster.</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>Taxes and compliance are already calculated.</p>
-          </div>
-          <div className={styles.stepGlass}>
-            <div className={styles.stepNum}>3</div>
-            <h3 style={{ marginBottom: '1rem' }}>Hit send.</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>Funds arrive instantly in local currency.</p>
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* 5. FEATURES AS BENEFITS */}
-      <section id="features" className={styles.section}>
-        <h2 className={styles.sectionTitle}>Built for speed.</h2>
-        <p className={styles.sectionSubtitle}>Everything you need. Nothing you don't.</p>
-        
-        <div className={styles.featuresGrid}>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIconWrapper}><Banknote size={24} color="var(--accent-teal)" /></div>
-            <h3 style={{ marginBottom: '0.75rem' }}>Zero wire fees</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>No intermediary banks. Just direct routes.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIconWrapper}><Zap size={24} color="var(--accent-gold)" /></div>
-            <h3 style={{ marginBottom: '0.75rem' }}>Instant settlement</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>Funds clear in seconds, not days.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIconWrapper}><Scale size={24} color="var(--accent-purple)" /></div>
-            <h3 style={{ marginBottom: '0.75rem' }}>Automated compliance</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>Tax math is calculated automatically.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIconWrapper}><Coins size={24} color="var(--status-success)" /></div>
-            <h3 style={{ marginBottom: '0.75rem' }}>Salary advances</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>Employees can request early payroll.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIconWrapper}><Unlock size={24} color="var(--accent-blue)" /></div>
-            <h3 style={{ marginBottom: '0.75rem' }}>Earned wage access</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>Draw down accrued earnings instantly.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIconWrapper}><GlobeIcon size={24} className={styles.tealIcon} /></div>
-            <h3 style={{ marginBottom: '0.75rem' }}>Open standards</h3>
-            <p style={{ color: 'var(--text-secondary)' }}>Built on Open Payments and Interledger.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* 6. TESTIMONIALS */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Built for builders</h2>
-        
-        <div className={styles.testimonialGrid}>
-          <div className={styles.testimonialCard}>
-            <p className={styles.testimonialText}>
-              "Honestly, it used to take me a full day just to figure out who I was paying and how to get the money to Nigeria. Now I just click a button and go grab breakfast."
-            </p>
-            <div className={styles.testimonialAuthor}>
-              <div className={styles.authorAvatar}></div>
+        {/* 3. FINAL CTA */}
+        <section className={styles.section} style={{ paddingTop: '1rem' }}>
+          <div className="bezel-shell">
+            <div className={`bezel-core ${styles.ctaCore}`}>
               <div>
-                <div style={{ fontWeight: 700 }}>Treasure Anosike</div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Founder</div>
+                <h2 style={{ fontSize: 'clamp(1.6rem, 2.8vw, 2.3rem)', marginBottom: '0.5rem' }}>
+                  Experience both sides in under 60 seconds.
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', maxWidth: '48ch' }}>
+                  No signup required for the interactive walkthrough. Jump straight into the live Employer or Employee workspace.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                <button onClick={() => enterDemo('employer')} className="btn btn-primary btn-lg">
+                  Employer demo
+                  <span className="btn-icon-nest"><ArrowUpRight size={16} strokeWidth={1.75} /></span>
+                </button>
+                <button onClick={() => enterDemo('employee')} className="btn btn-secondary btn-lg">
+                  Employee demo
+                  <span className="btn-icon-nest"><ArrowUpRight size={16} strokeWidth={1.75} /></span>
+                </button>
               </div>
             </div>
           </div>
-          <div className={styles.testimonialCard}>
-            <p className={styles.testimonialText}>
-              "The automatic tax compliance alone is a lifesaver. I don't have to keep a spreadsheet of housing levies for three different countries anymore."
-            </p>
-            <div className={styles.testimonialAuthor}>
-              <div className={styles.authorAvatar}></div>
-              <div>
-                <div style={{ fontWeight: 700 }}>Inioluwa Babarinde</div>
-                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Head of People</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      </main>
 
-      {/* 7. PRICING WITH TRANSPARENCY BIAS */}
-      <section id="pricing" className={styles.section}>
-        <h2 className={styles.sectionTitle}>Simple pricing.</h2>
-        <p className={styles.sectionSubtitle}>No hidden fees.</p>
-
-        {/* Transaction fee pill */}
-        <div className={styles.pricingTxRow}>
-          <div className={styles.pricingTxPill}>
-            <span className={styles.pricingTxLabel}>Transaction Rate</span>
-            <div className={styles.pricingTxDivider}></div>
-            <span className={styles.pricingTxRate}>0.2%</span>
-            <div className={styles.pricingTxDivider}></div>
-            <span className={styles.pricingTxDesc}>On every transaction. No markup, no hidden spreads.</span>
-          </div>
-        </div>
-
-        {/* The 4-card grid */}
-        <div className={styles.pricingGrid}>
-          {/* Free Tier */}
-          <div className={styles.pricingCard}>
-            <div className={styles.pricingTier}>Free</div>
-            <div className={styles.pricingAmount}>
-              <span className={styles.pricingDollar}>$</span>
-              <span className={styles.pricingNum}>0</span>
-              <span className={styles.pricingPer}>/mo</span>
-            </div>
-            <div>
-              <span className={styles.pricingEmployees}>1-10 employees</span>
-            </div>
-            <ul className={styles.pricingFeatures}>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Standard global payroll routing</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Open Payments integration</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Basic tax computation</span>
-              </li>
-            </ul>
-            <Link href="/auth/register" className="btn btn-secondary btn-sm btn-block" style={{ marginTop: 'auto' }}>
-              Get started
-            </Link>
-          </div>
-
-          {/* Pro Tier (Featured) */}
-          <div className={`${styles.pricingCard} ${styles.pricingCardFeatured}`}>
-            <span className={styles.pricingBadge}>Most Popular</span>
-            <div className={styles.pricingTier}>Pro</div>
-            <div className={styles.pricingAmount}>
-              <span className={styles.pricingDollar}>$</span>
-              <span className={styles.pricingNum}>5</span>
-              <span className={styles.pricingPer}>/mo</span>
-            </div>
-            <div>
-              <span className={styles.pricingEmployees}>11-100 employees</span>
-            </div>
-            <ul className={styles.pricingFeatures}>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Everything in Free</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Automated monthly bank pulls</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Advanced multi-currency routing</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Priority support</span>
-              </li>
-            </ul>
-            <Link href="/auth/register" className="btn btn-primary btn-sm btn-block" style={{ marginTop: 'auto' }}>
-              Start Pro trial
-            </Link>
-          </div>
-
-          {/* Premium Tier */}
-          <div className={styles.pricingCard}>
-            <div className={styles.pricingTier}>Premium</div>
-            <div className={styles.pricingAmount}>
-              <span className={styles.pricingDollar}>$</span>
-              <span className={styles.pricingNum}>10</span>
-              <span className={styles.pricingPer}>/mo</span>
-            </div>
-            <div>
-              <span className={styles.pricingEmployees}>101-500 employees</span>
-            </div>
-            <ul className={styles.pricingFeatures}>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Everything in Pro</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>EWA (Earned Wage Access) panel</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Custom compliance reports</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Dedicated account team</span>
-              </li>
-            </ul>
-            <Link href="/auth/register" className="btn btn-secondary btn-sm btn-block" style={{ marginTop: 'auto' }}>
-              Start Premium trial
-            </Link>
-          </div>
-
-          {/* Enterprise Tier */}
-          <div className={styles.pricingCard}>
-            <div className={styles.pricingTier}>Enterprise</div>
-            <div className={styles.pricingCustom}>Custom</div>
-            <div>
-              <span className={styles.pricingEmployees}>501+ employees</span>
-            </div>
-            <ul className={styles.pricingFeatures}>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Tailored transaction rates</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Unlimited employees</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>Dedicated liquidity routing paths</span>
-              </li>
-              <li className={styles.pricingFeatureItem}>
-                <CheckIcon className={styles.pricingCheckIcon} />
-                <span>24/7 SLA support</span>
-              </li>
-            </ul>
-            <Link href="/auth/register" className="btn btn-secondary btn-sm btn-block" style={{ marginTop: 'auto' }}>
-              Contact sales
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. FAQ */}
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>FAQ</h2>
-        
-        <div className={styles.faqSection}>
-          <div className={styles.faqItem}>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>Is it really instant?</div>
-            <div style={{ color: 'var(--text-secondary)' }}>Yep! Because we use the Interledger network, your funds are routed quickly and securely without relying on old bank clearing houses. It takes seconds, not days.</div>
-          </div>
-          <div className={styles.faqItem}>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>How do you handle the taxes?</div>
-            <div style={{ color: 'var(--text-secondary)' }}>We keep our system updated with the latest tax brackets and rules for over 100 countries. When it's time to run payroll, we automatically figure out exactly what needs to be deducted based on where your employee lives.</div>
-          </div>
-          <div className={styles.faqItem}>
-            <div style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem' }}>Does my team need crypto wallets?</div>
-            <div style={{ color: 'var(--text-secondary)' }}>Not at all. They just need a standard account that supports Open Payments, and they'll receive everything in their own local currency.</div>
-          </div>
-        </div>
-      </section>
-
-      {/* 9. FINAL CTA */}
-      <section className={styles.finalCta}>
-        <h2>Ready for payroll?</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.25rem' }}>Join the companies that are paying their global teams instantly.</p>
-        <Link href="/auth/register" className="btn btn-primary btn-lg">
-          Get started
-        </Link>
-      </section>
-
-      {/* Footer */}
       <footer className={styles.footer}>
-        <div className={styles.footerContent}>
-          <div>
-            <div className={styles.navLogo} style={{ marginBottom: '1rem' }}>
-              <div className={styles.logoMark}>
-                <div className={styles.logoRow}><div className={styles.sq}></div><div className={styles.sq}></div></div>
-                <div className={styles.logoRow}><div className={styles.cr}></div><div className={styles.cr}></div></div>
-              </div>
-              <span>Payzati</span>
-            </div>
-            <p style={{ color: 'var(--text-secondary)' }}>Making global payroll actually pleasant.</p>
-            <p style={{ marginTop: '2rem', fontSize: '0.875rem', opacity: 0.7, color: 'var(--text-tertiary)' }}>© 2026 Payzati. Interledger Foundation Grant Submission.</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-            <div>
-              <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: 'var(--text-primary)' }}>Links</h4>
-              <ul style={{ listStyle: 'none', lineHeight: '2' }}>
-                <li><a href="#how-it-works">How it works</a></li>
-                <li><a href="#features">What's inside</a></li>
-                <li><a href="#pricing">Pricing</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 style={{ marginBottom: '1rem', fontSize: '1rem', color: 'var(--text-primary)' }}>Legal</h4>
-              <ul style={{ listStyle: 'none', lineHeight: '2' }}>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms of Service</a></li>
-                <li><a href="#">Compliance</a></li>
-              </ul>
-            </div>
-          </div>
+        <div>
+          <strong style={{ color: 'var(--text-primary)' }}>Payzati</strong> · Global Payroll on Interledger Open Payments
+        </div>
+        <div className={styles.footerLinks}>
+          <Link href="/auth/login">Sign in</Link>
+          <Link href="/auth/register">Create account</Link>
+          <a href="https://ilp.interledger-test.dev/da071cb6" target="_blank" rel="noreferrer">Testnet Master Wallet</a>
         </div>
       </footer>
     </div>

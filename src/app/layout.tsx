@@ -40,7 +40,7 @@ export default function RootLayout({
             }),
           }}
         />
-        <meta name="theme-color" content="#1dbb9c" />
+        <meta name="theme-color" content="#0b6e5c" />
       </head>
       <body>
         <PWARegister />

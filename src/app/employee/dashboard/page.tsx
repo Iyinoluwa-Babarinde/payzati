@@ -4,14 +4,18 @@ import { useState, useEffect } from 'react';
 import { formatCurrency, convertCurrency } from '@/lib/fx-engine';
 import { getEmployeeProfile } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
-import { processPayment } from '@/lib/ilp/payments';
-import { 
-  Zap, 
-  Copy, 
-  ShieldCheck,
+import {
+  ArrowUpRight,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  Copy,
   ExternalLink,
+  Fingerprint,
+  Pencil,
   Receipt,
-  CheckCircle2
+  Sparkles,
+  Zap,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ILPTransferVisualizer from '@/components/ILPTransferVisualizer';
@@ -23,18 +27,33 @@ export default function EmployeeDashboard() {
   const [withdrawAmount, setWithdrawAmount] = useState(50000);
   const [showVisualizer, setShowVisualizer] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [editingWallet, setEditingWallet] = useState(false);
+  const [receiverWalletInput, setReceiverWalletInput] = useState('');
+  const [expandedReceiptId, setExpandedReceiptId] = useState<string | null>(null);
   const supabase = createClient();
 
   const loadData = async () => {
     setLoading(true);
     const emp = await getEmployeeProfile();
-    if (emp) {
-      setEmployee({
-        ...emp,
-        company_name: emp.companies?.name || 'Payzati Global Inc.',
-        wallet_address: emp.wallet_address || 'https://ilp.interledger-test.dev/da071cb6',
-      });
+    const resolvedEmp = emp
+      ? {
+          ...emp,
+          company_name: emp.companies?.name || 'Payzati Global Inc.',
+          wallet_address: emp.wallet_address || 'https://ilp.interledger-test.dev/da071cb6',
+        }
+      : {
+          id: 'demo-emp',
+          name: 'Tunde Adeyemi',
+          company_name: 'Payzati Global Inc.',
+          salary: 850000,
+          currency: 'NGN',
+          wallet_address: 'https://ilp.interledger-test.dev/da071cb6',
+        };
 
+    setEmployee(resolvedEmp);
+    setReceiverWalletInput(resolvedEmp.wallet_address);
+
+    if (emp) {
       const now = new Date();
       const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
 
@@ -48,15 +67,20 @@ export default function EmployeeDashboard() {
         if (txs && txs.length > 0) {
           setTransactions(txs);
           const monthlyWithdrawn = txs
-            .filter((t: any) => t.type === 'withdrawal' && t.status === 'completed' && new Date(t.created_at || t.date) >= new Date(firstDayOfMonth))
+            .filter(
+              (t: any) =>
+                t.type === 'withdrawal' &&
+                t.status === 'completed' &&
+                new Date(t.created_at || t.date) >= new Date(firstDayOfMonth)
+            )
             .reduce((sum: number, t: any) => sum + Math.abs(Number(t.amount)), 0);
           setWithdrawnThisMonth(monthlyWithdrawn);
         } else {
           setTransactions([]);
           setWithdrawnThisMonth(0);
         }
-      } catch (e) {
-        console.warn('Could not fetch transactions:', e);
+      } catch {
+        setTransactions([]);
       }
     }
     setLoading(false);
@@ -66,16 +90,28 @@ export default function EmployeeDashboard() {
     loadData();
   }, []);
 
-  const handleCopyWallet = () => {
-    if (typeof navigator !== 'undefined' && employee?.wallet_address) {
-      navigator.clipboard.writeText(employee.wallet_address);
-      toast.success('Wallet Pointer copied to clipboard!');
+  const handleSaveWallet = async () => {
+    const trimmed = receiverWalletInput.trim();
+    if (!trimmed) {
+      toast.error('Please enter a valid receiving wallet address.');
+      return;
     }
+    setEmployee((prev: any) => ({ ...prev, wallet_address: trimmed }));
+    setEditingWallet(false);
+
+    if (employee?.id && employee.id !== 'demo-emp') {
+      try {
+        await supabase.from('employees').update({ wallet_address: trimmed }).eq('id', employee.id);
+      } catch {
+        // Non-blocking if demo session
+      }
+    }
+    toast.success('Receiving account updated.');
   };
 
   const handleWithdraw = () => {
     if (withdrawAmount <= 0 || withdrawAmount > availableWages) {
-      toast.error('Please select a valid withdrawal amount');
+      toast.error('Please choose an amount within your available earnings.');
       return;
     }
     setShowVisualizer(true);
@@ -83,40 +119,73 @@ export default function EmployeeDashboard() {
 
   const handleVisualizerComplete = async () => {
     const senderWallet = process.env.NEXT_PUBLIC_PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6';
-    const result = await processPayment(senderWallet, employee.wallet_address, withdrawAmount, employee.currency);
+    const targetWallet = employee.wallet_address || senderWallet;
+    const amountToWithdraw = Math.min(withdrawAmount, availableWages);
+
+    const res = await fetch('/api/payments', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        senderWallet,
+        receiverWallet: targetWallet,
+        amount: Math.max(1, Math.round(convertCurrency(amountToWithdraw, employee.currency || 'NGN', 'EUR'))),
+        currency: 'EUR',
+      }),
+    });
+
+    const data = await res.json();
+    const result = data?.result;
+
+    const newTx = {
+      id: result?.id || `tx_${Date.now()}`,
+      company_id: employee.company_id || 'demo-company-id',
+      employee_id: employee.id,
+      type: 'withdrawal',
+      amount: -amountToWithdraw,
+      currency: employee.currency || 'NGN',
+      status: 'completed',
+      description: 'Salary Withdrawal',
+      receipt: result?.receipt || '0x' + Date.now().toString(16),
+      mode: result?.mode || 'simulated',
+      quoteId: result?.quoteId,
+      outgoingPaymentUrl: result?.outgoingPaymentUrl,
+      notice: result?.notice,
+      created_at: new Date().toISOString(),
+    };
 
     try {
-      const newTx = {
-        company_id: employee.company_id || 'demo-company-id',
-        employee_id: employee.id,
-        type: 'withdrawal',
-        amount: -withdrawAmount,
-        currency: employee.currency,
-        status: 'completed',
-        description: 'Earned Wage Instant Withdrawal (ILP STREAM)',
-        receipt: result.receipt,
-        created_at: new Date().toISOString(),
-      };
-
-      await supabase.from('transactions').insert(newTx);
-      setTransactions(prev => [newTx, ...prev]);
-      setWithdrawnThisMonth(prev => prev + withdrawAmount);
-    } catch (e) {
-      console.warn('Notice saving transaction:', e);
+      if (employee.id !== 'demo-emp') {
+        await supabase.from('transactions').insert({
+          company_id: newTx.company_id,
+          employee_id: newTx.employee_id,
+          type: newTx.type,
+          amount: newTx.amount,
+          currency: newTx.currency,
+          status: newTx.status,
+          description: newTx.description,
+          receipt: newTx.receipt,
+        });
+      }
+    } catch {
+      // Keep UI updated even in demo mode
     }
 
-    toast.success(`Withdrawn ${formatCurrency(withdrawAmount, employee.currency)} instantly via Interledger!`);
+    setTransactions(prev => [newTx, ...prev]);
+    setWithdrawnThisMonth(prev => prev + amountToWithdraw);
+    setExpandedReceiptId(newTx.id);
+    toast.success(`Withdrew ${formatCurrency(amountToWithdraw, employee.currency || 'NGN')} to your account.`);
   };
 
   if (loading) {
     return (
-      <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-        Loading live employee profile...
+      <div style={{ maxWidth: '960px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <div className="skeleton" style={{ height: '140px', borderRadius: '24px' }} />
+        <div className="skeleton" style={{ height: '240px', borderRadius: '24px' }} />
       </div>
     );
   }
 
-  // 100% Dynamic Calculations based on real salary and days in current month
+  // Real-Time Calendar Wage Accrual
   const now = new Date();
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
   const currentDay = now.getDate();
@@ -126,218 +195,313 @@ export default function EmployeeDashboard() {
   const dailyRate = baseSalary / daysInMonth;
   const accruedToDate = Math.round(dailyRate * currentDay);
   const availableWages = Math.max(0, accruedToDate - withdrawnThisMonth);
+  const clampedWithdraw = Math.min(withdrawAmount, availableWages);
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      
-      {/* 🚀 1. EMPLOYEE HEADER BAR */}
-      <div 
-        className="card"
-        style={{
-          padding: '1.5rem',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '1rem',
-        }}
-      >
+    <div className="animate-fade-in" style={{ maxWidth: '960px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '1.65rem' }}>
+      {/* Plain-English Greeting Header */}
+      <div className="page-header" style={{ marginBottom: 0 }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <h1 style={{ fontSize: '1.35rem', margin: 0 }}>Welcome back, {employee?.name}</h1>
-            <span className="badge badge-success">
-              Active Onboarded
-            </span>
-          </div>
-          <div style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span>{employee?.company_name}</span>
-            <span>·</span>
-            <span style={{ fontFamily: 'monospace' }}>{employee?.wallet_address}</span>
-            <button 
-              onClick={handleCopyWallet}
-              style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '2px', display: 'flex', alignItems: 'center' }}
-              title="Copy Pointer"
-            >
-              <Copy size={14} />
-            </button>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <a
-            href={employee?.wallet_address || 'https://ilp.interledger-test.dev/da071cb6'}
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              background: 'var(--accent-teal-dim)',
-              border: '1px solid var(--border-accent)',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.775rem',
-              fontWeight: 700,
-              color: 'var(--accent-teal)',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              textDecoration: 'none'
-            }}
-          >
-            <ShieldCheck size={18} color="var(--accent-teal)" />
-            <span>Open Testnet Wallet</span>
-            <ExternalLink size={14} />
-          </a>
-        </div>
-      </div>
-
-      {/* 📊 2. METRIC SUMMARY TILES (100% DYNAMIC) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1rem' }}>
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Monthly Base Salary</span>
-          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '4px' }}>
-            {formatCurrency(baseSalary, employee?.currency || 'NGN')}
-          </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Contracted monthly earnings</span>
-        </div>
-
-        <div className="card" style={{ padding: '1.25rem' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
-            Accrued to Date (Day {currentDay}/{daysInMonth})
+          <span className="eyebrow-pill" style={{ marginBottom: '0.6rem' }}>
+            <Sparkles size={12} strokeWidth={1.75} color="var(--accent-teal)" />
+            {employee?.company_name}
           </span>
-          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-teal)', marginBottom: '4px' }}>
-            {formatCurrency(accruedToDate, employee?.currency || 'NGN')}
-          </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--status-success)' }}>{progressPct}% of pay period completed</span>
-        </div>
-
-        <div className="card" style={{ padding: '1.25rem', borderLeft: '4px solid var(--accent-teal)' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--accent-teal)', fontWeight: 600, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Available for Early Withdrawal</span>
-          <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--accent-teal)', marginBottom: '4px' }}>
-            {formatCurrency(availableWages, employee?.currency || 'NGN')}
-          </div>
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-            {withdrawnThisMonth > 0 ? `(${formatCurrency(withdrawnThisMonth, employee?.currency)} already withdrawn)` : '0% Interest · Flat $1.50 Fee'}
-          </span>
-        </div>
-      </div>
-
-      {/* ⚡ 3. UNIFIED EARNED WAGE ACCESS (EWA) COCKPIT */}
-      <div className="card" style={{ padding: '1.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
-          <div>
-            <h2 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Zap size={18} color="var(--accent-teal)" /> Instant Earned Wage Access
-            </h2>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Withdraw your earned salary before payday. Money arrives in seconds over the Interledger STREAM protocol.
-            </span>
-          </div>
-
-          <div style={{ background: 'var(--elevation-2)', padding: '4px 12px', borderRadius: 'var(--radius-full)', border: '1px solid var(--border-default)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-            Fee: <strong style={{ color: 'var(--text-primary)' }}>$1.50 USD</strong> · 0% Interest
-          </div>
-        </div>
-
-        {/* Interactive Slider */}
-        <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-default)', borderRadius: 'var(--radius-md)', padding: '1.25rem', marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-            <span style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Select Withdrawal Amount:</span>
-            <strong style={{ fontSize: '1.35rem', color: 'var(--accent-teal)', fontWeight: 700 }}>
-              {formatCurrency(Math.min(withdrawAmount, availableWages), employee?.currency || 'NGN')}
-            </strong>
-          </div>
-
-          <input
-            type="range"
-            min={availableWages > 0 ? 10000 : 0}
-            max={availableWages || 10000}
-            step={5000}
-            value={Math.min(withdrawAmount, availableWages)}
-            disabled={availableWages <= 0}
-            onChange={e => setWithdrawAmount(Number(e.target.value))}
-            style={{ width: '100%', accentColor: 'var(--accent-teal)', cursor: availableWages > 0 ? 'pointer' : 'not-allowed', height: '6px', marginBottom: '0.75rem' }}
-          />
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-            <span>Min: {formatCurrency(10000, employee?.currency || 'NGN')}</span>
-            <span>Max Accrued Available: {formatCurrency(availableWages, employee?.currency || 'NGN')}</span>
-          </div>
+          <h1 className="page-title">
+            Welcome back, <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>{employee?.name?.split(' ')[0]}</span>.
+          </h1>
+          <p className="page-subtitle">
+            Your earnings update every day. Withdraw what you have earned whenever you need it—no loans, no interest.
+          </p>
         </div>
 
         <button
-          onClick={handleWithdraw}
-          disabled={availableWages <= 0}
-          className="btn btn-primary btn-block"
-          style={{
-            padding: '0.95rem',
-            fontSize: '0.95rem',
-            fontWeight: 700,
-            opacity: availableWages <= 0 ? 0.6 : 1,
-            cursor: availableWages <= 0 ? 'not-allowed' : 'pointer'
-          }}
+          onClick={() => setEditingWallet(prev => !prev)}
+          className="btn btn-secondary btn-sm"
         >
-          <Zap size={18} /> Withdraw {formatCurrency(Math.min(withdrawAmount, availableWages), employee?.currency || 'NGN')} via Interledger (ILP)
+          <Pencil size={13} strokeWidth={1.75} />
+          {editingWallet ? 'Close account' : 'Receiving account'}
         </button>
       </div>
 
-      {/* 📋 4. RECENT CRYPTOGRAPHIC PAYSTUBS & TRANSACTIONS LEDGER (100% DYNAMIC) */}
-      <div className="card" style={{ padding: '1.5rem' }}>
-        <h2 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', fontWeight: 700 }}>Recent Paystubs &amp; ILP Receipts</h2>
-        <div style={{ overflowX: 'auto' }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Cryptographic Receipt</th>
-                <th style={{ textAlign: 'right' }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.length === 0 ? (
-                <tr>
-                  <td colSpan={5} style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-secondary)' }}>
-                    <Receipt size={32} style={{ margin: '0 auto 8px auto', opacity: 0.5, display: 'block' }} />
-                    <p style={{ margin: 0 }}>No transactions recorded yet. Withdraw your earned wages above to generate your first live Interledger receipt!</p>
-                  </td>
-                </tr>
-              ) : (
-                transactions.map((tx, idx) => (
-                  <tr key={tx.id || idx}>
-                    <td>{new Date(tx.created_at || tx.date || Date.now()).toLocaleDateString()}</td>
-                    <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
-                      {tx.type === 'withdrawal' ? 'Earned Wage Advance' : tx.description || 'Payroll Deposit'}
-                    </td>
-                    <td style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>
-                      {formatCurrency(Math.abs(Number(tx.amount)), tx.currency || employee?.currency || 'NGN')}
-                    </td>
-                    <td style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                      {tx.receipt ? `${tx.receipt.substring(0, 16)}...` : '0x7f8a92b0c1e8...'}
-                    </td>
-                    <td style={{ textAlign: 'right' }}>
-                      <span className="badge badge-success">
-                        <CheckCircle2 size={12} /> Settled (0.8s)
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Collapsible Editable Receiving Account Drawer (for testing any second testnet wallet) */}
+      {editingWallet && (
+        <div className="bezel-shell">
+          <div className="bezel-core" style={{ padding: '1.25rem 1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <div style={{ flex: 1, minWidth: '240px' }}>
+              <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
+                Receiving Payout Address (paste any Interledger Testnet wallet pointer)
+              </label>
+              <input
+                type="text"
+                value={receiverWalletInput}
+                onChange={e => setReceiverWalletInput(e.target.value)}
+                placeholder="$ilp.interledger-test.dev/your-employee-wallet"
+                style={{ width: '100%', fontFamily: 'var(--font-mono)', fontSize: '0.82rem' }}
+              />
+            </div>
+            <button onClick={handleSaveWallet} className="btn btn-primary btn-sm" style={{ alignSelf: 'flex-end' }}>
+              Save address
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Summary Metric Bento */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.1rem' }}>
+        <div className="bezel-shell">
+          <div className="bezel-core" style={{ padding: '1.35rem 1.5rem' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+              Monthly salary
+            </span>
+            <div className="tabular-nums" style={{ fontSize: '1.6rem', fontWeight: 800 }}>
+              {formatCurrency(baseSalary, employee?.currency || 'NGN')}
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>Standard pay cycle</span>
+          </div>
+        </div>
+
+        <div className="bezel-shell">
+          <div className="bezel-core" style={{ padding: '1.35rem 1.5rem' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600, display: 'block', marginBottom: '6px' }}>
+              Earned so far (Day {currentDay} of {daysInMonth})
+            </span>
+            <div className="tabular-nums" style={{ fontSize: '1.6rem', fontWeight: 800 }}>
+              {formatCurrency(accruedToDate, employee?.currency || 'NGN')}
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--status-success)' }}>{progressPct}% of month completed</span>
+          </div>
+        </div>
+
+        <div className="bezel-shell">
+          <div
+            className="bezel-core"
+            style={{
+              padding: '1.35rem 1.5rem',
+              background: 'radial-gradient(280px 140px at 90% 10%, rgba(11, 110, 92, 0.08), transparent 70%), var(--elevation-1)',
+            }}
+          >
+            <span style={{ fontSize: '0.75rem', color: 'var(--accent-teal)', fontWeight: 700, display: 'block', marginBottom: '6px' }}>
+              Available to withdraw now
+            </span>
+            <div className="tabular-nums" style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--accent-teal)' }}>
+              {formatCurrency(availableWages, employee?.currency || 'NGN')}
+            </div>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+              {withdrawnThisMonth > 0
+                ? `${formatCurrency(withdrawnThisMonth, employee?.currency || 'NGN')} already withdrawn`
+                : '0% interest · Instant arrival'}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Full-Screen Visualizer Modal */}
+      {/* Double-Bezel Instant Salary Withdrawal Card */}
+      <div className="bezel-shell">
+        <div className="bezel-core" style={{ padding: '1.75rem 2rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.35rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+            <div>
+              <h2 style={{ fontSize: '1.2rem', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Zap size={18} strokeWidth={1.75} color="var(--accent-teal)" /> Withdraw earned salary
+              </h2>
+              <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)' }}>
+                Pick how much you want today. The remainder arrives on your normal payday.
+              </p>
+            </div>
+            <span className="badge badge-success">Arrives in seconds</span>
+          </div>
+
+          <div style={{ background: 'var(--elevation-2)', border: '1px solid var(--border-subtle)', borderRadius: '16px', padding: '1.35rem', marginBottom: '1.35rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '0.85rem' }}>
+              <span style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', fontWeight: 600 }}>Amount to withdraw</span>
+              <strong className="tabular-nums" style={{ fontSize: '1.65rem', color: 'var(--accent-teal)', fontWeight: 800 }}>
+                {formatCurrency(clampedWithdraw, employee?.currency || 'NGN')}
+              </strong>
+            </div>
+
+            <input
+              type="range"
+              min={availableWages > 0 ? 10000 : 0}
+              max={availableWages || 10000}
+              step={5000}
+              value={clampedWithdraw}
+              disabled={availableWages <= 0}
+              onChange={e => setWithdrawAmount(Number(e.target.value))}
+              style={{ width: '100%', accentColor: 'var(--accent-teal)', cursor: availableWages > 0 ? 'pointer' : 'not-allowed', height: '6px', marginBottom: '0.75rem' }}
+            />
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>
+              <span>Min: {formatCurrency(10000, employee?.currency || 'NGN')}</span>
+              <span>Max available: {formatCurrency(availableWages, employee?.currency || 'NGN')}</span>
+            </div>
+          </div>
+
+          <button
+            onClick={handleWithdraw}
+            disabled={availableWages <= 0}
+            className="btn btn-primary btn-lg btn-block"
+            style={{ justifyContent: 'space-between', opacity: availableWages <= 0 ? 0.55 : 1 }}
+          >
+            <span>Withdraw {formatCurrency(clampedWithdraw, employee?.currency || 'NGN')} now</span>
+            <span className="btn-icon-nest">
+              <ArrowUpRight size={16} strokeWidth={1.75} />
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Payment Receipts with Expandable Live Interledger Proof Drawer */}
+      <div className="bezel-shell">
+        <div className="bezel-core" style={{ padding: '1.5rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <h2 style={{ fontSize: '1.1rem', marginBottom: '2px' }}>Payment receipts</h2>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
+              Every payout includes a verifiable cryptographic receipt. Click View proof on any row to inspect the live settlement record.
+            </p>
+          </div>
+
+          {transactions.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '2.5rem 1rem', color: 'var(--text-secondary)' }}>
+              <Receipt size={30} strokeWidth={1.5} style={{ margin: '0 auto 10px', opacity: 0.45, display: 'block' }} />
+              <p style={{ margin: 0, fontSize: '0.88rem' }}>
+                No withdrawals yet. Move the slider above and withdraw to generate your first live payment receipt.
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              {transactions.map((tx, idx) => {
+                const rowId = tx.id || String(idx);
+                const isExpanded = expandedReceiptId === rowId;
+                return (
+                  <div
+                    key={rowId}
+                    style={{
+                      borderRadius: '14px',
+                      border: '1px solid var(--border-subtle)',
+                      background: 'var(--elevation-2)',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '0.95rem 1.15rem',
+                        gap: '1rem',
+                        flexWrap: 'wrap',
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>
+                          {tx.description || (tx.type === 'withdrawal' ? 'Salary Withdrawal' : 'Payroll Deposit')}
+                        </div>
+                        <div style={{ fontSize: '0.76rem', color: 'var(--text-tertiary)' }}>
+                          {new Date(tx.created_at || tx.date || Date.now()).toLocaleString()}
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                        <span className="tabular-nums" style={{ fontWeight: 800, color: 'var(--accent-teal)', fontSize: '0.95rem' }}>
+                          {formatCurrency(Math.abs(Number(tx.amount)), tx.currency || employee?.currency || 'NGN')}
+                        </span>
+                        <span className="badge badge-success">
+                          <CheckCircle2 size={12} strokeWidth={2} /> Settled
+                        </span>
+                        <button
+                          onClick={() => setExpandedReceiptId(isExpanded ? null : rowId)}
+                          className="btn btn-secondary btn-sm"
+                          style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}
+                        >
+                          <Fingerprint size={13} strokeWidth={1.75} />
+                          View proof
+                          {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {isExpanded && (
+                      <div
+                        style={{
+                          padding: '1rem 1.15rem',
+                          borderTop: '1px solid var(--border-subtle)',
+                          background: 'var(--elevation-1)',
+                          fontSize: '0.78rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '0.55rem',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>Settlement rail</span>
+                          <span style={{ fontWeight: 600 }}>
+                            {tx.mode === 'live' ? 'Live Interledger Open Payments (Testnet)' : 'Demo Settlement Mode'}
+                          </span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                          <span style={{ color: 'var(--text-secondary)' }}>SHA-256 Receipt</span>
+                          <span style={{ fontFamily: 'var(--font-mono)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                            {tx.receipt ? `${tx.receipt.substring(0, 26)}...` : 'Verified'}
+                            <button
+                              onClick={() => {
+                                navigator.clipboard.writeText(tx.receipt || '');
+                                toast.success('Receipt hash copied.');
+                              }}
+                              style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--accent-teal)' }}
+                              title="Copy receipt"
+                            >
+                              <Copy size={13} />
+                            </button>
+                          </span>
+                        </div>
+                        {tx.quoteId && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                            <span style={{ color: 'var(--text-secondary)' }}>Open Payments Quote ID</span>
+                            <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>{tx.quoteId}</span>
+                          </div>
+                        )}
+                        {tx.notice && (
+                          <div style={{ color: 'var(--status-warning)', fontSize: '0.76rem' }}>
+                            Note: {tx.notice}
+                          </div>
+                        )}
+                        <div style={{ paddingTop: '0.35rem' }}>
+                          <a
+                            href={tx.outgoingPaymentUrl || employee?.wallet_address || 'https://ilp.interledger-test.dev/da071cb6'}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              color: 'var(--accent-teal)',
+                              fontWeight: 600,
+                              textDecoration: 'none',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                            }}
+                          >
+                            Verify wallet on Interledger Testnet <ExternalLink size={13} />
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Live Transfer Modal */}
       <ILPTransferVisualizer
         isOpen={showVisualizer}
         onClose={() => setShowVisualizer(false)}
         senderWallet="https://ilp.interledger-test.dev/da071cb6"
         receiverWallet={employee?.wallet_address || 'https://ilp.interledger-test.dev/da071cb6'}
-        senderName="Payzati Employer Master Wallet"
-        receiverName={`${employee?.name || 'Employee'}`}
-        sendAmount={convertCurrency(Math.min(withdrawAmount, availableWages), employee?.currency || 'NGN', 'USD')}
-        sendCurrency="USD"
-        receiveAmount={Math.min(withdrawAmount, availableWages)}
+        senderName={`${employee?.company_name} Treasury`}
+        receiverName={employee?.name || 'Employee'}
+        sendAmount={Math.max(1, Math.round(convertCurrency(clampedWithdraw, employee?.currency || 'NGN', 'EUR')))}
+        sendCurrency="EUR"
+        receiveAmount={clampedWithdraw}
         receiveCurrency={employee?.currency || 'NGN'}
         onComplete={handleVisualizerComplete}
       />

@@ -7,11 +7,11 @@ export async function POST(request: Request) {
 
     if (body.batch && Array.isArray(body.payments)) {
       const senderWallet = body.senderWallet || process.env.PAYZATI_WALLET_ADDRESS || 'https://ilp.interledger-test.dev/da071cb6';
-      const batchResult = await processBatchPayroll(senderWallet, body.payments);
+      const batchResult = await processBatchPayroll(senderWallet, body.payments, { demoMode: !!body.demoMode });
       return NextResponse.json({ success: true, result: batchResult });
     }
 
-    const { senderWallet, receiverWallet, amount, currency } = body;
+    const { senderWallet, receiverWallet, amount, currency, demoMode } = body;
 
     if (!receiverWallet || !amount || !currency) {
       return NextResponse.json(
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid amount' }, { status: 400 });
     }
 
-    const paymentResult = await processPayment(sender, receiverWallet, numAmount, currency);
+    const paymentResult = await processPayment(sender, receiverWallet, numAmount, currency, { demoMode: !!demoMode });
 
     return NextResponse.json({
       success: true,
