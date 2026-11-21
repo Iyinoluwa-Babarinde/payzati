@@ -238,10 +238,10 @@ export default function ILPTransferVisualizer({
                   </div>
                   <div>
                     <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.025em' }}>
-                      Interledger Settlement
+                      {phase === 'settled' ? 'Payment sent' : 'Sending payment'}
                     </h3>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                      Open Payments STREAM Protocol
+                      Instant transfer via Interledger
                     </span>
                   </div>
                 </div>
@@ -252,7 +252,7 @@ export default function ILPTransferVisualizer({
                     padding: '6px 12px',
                     fontSize: '0.72rem',
                     fontWeight: 700,
-                    letterSpacing: '0.04em',
+                    letterSpacing: '0.02em',
                   }}
                 >
                   <span
@@ -264,7 +264,7 @@ export default function ILPTransferVisualizer({
                       display: 'inline-block',
                     }}
                   />
-                  LIVE TESTNET STREAM
+                  Live transfer
                 </span>
               </div>
 
@@ -475,12 +475,12 @@ export default function ILPTransferVisualizer({
                   >
                     <Layers size={16} strokeWidth={1.75} color="var(--accent-teal)" />
                     {phase === 'initiating'
-                      ? 'Resolving Open Payments Pointers...'
+                      ? 'Checking accounts...'
                       : phase === 'grant_quoting'
-                      ? 'Obtaining GNAP Grants & FX Quotes...'
+                      ? 'Locking in exchange rate...'
                       : phase === 'streaming'
-                      ? 'Streaming ILP Packets...'
-                      : 'Settlement Complete!'}
+                      ? 'Moving money...'
+                      : 'Money delivered'}
                   </span>
                   <span
                     className="tabular-nums"
@@ -491,7 +491,7 @@ export default function ILPTransferVisualizer({
                       fontSize: '0.8rem',
                     }}
                   >
-                    {packetsDelivered} / 64 Packets
+                    {progress}%
                   </span>
                 </div>
 
@@ -542,10 +542,10 @@ export default function ILPTransferVisualizer({
                       marginBottom: '6px',
                     }}
                   >
-                    <CheckCircle2 size={17} strokeWidth={2} /> Payment Verified &amp; Cryptographically Settled
+                    <CheckCircle2 size={17} strokeWidth={2} /> Payment delivered &amp; verified
                   </div>
                   <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                    Transaction Resource:{' '}
+                    Transfer ID:{' '}
                     <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-primary)' }}>
                       {transactionId}
                     </span>
@@ -562,7 +562,7 @@ export default function ILPTransferVisualizer({
                     }}
                   >
                     <span>
-                      SHA-256 Receipt:{' '}
+                      Receipt code:{' '}
                       <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent-teal)' }}>
                         {displayReceipt.substring(0, 32)}...
                       </strong>
@@ -581,7 +581,7 @@ export default function ILPTransferVisualizer({
                         fontSize: '0.76rem',
                       }}
                     >
-                      <Copy size={12} /> Copy hash
+                      <Copy size={12} /> Copy receipt
                     </button>
                   </div>
                 </motion.div>
@@ -600,10 +600,10 @@ export default function ILPTransferVisualizer({
                   }}
                 >
                   {phase === 'settled' ? (
-                    'Done & Return to Workspace'
+                    'Done'
                   ) : (
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                      <Zap size={16} className="animate-spin" /> Executing Interledger STREAM Protocol...
+                      <Zap size={16} className="animate-spin" /> Sending payment...
                     </span>
                   )}
                 </button>

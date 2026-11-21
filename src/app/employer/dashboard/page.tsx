@@ -140,14 +140,14 @@ export default function EmployerDashboard() {
         <div>
           <span className="eyebrow-pill" style={{ marginBottom: '0.65rem' }}>
             <Sparkles size={12} strokeWidth={1.75} color="var(--accent-teal)" />
-            {companyName} · Treasury Overview
+            {companyName} · Company overview
           </span>
           <h1 className="page-title">
-            Payroll command,{' '}
-            <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>simplified</span>.
+            Pay your team,{' '}
+            <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>in one click</span>.
           </h1>
           <p className="page-subtitle">
-            Approve your master wallet once, then settle salaries across borders in under a second.
+            Approve your payout budget once, then send salaries anywhere in seconds.
           </p>
         </div>
 
@@ -155,10 +155,10 @@ export default function EmployerDashboard() {
           <button
             onClick={() => {
               setDemoMode(prev => !prev);
-              toast.success(!demoMode ? 'Switched to explicit Demo Mode' : 'Switched to Live Interledger Testnet');
+              toast.success(!demoMode ? 'Demo mode enabled.' : 'Live Interledger mode enabled.');
             }}
             className="btn btn-secondary btn-sm"
-            title="Toggle between live Interledger Testnet and explicit Demo Mode"
+            title="Switch between live transfers and demo mode"
           >
             <span
               style={{
@@ -168,11 +168,11 @@ export default function EmployerDashboard() {
                 background: demoMode ? 'var(--status-warning)' : 'var(--status-success)',
               }}
             />
-            {demoMode ? 'Demo Mode (Simulated)' : 'Live Testnet Mode'}
+            {demoMode ? 'Demo mode' : 'Live mode'}
           </button>
 
           <Link href="/employer/payroll" className="btn btn-primary btn-sm">
-            Run batch payroll
+            Pay whole team
             <ArrowUpRight size={15} strokeWidth={1.75} />
           </Link>
         </div>
@@ -190,28 +190,28 @@ export default function EmployerDashboard() {
             gap: '1.5rem',
             flexWrap: 'wrap',
             background:
-              'radial-gradient(520px 240px at 92% 0%, rgba(11, 110, 92, 0.08), transparent 68%), var(--elevation-1)',
+              'radial-gradient(520px 240px at 92% 0%, rgba(13, 143, 104, 0.08), transparent 68%), var(--elevation-1)',
           }}
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.55rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                Master Interledger Wallet
+                Company payout wallet
               </span>
               {budgetApproved ? (
                 <span className="badge badge-success">
-                  <CheckCircle2 size={12} strokeWidth={2} /> Budget Approved on Testnet
+                  <CheckCircle2 size={12} strokeWidth={2} /> Budget ready
                 </span>
               ) : (
                 <span className="badge badge-warning">
-                  <ShieldAlert size={12} strokeWidth={2} /> Budget Approval Needed for Live Transfers
+                  <ShieldAlert size={12} strokeWidth={2} /> Approval needed for live payouts
                 </span>
               )}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.75rem', flexWrap: 'wrap' }}>
               <span className="tabular-nums" style={{ fontSize: '1.9rem', fontWeight: 800, letterSpacing: '-0.03em' }}>
-                {stats.walletAsset} Live Node
+                {stats.walletAsset} Wallet · Connected
               </span>
               <a
                 href="https://ilp.interledger-test.dev/da071cb6"
@@ -233,8 +233,8 @@ export default function EmployerDashboard() {
 
             <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', maxWidth: '58ch' }}>
               {budgetApproved
-                ? 'Your master wallet grant is active. Payments settle automatically over Interledger Open Payments.'
-                : 'Click Approve Payroll Budget once to authorize Payzati on Interledger Testnet so real money moves between wallets.'}
+                ? 'Your company wallet is approved. Payments go out instantly.'
+                : 'Approve your company wallet once so Payzati can send live payments automatically.'}
             </p>
           </div>
 
@@ -245,7 +245,7 @@ export default function EmployerDashboard() {
               className="btn btn-primary btn-lg"
             >
               <KeyRound size={16} strokeWidth={1.75} />
-              {approving ? 'Opening Interledger...' : budgetApproved ? 'Re-approve budget' : 'Approve payroll budget'}
+              {approving ? 'Opening wallet...' : budgetApproved ? 'Update budget' : 'Approve payout budget'}
               <span className="btn-icon-nest">
                 <ArrowUpRight size={15} strokeWidth={1.75} />
               </span>

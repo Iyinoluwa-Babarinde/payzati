@@ -2,45 +2,34 @@
 
 import React, { useState, useEffect } from 'react';
 import { getFXQuote, formatCurrency, FXQuote } from '@/lib/fx-engine';
-import { ArrowRightLeft, RefreshCw, Zap, ShieldCheck, CheckCircle, Sparkles } from 'lucide-react';
+import { ArrowUpDown, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', flag: '🇺🇸' },
+  { code: 'GBP', name: 'British Pound', flag: '🇬🇧' },
+  { code: 'EUR', name: 'Euro', flag: '🇪🇺' },
   { code: 'NGN', name: 'Nigerian Naira', flag: '🇳🇬' },
   { code: 'KES', name: 'Kenyan Shilling', flag: '🇰🇪' },
   { code: 'GHS', name: 'Ghanaian Cedi', flag: '🇬🇭' },
   { code: 'ZAR', name: 'South African Rand', flag: '🇿🇦' },
   { code: 'EGP', name: 'Egyptian Pound', flag: '🇪🇬' },
-  { code: 'GBP', name: 'British Pound', flag: '🇬🇧' },
-  { code: 'EUR', name: 'Euro', flag: '🇪🇺' },
 ];
 
 export default function LiveFXQuoteWidget() {
-  const [fromCurrency, setFromCurrency] = useState('USD');
+  const [fromCurrency, setFromCurrency] = useState('GBP');
   const [toCurrency, setToCurrency] = useState('NGN');
   const [amount, setAmount] = useState<number>(1000);
   const [quote, setQuote] = useState<FXQuote | null>(null);
-  const [loading, setLoading] = useState(false);
   const [testingPayment, setTestingPayment] = useState(false);
 
-  const fetchQuote = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const newQuote = getFXQuote(fromCurrency, toCurrency, amount);
-      setQuote(newQuote);
-      setLoading(false);
-    }, 250);
-  };
-
   useEffect(() => {
-    fetchQuote();
+    setQuote(getFXQuote(fromCurrency, toCurrency, amount));
   }, [fromCurrency, toCurrency, amount]);
 
   const handleSwap = () => {
-    const temp = fromCurrency;
     setFromCurrency(toCurrency);
-    setToCurrency(temp);
+    setToCurrency(fromCurrency);
   };
 
   const handleTestQuotePayment = async () => {
@@ -51,19 +40,19 @@ export default function LiveFXQuoteWidget() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          receiverWallet: `https://ilp.interledger-test.dev/demo-${toCurrency.toLowerCase()}`,
+          receiverWallet: `https://ilp.interledger-test.dev/da071cb6`,
           amount: quote.toAmount,
           currency: toCurrency,
         }),
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Demo payment of ${formatCurrency(quote.toAmount, toCurrency)} settled via Interledger!`);
+        toast.success(`Sent ${formatCurrency(quote.toAmount, toCurrency)} in under a second.`);
       } else {
-        toast.error('Payment simulation failed.');
+        toast.error('Could not send test payment. Please try again.');
       }
-    } catch (e) {
-      toast.error('Failed to trigger payment simulation.');
+    } catch {
+      toast.error('Connection issue. Please try again.');
     } finally {
       setTestingPayment(false);
     }
@@ -72,96 +61,67 @@ export default function LiveFXQuoteWidget() {
   return (
     <div
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: '24px',
-        padding: '2rem',
-        color: '#ffffff',
-        boxShadow: '0 20px 50px rgba(0,0,0,0.3)',
-        maxWidth: '520px',
-        margin: '0 auto',
+        background: 'var(--elevation-2)',
+        border: '1px solid var(--border-subtle)',
+        borderRadius: '18px',
+        padding: '1.25rem',
+        width: '100%',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div
-            style={{
-              background: 'linear-gradient(135deg, #1dbb9c 0%, #00d4aa 100%)',
-              borderRadius: '10px',
-              padding: '6px',
-              display: 'flex',
-            }}
-          >
-            <Sparkles size={18} color="#0d1117" />
-          </div>
-          <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#fff' }}>Live FX Rate Quote</h3>
-        </div>
-        <button
-          onClick={fetchQuote}
-          disabled={loading}
-          style={{
-            background: 'rgba(255,255,255,0.08)',
-            border: 'none',
-            borderRadius: '10px',
-            padding: '8px 12px',
-            color: '#aaa',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '0.8rem',
-            transition: 'all 0.2s ease',
-          }}
+      {/* You send */}
+      <div style={{ marginBottom: '0.65rem' }}>
+        <label
+          htmlFor="fx-send-amount"
+          style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}
         >
-          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh
-        </button>
-      </div>
-
-      {/* Amount Input */}
-      <div style={{ marginBottom: '1.25rem' }}>
-        <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px' }}>Send Amount</label>
+          You send
+        </label>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            background: 'rgba(15,23,42,0.6)',
-            border: '1px solid rgba(255,255,255,0.15)',
+            background: 'var(--elevation-1)',
+            border: '1px solid var(--border-default)',
             borderRadius: '14px',
-            padding: '0.75rem 1rem',
+            padding: '0.55rem 0.75rem',
+            gap: '0.5rem',
           }}
         >
           <input
+            id="fx-send-amount"
             type="number"
             value={amount}
             onChange={(e) => setAmount(Math.max(1, Number(e.target.value)))}
+            className="tabular-nums"
             style={{
               background: 'transparent',
               border: 'none',
               outline: 'none',
-              color: '#fff',
-              fontSize: '1.5rem',
+              boxShadow: 'none',
+              color: 'var(--text-primary)',
+              fontSize: '1.35rem',
               fontWeight: 700,
               width: '100%',
+              padding: '0.2rem 0.25rem',
             }}
           />
           <select
+            aria-label="Send currency"
             value={fromCurrency}
             onChange={(e) => setFromCurrency(e.target.value)}
             style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.15)',
+              background: 'var(--elevation-2)',
+              border: '1px solid var(--border-default)',
               borderRadius: '10px',
-              color: '#fff',
-              padding: '6px 12px',
+              color: 'var(--text-primary)',
+              padding: '0.45rem 0.65rem',
               fontWeight: 600,
-              fontSize: '0.95rem',
-              outline: 'none',
+              fontSize: '0.85rem',
               cursor: 'pointer',
             }}
           >
             {CURRENCIES.map((c) => (
-              <option key={c.code} value={c.code} style={{ background: '#0f172a', color: '#fff' }}>
+              <option key={c.code} value={c.code}>
                 {c.flag} {c.code}
               </option>
             ))}
@@ -169,61 +129,67 @@ export default function LiveFXQuoteWidget() {
         </div>
       </div>
 
-      {/* Swap Button */}
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '-0.5rem 0 0.75rem 0' }}>
+      {/* Swap */}
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '-0.35rem 0' }}>
         <button
+          type="button"
           onClick={handleSwap}
+          aria-label="Swap currencies"
           style={{
-            background: 'linear-gradient(135deg, #1dbb9c 0%, #00d4aa 100%)',
-            border: 'none',
+            background: 'var(--elevation-1)',
+            border: '1px solid var(--border-default)',
             borderRadius: '50%',
-            width: '36px',
-            height: '36px',
+            width: '32px',
+            height: '32px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            boxShadow: '0 4px 14px rgba(0,212,170,0.4)',
+            color: 'var(--text-primary)',
+            boxShadow: 'var(--shadow-sm)',
             zIndex: 2,
           }}
         >
-          <ArrowRightLeft size={16} color="#0d1117" />
+          <ArrowUpDown size={14} strokeWidth={1.75} />
         </button>
       </div>
 
-      {/* Receive Amount */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px' }}>Recipient Takes Home</label>
+      {/* They receive */}
+      <div style={{ marginBottom: '1rem' }}>
+        <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '6px' }}>
+          They receive
+        </span>
         <div
           style={{
             display: 'flex',
             alignItems: 'center',
-            background: 'rgba(15,23,42,0.6)',
-            border: '1px solid rgba(0,212,170,0.3)',
+            background: 'var(--elevation-1)',
+            border: '1px solid var(--border-accent)',
             borderRadius: '14px',
-            padding: '0.75rem 1rem',
+            padding: '0.55rem 0.75rem',
+            gap: '0.5rem',
           }}
         >
-          <div style={{ width: '100%', fontSize: '1.5rem', fontWeight: 700, color: '#00d4aa' }}>
-            {quote ? formatCurrency(quote.toAmount, toCurrency) : '...'}
+          <div className="tabular-nums" style={{ width: '100%', fontSize: '1.35rem', fontWeight: 800, color: 'var(--accent-teal)', padding: '0.2rem 0.25rem' }}>
+            {quote ? formatCurrency(quote.toAmount, toCurrency) : '—'}
           </div>
           <select
+            aria-label="Receive currency"
             value={toCurrency}
             onChange={(e) => setToCurrency(e.target.value)}
             style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.15)',
+              background: 'var(--elevation-2)',
+              border: '1px solid var(--border-default)',
               borderRadius: '10px',
-              color: '#fff',
-              padding: '6px 12px',
+              color: 'var(--text-primary)',
+              padding: '0.45rem 0.65rem',
               fontWeight: 600,
-              fontSize: '0.95rem',
-              outline: 'none',
+              fontSize: '0.85rem',
               cursor: 'pointer',
             }}
           >
             {CURRENCIES.map((c) => (
-              <option key={c.code} value={c.code} style={{ background: '#0f172a', color: '#fff' }}>
+              <option key={c.code} value={c.code}>
                 {c.flag} {c.code}
               </option>
             ))}
@@ -231,64 +197,41 @@ export default function LiveFXQuoteWidget() {
         </div>
       </div>
 
-      {/* FX Rate & Fee Breakdown */}
+      {/* Simple rate summary */}
       {quote && (
         <div
           style={{
-            background: 'rgba(255,255,255,0.03)',
-            borderRadius: '14px',
-            padding: '1rem',
-            marginBottom: '1.5rem',
-            border: '1px solid rgba(255,255,255,0.06)',
-            fontSize: '0.85rem',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '0.5rem',
+            fontSize: '0.78rem',
+            color: 'var(--text-secondary)',
+            marginBottom: '1rem',
+            padding: '0 0.25rem',
           }}
         >
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: '#cbd5e1' }}>
-            <span>Exchange Rate</span>
-            <span>1 {fromCurrency} = {quote.effectiveRate} {toCurrency}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', color: '#cbd5e1' }}>
-            <span>Payzati Spread (Transparent)</span>
-            <span style={{ color: '#00d4aa' }}>0.2% (vs 3-5% traditional bank)</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', color: '#cbd5e1' }}>
-            <span>Settlement Rail</span>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#38bdf8' }}>
-              <Zap size={13} /> Interledger Open Payments
-            </span>
-          </div>
+          <span className="tabular-nums">
+            1 {fromCurrency} = <strong style={{ color: 'var(--text-primary)' }}>{quote.effectiveRate} {toCurrency}</strong>
+          </span>
+          <span style={{ color: 'var(--accent-teal)', fontWeight: 600 }}>Arrives in ~1 second</span>
         </div>
       )}
 
-      {/* Action Button */}
       <button
+        type="button"
         onClick={handleTestQuotePayment}
         disabled={testingPayment || !quote}
-        style={{
-          width: '100%',
-          background: 'linear-gradient(135deg, #1dbb9c 0%, #00d4aa 100%)',
-          color: '#0d1117',
-          border: 'none',
-          borderRadius: '14px',
-          padding: '1rem',
-          fontWeight: 700,
-          fontSize: '1rem',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '8px',
-          boxShadow: '0 8px 24px rgba(0,212,170,0.3)',
-          transition: 'all 0.2s ease',
-        }}
+        className="btn btn-primary btn-block"
       >
         {testingPayment ? (
           <>
-            <RefreshCw size={18} className="animate-spin" /> Processing Interledger Settlement...
+            <RefreshCw size={15} className="animate-spin" /> Sending test transfer...
           </>
         ) : (
           <>
-            <ShieldCheck size={18} /> Test Instant Quote Settlement
+            <CheckCircle2 size={15} strokeWidth={1.75} /> Send test transfer
           </>
         )}
       </button>

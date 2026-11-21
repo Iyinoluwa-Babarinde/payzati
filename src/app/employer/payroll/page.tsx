@@ -228,10 +228,10 @@ export default function PayrollPage() {
   }
 
   const stepsList = [
-    { num: 1, title: 'Select Team' },
-    { num: 2, title: 'Review Deductions' },
-    { num: 3, title: 'Treasury Check' },
-    { num: 4, title: 'Settlement' },
+    { num: 1, title: 'Pick team' },
+    { num: 2, title: 'Check taxes' },
+    { num: 3, title: 'Confirm total' },
+    { num: 4, title: 'Done' },
   ];
 
   return (
@@ -241,13 +241,13 @@ export default function PayrollPage() {
         <div>
           <span className="eyebrow-pill" style={{ marginBottom: '0.6rem' }}>
             <Sparkles size={12} strokeWidth={1.75} color="var(--accent-teal)" />
-            Open Payments Batch Pipeline
+            Monthly payroll
           </span>
           <h1 className="page-title">
-            Run <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>Payroll</span>
+            Pay everyone <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>at once</span>.
           </h1>
           <p className="page-subtitle">
-            Disburse salaries worldwide with near-zero network fees and automatic statutory tax calculations.
+            Send salaries to your whole team in four quick steps—taxes calculated automatically.
           </p>
         </div>
       </div>
@@ -672,7 +672,7 @@ export default function PayrollPage() {
                 onClick={handleStartPayroll}
               >
                 <Play size={14} fill="currentColor" />
-                <span>Broadcast Payments Now</span>
+                <span>Send pay now</span>
                 <span className="btn-icon-nest">
                   <ArrowUpRight size={15} strokeWidth={2} />
                 </span>

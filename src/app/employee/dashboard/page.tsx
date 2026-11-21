@@ -236,7 +236,7 @@ export default function EmployeeDashboard() {
           <div className="bezel-core" style={{ padding: '1.25rem 1.5rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: '240px' }}>
               <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '4px' }}>
-                Receiving Payout Address (paste any Interledger Testnet wallet pointer)
+                Where your money lands (wallet address)
               </label>
               <input
                 type="text"
@@ -439,13 +439,13 @@ export default function EmployeeDashboard() {
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                          <span style={{ color: 'var(--text-secondary)' }}>Settlement rail</span>
+                          <span style={{ color: 'var(--text-secondary)' }}>Payment network</span>
                           <span style={{ fontWeight: 600 }}>
-                            {tx.mode === 'live' ? 'Live Interledger Open Payments (Testnet)' : 'Demo Settlement Mode'}
+                            {tx.mode === 'live' ? 'Interledger (Live Testnet)' : 'Demo mode'}
                           </span>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                          <span style={{ color: 'var(--text-secondary)' }}>SHA-256 Receipt</span>
+                          <span style={{ color: 'var(--text-secondary)' }}>Receipt ID</span>
                           <span style={{ fontFamily: 'var(--font-mono)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                             {tx.receipt ? `${tx.receipt.substring(0, 26)}...` : 'Verified'}
                             <button

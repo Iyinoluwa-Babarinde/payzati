@@ -105,7 +105,7 @@ export default function LandingPage() {
           <div className={`${styles.heroLeft} animate-fade-in`}>
             <span className="eyebrow-pill">
               <Sparkles size={12} strokeWidth={1.75} color="var(--accent-teal)" />
-              Interledger Open Payments · Live Testnet
+              Instant global payroll · Powered by Interledger
             </span>
 
             <h1 className={styles.heroTitle}>
@@ -114,19 +114,19 @@ export default function LandingPage() {
             </h1>
 
             <p className={styles.heroSubtitle}>
-              Pay remote teams across Nigeria, Kenya, Ghana, and worldwide without 5-day bank wires or 8% FX markups. Employees see their salary arrive in local currency—zero crypto knowledge required.
+              Send salaries across Nigeria, Kenya, Ghana, and worldwide in seconds. No 5-day bank delays, no hidden fees, and nothing technical for your team to learn.
             </p>
 
             <div className={styles.heroCTAs}>
               <button onClick={() => enterDemo('employer')} className="btn btn-primary btn-lg">
-                Launch employer demo
+                Try as an employer
                 <span className="btn-icon-nest">
                   <ArrowUpRight size={16} strokeWidth={1.75} />
                 </span>
               </button>
 
               <button onClick={() => enterDemo('employee')} className="btn btn-secondary btn-lg">
-                Preview employee view
+                Try as an employee
                 <span className="btn-icon-nest">
                   <ArrowUpRight size={16} strokeWidth={1.75} />
                 </span>
@@ -135,16 +135,16 @@ export default function LandingPage() {
 
             <div className={styles.trustStrip}>
               <div className={styles.trustStat}>
-                <span className={styles.trustValue}>0.8s</span>
-                <span className={styles.trustLabel}>Avg. settlement time</span>
+                <span className={styles.trustValue}>~1 sec</span>
+                <span className={styles.trustLabel}>Time to arrive</span>
               </div>
               <div className={styles.trustStat}>
                 <span className={styles.trustValue}>$0.02</span>
-                <span className={styles.trustLabel}>Protocol network fee</span>
+                <span className={styles.trustLabel}>Transfer fee</span>
               </div>
               <div className={styles.trustStat}>
                 <span className={styles.trustValue}>100%</span>
-                <span className={styles.trustLabel}>Verifiable ILP receipts</span>
+                <span className={styles.trustLabel}>Instant receipts</span>
               </div>
             </div>
           </div>
@@ -294,13 +294,13 @@ export default function LandingPage() {
         {/* 2. ASYMMETRICAL BENTO GRID */}
         <section id="features" className={styles.section}>
           <div className={styles.sectionHeader}>
-            <span className="eyebrow-pill">Built for real operators</span>
+            <span className="eyebrow-pill">Simple by design</span>
             <h2 className={styles.sectionTitle}>
-              Payroll infrastructure that{' '}
-              <span className="serif-accent">disappears</span> into the background.
+              Pay your team like they live{' '}
+              <span className="serif-accent">next door</span>.
             </h2>
             <p className={styles.sectionLead}>
-              Employers approve one payroll budget. Employees withdraw what they have earned in plain everyday language—while Interledger handles cross-currency settlement behind the scenes.
+              Approve your monthly budget once. Your team gets paid in their local currency and can withdraw what they have earned anytime.
             </p>
           </div>
 
@@ -309,9 +309,9 @@ export default function LandingPage() {
               <div className={`bezel-core ${styles.bentoInner}`}>
                 <div>
                   <Globe2 size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
-                  <h3 className={styles.bentoHeading}>Real-time FX quotes, zero hidden spreads</h3>
+                  <h3 className={styles.bentoHeading}>See the exact amount they get</h3>
                   <p className={styles.bentoText}>
-                    See the exact local amount your team receives before a single cent leaves your master wallet.
+                    No surprise deductions or hidden exchange markups. What you see here is what lands in their account.
                   </p>
                 </div>
                 <LiveFXQuoteWidget />
@@ -322,14 +322,14 @@ export default function LandingPage() {
               <div className={`bezel-core ${styles.bentoInner}`}>
                 <div>
                   <Zap size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
-                  <h3 className={styles.bentoHeading}>Earned wage access, built in</h3>
+                  <h3 className={styles.bentoHeading}>Get paid as you work</h3>
                   <p className={styles.bentoText}>
-                    Workers don&apos;t need to wait 30 days for payday or take high-interest loans. Accrued earnings update daily and withdraw in one tap.
+                    No need to wait until the end of the month when rent or bills come early. Workers can withdraw earned pay in one tap—with zero interest.
                   </p>
                 </div>
                 <div style={{ padding: '1.1rem', borderRadius: '14px', background: 'var(--elevation-2)', border: '1px solid var(--border-subtle)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '8px' }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Pay cycle progress</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>Month progress</span>
                     <span className="tabular-nums" style={{ fontWeight: 700, color: 'var(--accent-teal)' }}>Day 21 of 30</span>
                   </div>
                   <div style={{ height: '6px', borderRadius: '9999px', background: 'var(--elevation-3)', overflow: 'hidden' }}>
@@ -343,13 +343,13 @@ export default function LandingPage() {
               <div className={`bezel-core ${styles.bentoInner}`}>
                 <div>
                   <Fingerprint size={22} strokeWidth={1.5} color="var(--accent-teal)" style={{ marginBottom: '0.85rem' }} />
-                  <h3 className={styles.bentoHeading}>Cryptographic audit receipts</h3>
+                  <h3 className={styles.bentoHeading}>Instant proof for every payment</h3>
                   <p className={styles.bentoText}>
-                    Every payout generates a verifiable Open Payments Outgoing Payment ID, Quote ID, and SHA-256 receipt tucked cleanly into a proof drawer.
+                    Every transfer creates a verified receipt automatically—easy to read for employees, and ready to audit for finance teams.
                   </p>
                 </div>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', padding: '0.85rem 1rem', borderRadius: '12px', background: 'var(--elevation-2)', color: 'var(--text-secondary)' }}>
-                  POST /outgoing-payments · 201 Created
+                  Receipt saved · Verified on Interledger
                 </div>
               </div>
             </div>
@@ -357,32 +357,32 @@ export default function LandingPage() {
             <div className={`bezel-shell ${styles.col7}`} id="how-it-works">
               <div className={`bezel-core ${styles.bentoInner}`}>
                 <div>
-                  <h3 className={styles.bentoHeading}>Three steps from wallet to payday</h3>
+                  <h3 className={styles.bentoHeading}>Three steps to payday</h3>
                   <p className={styles.bentoText}>
-                    Designed so a first-time user understands every action without reading a manual.
+                    Set up in minutes. Anyone on your team can use it right away.
                   </p>
                 </div>
 
                 <div className={styles.stepsGrid}>
                   <div>
                     <span className={styles.stepNum}>01</span>
-                    <div style={{ fontWeight: 700, marginBottom: '4px' }}>Approve budget once</div>
+                    <div style={{ fontWeight: 700, marginBottom: '4px' }}>Connect your wallet</div>
                     <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                      Authorize your master Interledger wallet spending limit in one click.
+                      Approve your company payout limit once.
                     </p>
                   </div>
                   <div>
                     <span className={styles.stepNum}>02</span>
                     <div style={{ fontWeight: 700, marginBottom: '4px' }}>Add your team</div>
                     <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                      Set local currency salaries and receiving wallet pointers.
+                      Enter their local currency salary and payout address.
                     </p>
                   </div>
                   <div>
                     <span className={styles.stepNum}>03</span>
-                    <div style={{ fontWeight: 700, marginBottom: '4px' }}>Settle in seconds</div>
+                    <div style={{ fontWeight: 700, marginBottom: '4px' }}>Send pay in seconds</div>
                     <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                      Run batch payroll or let staff withdraw earned wages anytime.
+                      Pay everyone at once, or let staff withdraw early.
                     </p>
                   </div>
                 </div>
