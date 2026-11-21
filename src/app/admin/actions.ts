@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { getAuthenticatedClient, getUnauthenticatedClient, normalizePaymentPointer } from '@/lib/ilp/client';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 
-export async function initiateMasterAuthorization(limitAmount: number = 1000, originUrl?: string) {
+export async function initiateMasterAuthorization(limitAmount: number = 50000, originUrl?: string) {
   const rawMasterWallet = process.env.PAYZATI_WALLET_ADDRESS;
   if (!rawMasterWallet) throw new Error('PAYZATI_WALLET_ADDRESS is not configured in environment variables.');
 

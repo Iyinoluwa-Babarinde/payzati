@@ -60,8 +60,13 @@ export default function PayrollPage() {
             .eq('company_id', comp.id)
             .eq('status', 'active');
           if (emps && emps.length > 0) {
-            setEmployees(emps);
-            setSelected(emps.map((e) => e.id));
+            const hasAmara = emps.some((e: any) =>
+              (e.wallet_address || '').toLowerCase().includes('/amara') ||
+              (e.name || '').toLowerCase().includes('amara')
+            );
+            const merged = hasAmara ? emps : [DEFAULT_DEMO_TEAM[0], ...emps];
+            setEmployees(merged);
+            setSelected(merged.map((e: any) => e.id));
           } else {
             const demoEmps = [
               {
@@ -185,7 +190,7 @@ export default function PayrollPage() {
 
     let settledPayments: any[] = [];
     try {
-      const res = await processBatchPayroll(senderWallet, payments, { demoMode: true });
+      const res = await processBatchPayroll(senderWallet, payments, { demoMode: false });
       settledPayments = res.payments || [];
     } catch {
       settledPayments = payments.map((p, idx) => ({

@@ -37,9 +37,9 @@ export default function EmployerDashboard() {
   const [loading, setLoading] = useState(false);
   const [companyName, setCompanyName] = useState('Payzati Global Inc.');
   const [masterWalletPointer, setMasterWalletPointer] = useState('$ilp.interledger-test.dev/payzati');
-  const [budgetApproved, setBudgetApproved] = useState(true);
+  const [budgetApproved, setBudgetApproved] = useState(false);
   const [approving, setApproving] = useState(false);
-  const [demoMode, setDemoMode] = useState(true);
+  const [demoMode, setDemoMode] = useState(false);
   const [showExpressVisualizer, setShowExpressVisualizer] = useState(false);
   const [selectedRecipient, setSelectedRecipient] = useState<any>(null);
   const [customReceiverWallet, setCustomReceiverWallet] = useState('');
@@ -96,14 +96,19 @@ export default function EmployerDashboard() {
       }
 
       if (empsRes.status === 'fulfilled' && empsRes.value.data && empsRes.value.data.length > 0) {
-        const emps = empsRes.value.data;
-        setEmployees(emps);
-        saveStoredTeam(emps);
-        const uniqueCountries = new Set(emps.map((e: any) => e.country).filter(Boolean));
-        const totalMonthly = emps.reduce((sum: number, e: any) => sum + Number(e.salary || 0), 0);
+        const remoteEmps = empsRes.value.data;
+        const hasAmara = remoteEmps.some((e: any) =>
+          (e.wallet_address || '').toLowerCase().includes('/amara') ||
+          (e.name || '').toLowerCase().includes('amara')
+        );
+        const merged = hasAmara ? remoteEmps : [DEFAULT_DEMO_TEAM[0], ...remoteEmps];
+        setEmployees(merged);
+        saveStoredTeam(merged);
+        const uniqueCountries = new Set(merged.map((e: any) => e.country).filter(Boolean));
+        const totalMonthly = merged.reduce((sum: number, e: any) => sum + Number(e.salary || 0), 0);
         setStats(prev => ({
           ...prev,
-          totalEmployees: emps.length,
+          totalEmployees: merged.length,
           countries: uniqueCountries.size,
           monthlyPayroll: totalMonthly,
         }));
@@ -120,7 +125,7 @@ export default function EmployerDashboard() {
   const handleApproveBudget = async () => {
     setApproving(true);
     try {
-      const redirectUrl = await initiateMasterAuthorization(1000, window.location.origin);
+      const redirectUrl = await initiateMasterAuthorization(50000, window.location.origin);
       if (redirectUrl) {
         window.location.href = redirectUrl;
       }
@@ -483,9 +488,9 @@ export default function EmployerDashboard() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   senderWallet: 'https://ilp.interledger-test.dev/payzati',
-                  receiverWallet: customReceiverWallet || selectedRecipient.wallet_address,
-                  amount: Math.max(1, Math.round(Number(selectedRecipient.salary || 50) / 1600)),
-                  currency: stats.walletAsset,
+                  receiverWallet: customReceiverWallet || selectedRecipient.wallet_address || 'https://ilp.interledger-test.dev/amara',
+                  amount: selectedRecipient.currency === 'CAD' ? 25 : Math.max(5, Math.round(Number(selectedRecipient.salary || 50) / 1600)),
+                  currency: selectedRecipient.currency || 'CAD',
                   demoMode,
                 }),
               });
