@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { formatCurrency } from '@/lib/fx-engine';
-import { DEFAULT_DEMO_TEAM, appendStoredTransaction } from '@/lib/demo-ledger';
+import { DEFAULT_DEMO_TEAM, getStoredTeam, saveStoredTeam, appendStoredTransaction } from '@/lib/demo-ledger';
 import { getCompany } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/client';
 import { getAdminConfigStatus, initiateMasterAuthorization } from '@/app/admin/actions';
@@ -45,6 +45,23 @@ export default function EmployerDashboard() {
   const [customReceiverWallet, setCustomReceiverWallet] = useState('');
 
   useEffect(() => {
+    const syncLocalTeam = () => {
+      const localTeam = getStoredTeam();
+      setEmployees(localTeam);
+      const uniqueCountries = new Set(localTeam.map((e: any) => e.country).filter(Boolean));
+      const totalMonthly = localTeam.reduce((sum: number, e: any) => sum + Number(e.salary || 0), 0);
+      setStats(prev => ({
+        ...prev,
+        totalEmployees: localTeam.length,
+        countries: uniqueCountries.size,
+        monthlyPayroll: totalMonthly,
+      }));
+    };
+
+    syncLocalTeam();
+    window.addEventListener('payzati:sync', syncLocalTeam);
+    window.addEventListener('storage', syncLocalTeam);
+
     async function loadData() {
       const supabase = createClient();
 
@@ -81,6 +98,7 @@ export default function EmployerDashboard() {
       if (empsRes.status === 'fulfilled' && empsRes.value.data && empsRes.value.data.length > 0) {
         const emps = empsRes.value.data;
         setEmployees(emps);
+        saveStoredTeam(emps);
         const uniqueCountries = new Set(emps.map((e: any) => e.country).filter(Boolean));
         const totalMonthly = emps.reduce((sum: number, e: any) => sum + Number(e.salary || 0), 0);
         setStats(prev => ({
@@ -93,6 +111,10 @@ export default function EmployerDashboard() {
     }
 
     loadData();
+    return () => {
+      window.removeEventListener('payzati:sync', syncLocalTeam);
+      window.removeEventListener('storage', syncLocalTeam);
+    };
   }, []);
 
   const handleApproveBudget = async () => {
@@ -303,8 +325,8 @@ export default function EmployerDashboard() {
         <Link href="/employer/compliance" className="bezel-shell" style={{ textDecoration: 'none' }}>
           <div className="bezel-core" style={{ padding: '1.15rem 1.25rem', height: '100%' }}>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent-teal)' }}>STEP 02</span>
-            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', margin: '4px 0' }}>Automatic tax compliance</div>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>Canada CRA, Nigeria PAYE, Kenya &amp; Ghana taxes calculated automatically.</p>
+            <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)', margin: '4px 0' }}>External tax APIs</div>
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: 0 }}>Powered by certified tax APIs (Avalara, TaxJar &amp; local providers).</p>
           </div>
         </Link>
 

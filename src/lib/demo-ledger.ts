@@ -63,6 +63,35 @@ export const DEFAULT_DEMO_TEAM = [
 ];
 
 const STORAGE_KEY = 'payzati_live_txs';
+const TEAM_STORAGE_KEY = 'payzati_live_team';
+
+function emitSync() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('payzati:sync'));
+  }
+}
+
+export function getStoredTeam(): any[] {
+  if (typeof window === 'undefined') return DEFAULT_DEMO_TEAM;
+  try {
+    const raw = localStorage.getItem(TEAM_STORAGE_KEY);
+    if (!raw) return DEFAULT_DEMO_TEAM;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_DEMO_TEAM;
+  } catch {
+    return DEFAULT_DEMO_TEAM;
+  }
+}
+
+export function saveStoredTeam(team: any[]) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(TEAM_STORAGE_KEY, JSON.stringify(team));
+    emitSync();
+  } catch {
+    // Ignore storage quota errors
+  }
+}
 
 export function getStoredTransactions(): DemoTransaction[] {
   if (typeof window === 'undefined') return [];
@@ -82,6 +111,7 @@ export function appendStoredTransaction(tx: DemoTransaction) {
     const existing = getStoredTransactions();
     const deduped = [tx, ...existing.filter((t) => t.id !== tx.id)].slice(0, 50);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(deduped));
+    emitSync();
   } catch {
     // Ignore storage quota errors
   }

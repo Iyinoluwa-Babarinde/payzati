@@ -18,6 +18,7 @@ import {
 import { createClient } from '@/lib/supabase/client';
 import { getCompany } from '@/lib/supabase/queries';
 import { calculateTax } from '@/lib/tax-engine';
+import { getStoredTeam } from '@/lib/demo-ledger';
 import { formatCurrency } from '@/lib/fx-engine';
 
 // Custom Vector SVG Flags (no emojis)
@@ -142,7 +143,7 @@ const SCHEME_PREVIEWS = [
 ];
 
 export default function CompliancePage() {
-  const [employees, setEmployees] = useState<any[]>([]);
+  const [employees, setEmployees] = useState<any[]>(() => getStoredTeam());
   const [transactions, setTransactions] = useState<any[]>([]);
   const [companyId, setCompanyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -262,8 +263,8 @@ export default function CompliancePage() {
       <div className="animate-fade-in" style={{ maxWidth: '960px', margin: '0 auto' }}>
         <div className="page-header" style={{ marginBottom: '2rem' }}>
           <div>
-            <h1 className="page-title">Tax & Compliance</h1>
-            <p className="page-subtitle">No more tax headaches. We calculate local taxes and file them automatically so you don&apos;t have to.</p>
+            <h1 className="page-title">Tax Compliance</h1>
+            <p className="page-subtitle">Powered by certified external tax APIs — including Avalara, TaxJar, and local statutory providers.</p>
           </div>
         </div>
 

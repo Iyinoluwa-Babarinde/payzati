@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { SUPPORTED_COUNTRIES } from '@/lib/tax-engine';
 import { formatCurrency } from '@/lib/fx-engine';
-import { DEFAULT_DEMO_TEAM } from '@/lib/demo-ledger';
+import { DEFAULT_DEMO_TEAM, getStoredTeam, saveStoredTeam } from '@/lib/demo-ledger';
 import { createClient } from '@/lib/supabase/client';
 import { getCompany } from '@/lib/supabase/queries';
 import { toast } from 'sonner';
@@ -84,6 +84,7 @@ export default function EmployeesPage() {
   const supabase = createClient();
 
   useEffect(() => {
+    setEmployees(getStoredTeam());
     async function fetchEmployees() {
       const comp = await getCompany();
       if (comp) {
@@ -180,12 +181,24 @@ export default function EmployeesPage() {
       }).select().single();
 
       if (!error && data) {
-        setEmployees(prev => [...prev, data]);
+        setEmployees(prev => {
+          const updated = [...prev, data];
+          saveStoredTeam(updated);
+          return updated;
+        });
       } else {
-        setEmployees(prev => [...prev, newEmpObj]);
+        setEmployees(prev => {
+          const updated = [...prev, newEmpObj];
+          saveStoredTeam(updated);
+          return updated;
+        });
       }
     } catch (e) {
-      setEmployees(prev => [...prev, newEmpObj]);
+      setEmployees(prev => {
+        const updated = [...prev, newEmpObj];
+        saveStoredTeam(updated);
+        return updated;
+      });
     }
 
     setNewEmp({ name: '', email: '', country: 'Nigeria', currency: 'NGN', salary: '' });

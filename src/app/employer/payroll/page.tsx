@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { calculateTax } from '@/lib/tax-engine';
 import { formatCurrency, convertCurrency } from '@/lib/fx-engine';
-import { DEFAULT_DEMO_TEAM, appendStoredTransaction } from '@/lib/demo-ledger';
+import { DEFAULT_DEMO_TEAM, getStoredTeam, appendStoredTransaction } from '@/lib/demo-ledger';
 import { createClient } from '@/lib/supabase/client';
 import { getCompany } from '@/lib/supabase/queries';
 import { processBatchPayroll } from '@/lib/ilp/payments';
@@ -44,6 +44,10 @@ export default function PayrollPage() {
   const supabase = createClient();
 
   useEffect(() => {
+    const localTeam = getStoredTeam();
+    setEmployees(localTeam);
+    setSelected(localTeam.map((e: any) => e.id));
+
     async function loadData() {
       const comp = await getCompany();
       if (comp) {
@@ -264,7 +268,7 @@ export default function PayrollPage() {
             Pay everyone <span className="serif-accent" style={{ color: 'var(--accent-teal)' }}>at once</span>.
           </h1>
           <p className="page-subtitle">
-            Send salaries to your whole team in four quick steps—taxes calculated automatically.
+            Send salaries to your whole team in four quick steps—tax estimates synced via external APIs (Avalara, TaxJar &amp; local providers).
           </p>
         </div>
       </div>
